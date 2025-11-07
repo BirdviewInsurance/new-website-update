@@ -13,8 +13,7 @@ export interface GlobalAgentFormForm {
   city: string;
   company_name: string;
   company_number: string;
-  const {
-      title: string;
+  title: string;
   country: number;
   dateofbirth: string;
   eimail: string;
@@ -104,20 +103,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       workbook = XLSX.read(fileBuffer, { type: 'buffer' });
       worksheet = workbook.Sheets['Global Agent Data'] || XLSX.utils.aoa_to_sheet([
         ['Title', 'First Name', 'Middle Name', 'Last Name', 'Gender', 'Mobile No', 'Postal Address',
-         'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
-         'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number']
+          'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
+          'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number']
       ]);
     } else {
       workbook = XLSX.utils.book_new();
       worksheet = XLSX.utils.aoa_to_sheet([
         ['Title', 'First Name', 'Middle Name', 'Last Name', 'Gender', 'Mobile No', 'Postal Address',
-         'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
-         'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number']
+          'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
+          'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number']
       ]);
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Global Agent Data');
     }
 
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
     existingData.push([
       title, firstname, middlename, lastname, gender, mobileno, postal_address,
       idtype, idno, pin_no, dateofbirth, country, city, eimail,
@@ -138,8 +137,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         user: "customerservice@birdviewinsurance.com",
         pass: "B!rdv!ew@2024",
       },
-        logger: true,
-        debug: true,
+      logger: true,
+      debug: true,
     });
 
     const mailOptions = {
@@ -161,8 +160,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (emailError) {
       console.error("⚠️ Email failed to send:", emailError);
       const pendingEmailsPath = path.join(publicDir, 'pending_emails.json');
-      let pendingEmails = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
-      pendingEmails = JSON.parse(pendingEmails);
+      let pendingEmails: any[] = JSON.parse(await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]'));
       pendingEmails.push(mailOptions);
       await fs.writeFile(pendingEmailsPath, JSON.stringify(pendingEmails, null, 2));
       return res.status(202).json({ message: 'Agent submitted, email pending', fileUrl });

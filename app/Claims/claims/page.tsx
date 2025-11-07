@@ -82,32 +82,15 @@ const ClaimForm: React.FC = () => {
       });
 
       if (res.status === 200) {
-        toast({
-          title: "Claim Submitted",
-          description: res.data.message || "Your claim has been received.",
-          color: "success",
-          variant: "solid",
-          placement: "top-right",
-        });
+        (toast as any).success((res.data as any).message || "Your claim has been received.");
         handleReset();
       } else {
-        toast({
-          title: "Submission Failed",
-          description: res.data.error || "Something went wrong.",
-          color: "danger",
-          variant: "solid",
-          placement: "top-right",
-        });
+        (toast as any).error((res.data as any).error || "Something went wrong.");
       }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description:
-          error.response?.data?.error || error.message || "Submission error",
-        color: "danger",
-        variant: "solid",
-        placement: "top-right",
-      });
+      (toast as any).error(
+        error.response?.data?.error || error.message || "Submission error"
+      );
     } finally {
       setLoaderIcon(false);
     }

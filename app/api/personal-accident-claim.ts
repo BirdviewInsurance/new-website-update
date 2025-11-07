@@ -3,9 +3,9 @@ import nodemailer from "nodemailer";
 import PDFDocument from "pdfkit";
 
 // Helper: Convert PDFKit stream → Buffer
-function streamToBuffer(stream) {
+function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-        const chunks = [];
+        const chunks: Uint8Array[] = [];
         stream.on("data", (chunk) => chunks.push(chunk));
         stream.on("end", () => resolve(Buffer.concat(chunks)));
         stream.on("error", reject);
@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         doc.moveDown(1.5);
 
         // 🔹 Section helper
-        const drawSection = (title) => {
+        const drawSection = (title: string) => {
             doc.rect(50, doc.y, doc.page.width - 100, 25).fillAndStroke(gray, primaryColor);
             doc.fillColor(primaryColor).fontSize(14).text(title, 60, doc.y - 18);
             doc.moveDown(2);
@@ -146,7 +146,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Rows
         let y = startY + rowHeight;
-        scale.forEach(([disability, percent], i) => {
+        scale.forEach((row: string[], i: number) => {
+            const [disability, percent] = row;
             const fill = i % 2 === 0 ? "#ffffff" : "#f0f4ff";
             doc.rect(startX, y, col1Width + col2Width, rowHeight).fill(fill).stroke();
             doc.fillColor("black").text(disability, startX + 5, y + 7, { width: col1Width - 10 });
@@ -183,7 +184,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         res.status(200).json({ success: true, message: "Claim submitted successfully ✅" });
-    } catch (error) {
+    } catch (error: any) {
         console.error("❌ Error in claim API:", error);
         res.status(500).json({ error: "Error processing claim" });
     }

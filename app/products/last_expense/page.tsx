@@ -41,9 +41,10 @@ const LastExpenses: React.FC = () => {
                 const response = await axios.get(
                     "https://snownet-customer-quotation-server.onrender.com/api/underwriting/quotation/onlineQuotation/products/exchangeRate/"
                 );
-                const ratesArray = response.data?.data || [];
+                const responseData = response.data as any;
+                const data = responseData?.data || [];
                 const ratesMap: ExchangeRates = {};
-                for (let item of ratesArray) {
+                for (let item of data) {
                     if (item.currency && item.x_rate) {
                         ratesMap[item.currency] = parseFloat(item.x_rate);
                     }

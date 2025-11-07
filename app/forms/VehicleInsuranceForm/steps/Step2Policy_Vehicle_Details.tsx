@@ -14,7 +14,12 @@ import {
   Button,
 } from "@heroui/react";
 
-const Step2PolicyDetails = ({ formData = {}, updateFormData = () => { } }) => {
+interface Step2PolicyDetailsProps {
+  formData?: Record<string, any>;
+  updateFormData?: (data: Record<string, any>) => void;
+}
+
+const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, updateFormData = () => { } }) => {
   // 🔹 Helper: safely add months
   const addMonths = (date: string, months: number) => {
     const d = new Date(date);
@@ -246,18 +251,24 @@ const Step2PolicyDetails = ({ formData = {}, updateFormData = () => { } }) => {
 
               <Select
                 label="Year Of Manufacture"
-                selectedKeys={[formData.yearOfMake || ""]}
-                onChange={(e) => updateFormData({ yearOfMake: e.target.value })}
+                selectedKeys={formData.yearOfMake ? [String(formData.yearOfMake)] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  updateFormData({ yearOfMake: selected });
+                }}
               >
-                <SelectItem key="">Select Year</SelectItem>
-                {Array.from(
-                  { length: new Date().getFullYear() - 1976 + 1 },
-                  (_, i) => 1976 + i
-                )
-                  .reverse()
-                  .map((year) => (
-                    <SelectItem key={year}>{year}</SelectItem>
-                  ))}
+                {[
+                  <SelectItem key="select-year">Select Year</SelectItem>,
+                  ...Array.from(
+                    { length: new Date().getFullYear() - 1976 + 1 },
+                    (_, i) => 1976 + i
+                  )
+                    .reverse()
+                    .map((year) => {
+                      const yearStr = String(year);
+                      return <SelectItem key={yearStr}>{yearStr}</SelectItem>;
+                    })
+                ]}
               </Select>
 
               <Input

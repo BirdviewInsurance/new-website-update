@@ -1,9 +1,47 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
+
+// Helper to parse formidable multipart form data in an async/await style
+import { IncomingForm } from 'formidable';
+function parseForm(req: NextApiRequest): Promise<{ fields: any; files: any; }> {
+  return new Promise((resolve, reject) => {
+    const form = new IncomingForm({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) return reject(err);
+      resolve({ fields, files });
+    });
+  });
+}
+
 import * as fs from 'fs/promises';
 import * as XLSX from 'xlsx';
 import path from 'path';
-import { IncomingForm } from 'formidable';
+
+interface Dependant {
+  relationship: string;
+  firstName: string;
+  idnos: string;
+  title?: string;
+  middleName?: string;
+  surname?: string;
+  idtypes?: string;
+  dob?: string;
+  gendere?: string;
+  countrye?: string;
+  cities?: string;
+}
+
+interface Beneficiary {
+  relationship: string;
+  beneficiary_fullname: string;
+  title?: string;
+  dob?: string;
+  phone_number?: string;
+  beneficiary_address?: string;
+  beneficiary_email?: string;
+}
+
+type SheetMatrix = any[][];
 
 export const config = {
   api: {
@@ -26,12 +64,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const form = new IncomingForm({ multiples: true, uploadDir, keepExtensions: true });
 
-    const { fields, files } = await new Promise((resolve, reject) => {
+    const { fields, files } = await new Promise<{ fields: Record<string, any>; files: any }>((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);
         else resolve({ fields, files });
       });
-    });
+    }) as { fields: Record<string, any>; files: any };
 
     console.log("📝 Raw fields received:", fields);
 
@@ -41,23 +79,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       mobileno, eimail, family_option, option,
     } = fields;
 
-    let dependantsData = [];
+    let dependantsData: Dependant[] = [];
     try {
-      dependantsData = JSON.parse(fields.dependantsData || '[]');
+      dependantsData = typeof fields.dependantsData === 'string' 
+        ? JSON.parse(fields.dependantsData || '[]') 
+        : Array.isArray(fields.dependantsData) ? fields.dependantsData : [];
       console.log("👨‍👩‍👧 Dependants parsed:", dependantsData);
     } catch (err) {
       console.warn("⚠️ Invalid dependantsData JSON");
     }
 
-    let beneficiariesData = [];
+    let beneficiariesData: Beneficiary[] = [];
     try {
-      beneficiariesData = JSON.parse(fields.beneficiariesData || '[]');
+      beneficiariesData = typeof fields.beneficiariesData === 'string'
+        ? JSON.parse(fields.beneficiariesData || '[]')
+        : Array.isArray(fields.beneficiariesData) ? fields.beneficiariesData : [];
       console.log("🎯 Beneficiaries parsed:", beneficiariesData);
     } catch (err) {
       console.warn("⚠️ Invalid beneficiariesData JSON");
     }
 
-    let workbook;
+    let workbook: XLSX.WorkBook;
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
     if (fileBuffer) {
       workbook = XLSX.read(fileBuffer, { type: 'buffer' });
@@ -70,8 +112,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'Last Name', 'Middle Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender',
       'Country', 'City', 'Address', 'Mobile Number', 'Email', 'Family Option', 'Option'
     ];
-    let memberSheetData = workbook.Sheets['Member Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Member Details'], { header: 1 })
+    let memberSheetData: SheetMatrix = workbook.Sheets['Member Details']
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets['Member Details'], { header: 1 }) as SheetMatrix)
       : [memberHeaders];
 
     memberSheetData.push([
@@ -90,11 +132,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'Member Id No', 'ID', 'Relationship', 'Title', 'First Name', 'Middle Name',
       'Last Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender', 'Country', 'City'
     ];
-    let depSheetData = workbook.Sheets['Dependants Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Dependants Details'], { header: 1 })
+    let depSheetData: SheetMatrix = workbook.Sheets['Dependants Details']
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets['Dependants Details'], { header: 1 }) as SheetMatrix)
       : [depHeaders];
 
-    dependantsData.forEach((dep, index) => {
+    dependantsData.forEach((dep: Dependant, index: number) => {
       if (!dep || !dep.relationship || !dep.firstName || !dep.idnos) {
         console.warn(`⚠️ Skipping invalid dependant at index ${index}`, dep);
         return;
@@ -116,11 +158,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'Member Id No', 'ID', 'Relationship', 'Title', 'Full Name',
       'Date Of Birth', 'Phone Number', 'Address', 'Email'
     ];
-    let benSheetData = workbook.Sheets['Beneficiaries Info']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Beneficiaries Info'], { header: 1 })
+    let benSheetData: SheetMatrix = workbook.Sheets['Beneficiaries Info']
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets['Beneficiaries Info'], { header: 1 }) as SheetMatrix)
       : [benHeaders];
 
-    beneficiariesData.forEach((ben, index) => {
+    beneficiariesData.forEach((ben: Beneficiary, index: number) => {
       if (!ben || !ben.relationship || !ben.beneficiary_fullname) {
         console.warn(`⚠️ Skipping invalid beneficiary at index ${index}`, ben);
         return;
@@ -153,29 +195,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    const attachments = [
+    const attachments: NonNullable<nodemailer.SendMailOptions['attachments']> = [
       {
         filename: 'south-east-kent-kenyans.xlsx',
         content: updatedBuffer,
       },
     ];
 
-    const uploads = files.supportingDocuments;
+    const uploads = (files as any)?.supportingDocuments;
     if (uploads) {
       const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
-      uploadArray.forEach(file => {
+      uploadArray.forEach((file: any) => {
         attachments.push({
-          filename: file.originalFilename,
+          filename: file.originalFilename || 'document',
           path: file.filepath,
         });
       });
     }
 
-    const adminMailOptions = {
+    const adminMailOptions: nodemailer.SendMailOptions = {
       from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
       to: ['Gkangwana@birdviewinsurance.com', 'pkihuria@birdviewinsurance.com',
           'customerservice@birdviewinsurance.com', 'akinyanjui@birdviewinsurance.com'],
-      subject: `Updated Member Details from ${memberidno} - ${firstname}`,
+      subject: `Updated Member Details from ${memberidno || ''} - ${firstname || ''}`,
       text: `Please find the updated Excel sheet.\nDownload link:\n${fileUrl}`,
       attachments,
     };
@@ -206,12 +248,12 @@ Thank you for your submission.
 - Option : ${option}
 
 📌 DEPENDANTS
-${dependantsData.length > 0 ? dependantsData.map((d, i) => `
+${dependantsData.length > 0 ? dependantsData.map((d: Dependant, i: number) => `
 Dependant ${i + 1}:
 - ${d.relationship} - ${d.title || ''} ${d.firstName} ${d.middleName || ''} ${d.surname || ''}`).join('\n') : 'None'}
 
 📌 BENEFICIARIES
-${beneficiariesData.length > 0 ? beneficiariesData.map((b, i) => `
+${beneficiariesData.length > 0 ? beneficiariesData.map((b: Beneficiary, i: number) => `
 Beneficiary ${i + 1}:
 - ${b.relationship} - ${b.title || ''} ${b.beneficiary_fullname}
 - Phone: ${b.phone_number || ''} | Email: ${b.beneficiary_email || ''}`).join('\n') : 'None'}
@@ -243,8 +285,8 @@ Birdview Insurance`.trim();
     }
 
     return res.status(200).json({ message: 'Form sent successfully', fileUrl, reset: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error in handler:", error);
-    return res.status(500).json({ error: error.message || 'Unknown server error' });
+    return res.status(500).json({ error: error?.message || 'Unknown server error' });
   }
 }

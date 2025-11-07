@@ -48,9 +48,9 @@ const HospitalCash = () => {
                 const response = await axios.get(
                     "https://snownet-customer-quotation-server.onrender.com/api/underwriting/quotation/onlineQuotation/products/exchangeRate/"
                 );
-                const ratesArray = response.data?.data || [];
+                const data = (response.data as any)?.data || [];
                 const ratesMap: Record<string, number> = {};
-                for (let item of ratesArray) {
+                for (let item of data) {
                     if (item.currency && item.x_rate) {
                         ratesMap[item.currency] = parseFloat(item.x_rate);
                     }

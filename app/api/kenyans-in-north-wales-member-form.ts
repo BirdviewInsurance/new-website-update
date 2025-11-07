@@ -1,161 +1,218 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
-import * as fs from 'fs/promises';
-import * as XLSX from 'xlsx';
-import path from 'path';
-import { IncomingForm } from 'formidable';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { IncomingForm, type Fields, type Files, type Options } from "formidable";
+import nodemailer from "nodemailer";
+import * as fs from "fs/promises";
+import * as XLSX from "xlsx";
+import path from "path";
 
+// Required for formidable with Next.js
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const publicDir = path.join(process.cwd(), 'public');
-  const uploadDir = path.join(publicDir, 'uploads');
-  const filePath = path.join(publicDir, 'kenyans_in_north_wales_member_details.xlsx');
+// ----------------------------
+// ✅ Formidable Parse Helper
+// ----------------------------
+function parseForm(
+  req: NextApiRequest,
+  options: Partial<Options> = {}
+): Promise<{ fields: Fields; files: Files }> {
+  return new Promise((resolve, reject) => {
+    const form = new IncomingForm({
+      multiples: true,
+      keepExtensions: true,
+      ...options,
+    });
 
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
+
+// ----------------------------
+// ✅ MAIN HANDLER
+// ----------------------------
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   try {
+    const publicDir = path.join(process.cwd(), "public");
+    const uploadDir = path.join(publicDir, "uploads");
+    const filePath = path.join(
+      publicDir,
+      "kenyans_in_north_wales_member_details.xlsx"
+    );
+
     await fs.mkdir(uploadDir, { recursive: true });
 
-    const form = new IncomingForm({ multiples: true, uploadDir, keepExtensions: true });
-
-    const { fields, files } = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve({ fields, files });
-      });
+    // ✅ Parse form-data
+    const { fields, files } = await parseForm(req, {
+      uploadDir,
     });
 
-    console.log("📝 Raw fields received:", fields);
+    // ----------------------------
+    // ✅ Extract Clean Fields
+    // ----------------------------
+    const getField = (key: string): string => {
+      const value = fields[key];
 
-    const {
-      memberidno, groupname, groupnumber, title, firstname, lastname,
-      middlename, idtype, idno, dateofbirth, gender, country, city, address,
-      mobileno, eimail, family_option, option,
-    } = fields;
+      if (value === undefined || value === null) return "";
 
-    let dependantsData = [];
-    try {
-      dependantsData = JSON.parse(fields.dependantsData || '[]');
-      console.log("👨‍👩‍👧 Dependants parsed:", dependantsData);
-    } catch (err) {
-      console.warn("⚠️ Invalid dependantsData JSON");
-    }
+      if (Array.isArray(value)) {
+        const v = value[0];
+        return typeof v === "string" ? v : "";
+      }
 
-    let beneficiariesData = [];
-    try {
-      beneficiariesData = JSON.parse(fields.beneficiariesData || '[]');
-      console.log("🎯 Beneficiaries parsed:", beneficiariesData);
-    } catch (err) {
-      console.warn("⚠️ Invalid beneficiariesData JSON");
-    }
+      return typeof value === "string" ? value : "";
+    };
 
+
+    const memberidno = getField("memberidno");
+    const firstname = getField("firstname");
+    const lastname = getField("lastname");
+    const middlename = getField("middlename");
+
+    const groupname = getField("groupname");
+    const groupnumber = getField("groupnumber");
+    const title = getField("title");
+
+    const idtype = getField("idtype");
+    const idno = getField("idno");
+
+    const dateofbirth = getField("dateofbirth");
+    const gender = getField("gender");
+    const country = getField("country");
+    const city = getField("city");
+    const address = getField("address");
+
+    const mobileno = getField("mobileno");
+    const eimail = getField("eimail");
+    const family_option = getField("family_option");
+    const option = getField("option");
+
+    // ----------------------------
+    // ✅ Parse Dependants & Beneficiaries JSON
+    // ----------------------------
+    const dependantsData = JSON.parse(getField("dependantsData") || "[]") as any[];
+    const beneficiariesData = JSON.parse(getField("beneficiariesData") || "[]") as any[];
+
+    // ----------------------------
+    // ✅ Load or Create Excel Workbook
+    // ----------------------------
     let workbook;
-    const fileBuffer = await fs.readFile(filePath).catch(() => null);
-    if (fileBuffer) {
-      workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    } else {
-      workbook = XLSX.utils.book_new();
-    }
+    const buffer = await fs.readFile(filePath).catch(() => null);
 
+    workbook = buffer
+      ? XLSX.read(buffer, { type: "buffer" })
+      : XLSX.utils.book_new();
+
+    // ----------------------------
+    // ✅ MEMBER SHEET
+    // ----------------------------
     const memberHeaders = [
-      'Member Id Number', 'Group Name', 'Group Number', 'Title', 'First Name',
-      'Last Name', 'Middle Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender',
-      'Country', 'City', 'Address', 'Mobile Number', 'Email', 'Family Option', 'Option'
+      "Member Id Number", "Group Name", "Group Number", "Title", "First Name",
+      "Last Name", "Middle Name", "ID Type", "ID Number", "Date Of Birth", "Gender",
+      "Country", "City", "Address", "Mobile Number", "Email", "Family Option", "Option"
     ];
-    let memberSheetData = workbook.Sheets['Member Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Member Details'], { header: 1 })
+
+    let memberSheetData: any[][] = workbook.Sheets["Member Details"]
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Member Details"], { header: 1 }) as any[][])
       : [memberHeaders];
 
     memberSheetData.push([
       memberidno, groupname, groupnumber, title, firstname, lastname, middlename,
       idtype, idno, dateofbirth, gender, country, city, address,
-      mobileno, eimail, family_option, option
+      mobileno, eimail, family_option, option,
     ]);
 
-    const memberSheet = XLSX.utils.aoa_to_sheet(memberSheetData);
-    workbook.Sheets['Member Details'] = memberSheet;
-    if (!workbook.SheetNames.includes('Member Details')) {
-      XLSX.utils.book_append_sheet(workbook, memberSheet, 'Member Details');
-    }
+    workbook.Sheets["Member Details"] = XLSX.utils.aoa_to_sheet(memberSheetData);
+    if (!workbook.SheetNames.includes("Member Details"))
+      XLSX.utils.book_append_sheet(workbook, workbook.Sheets["Member Details"], "Member Details");
 
+    // ----------------------------
+    // ✅ DEPENDANTS SHEET
+    // ----------------------------
     const depHeaders = [
-      'Member Id No', 'ID', 'Relationship', 'Title', 'First Name', 'Middle Name',
-      'Last Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender', 'Country', 'City'
+      "Member Id No", "ID", "Relationship", "Title", "First Name",
+      "Middle Name", "Last Name", "ID Type", "ID Number", "Date Of Birth",
+      "Gender", "Country", "City"
     ];
-    let depSheetData = workbook.Sheets['Dependants Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Dependants Details'], { header: 1 })
+
+    let depSheetData: any[][] = workbook.Sheets["Dependants Details"]
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Dependants Details"], { header: 1 }) as any[][])
       : [depHeaders];
 
-    dependantsData.forEach((dep, index) => {
-      if (!dep || !dep.relationship || !dep.firstName || !dep.idnos) {
-        console.warn(`⚠️ Skipping invalid dependant at index ${index}`, dep);
-        return;
-      }
+    dependantsData.forEach((d, i) => {
+      if (!d.relationship || !d.firstName || !d.idnos) return;
+
       depSheetData.push([
-        memberidno, depSheetData.length, dep.relationship, dep.title || '',
-        dep.firstName, dep.middleName || '', dep.surname || '',
-        dep.idtypes, dep.idnos, dep.dob, dep.gendere, dep.countrye, dep.cities
+        memberidno, depSheetData.length, d.relationship, d.title || "",
+        d.firstName, d.middleName || "", d.surname || "",
+        d.idtypes, d.idnos, d.dob, d.gendere, d.countrye, d.cities,
       ]);
     });
 
-    const depSheet = XLSX.utils.aoa_to_sheet(depSheetData);
-    workbook.Sheets['Dependants Details'] = depSheet;
-    if (!workbook.SheetNames.includes('Dependants Details')) {
-      XLSX.utils.book_append_sheet(workbook, depSheet, 'Dependants Details');
-    }
+    workbook.Sheets["Dependants Details"] = XLSX.utils.aoa_to_sheet(depSheetData);
+    if (!workbook.SheetNames.includes("Dependants Details"))
+      XLSX.utils.book_append_sheet(workbook, workbook.Sheets["Dependants Details"], "Dependants Details");
 
+    // ----------------------------
+    // ✅ BENEFICIARIES SHEET
+    // ----------------------------
     const benHeaders = [
-      'Member Id No', 'ID', 'Relationship', 'Title', 'Full Name',
-      'Date Of Birth', 'Phone Number', 'Address', 'Email'
+      "Member Id No", "ID", "Relationship", "Title", "Full Name",
+      "Date Of Birth", "Phone Number", "Address", "Email",
     ];
-    let benSheetData = workbook.Sheets['Beneficiaries Info']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Beneficiaries Info'], { header: 1 })
+
+    let benSheetData: any[][] = workbook.Sheets["Beneficiaries Info"]
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Beneficiaries Info"], { header: 1 }) as any[][])
       : [benHeaders];
 
-    beneficiariesData.forEach((ben, index) => {
-      if (!ben || !ben.relationship || !ben.beneficiary_fullname) {
-        console.warn(`⚠️ Skipping invalid beneficiary at index ${index}`, ben);
-        return;
-      }
+    beneficiariesData.forEach((b, i) => {
+      if (!b.relationship || !b.beneficiary_fullname) return;
+
       benSheetData.push([
-        memberidno, benSheetData.length, ben.relationship, ben.title || '',
-        ben.beneficiary_fullname, ben.dob, ben.phone_number || '',
-        ben.beneficiary_address || '', ben.beneficiary_email || ''
+        memberidno, benSheetData.length, b.relationship, b.title || "",
+        b.beneficiary_fullname, b.dob,
+        b.phone_number || "", b.beneficiary_address || "", b.beneficiary_email || "",
       ]);
     });
 
-    const benSheet = XLSX.utils.aoa_to_sheet(benSheetData);
-    workbook.Sheets['Beneficiaries Info'] = benSheet;
-    if (!workbook.SheetNames.includes('Beneficiaries Info')) {
-      XLSX.utils.book_append_sheet(workbook, benSheet, 'Beneficiaries Info');
-    }
+    workbook.Sheets["Beneficiaries Info"] = XLSX.utils.aoa_to_sheet(benSheetData);
+    if (!workbook.SheetNames.includes("Beneficiaries Info"))
+      XLSX.utils.book_append_sheet(workbook, workbook.Sheets["Beneficiaries Info"], "Beneficiaries Info");
 
-    const updatedBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    // ✅ Save updated Excel file
+    const updatedBuffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
     await fs.writeFile(filePath, updatedBuffer);
-    console.log("✅ Excel file updated successfully");
 
-    const fileUrl = `https://www.birdviewmicroinsurance.com/kenyans_in_north_wales_member_details.xlsx`;
+    // ----------------------------
+    // ✅ Email Setup
+    // ----------------------------
     const transporter = nodemailer.createTransport({
-      host: 'mail5016.site4now.net',
+      host: "mail5016.site4now.net",
       port: 465,
       secure: true,
       auth: {
-        user: "customerservice@birdviewinsurance.com",
-        pass: "B!rdv!ew@2024",
+        user: process.env.BIRDVIEW_EMAIL ?? "customerservice@birdviewinsurance.com",
+        pass: process.env.BIRDVIEW_PASS ?? "B!rdv!ew@2024",
       },
     });
 
-    const attachments = [
+    // ✅ Attach uploaded files
+    const attachments: any[] = [
       {
-        filename: 'kenyans_in_north_wales_member_details.xlsx',
+        filename: "kenyans_in_north_wales_member_details.xlsx",
         content: updatedBuffer,
       },
     ];
@@ -163,7 +220,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const uploads = files.supportingDocuments;
     if (uploads) {
       const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
-      uploadArray.forEach(file => {
+      uploadArray.forEach((file: any) => {
         attachments.push({
           filename: file.originalFilename,
           path: file.filepath,
@@ -171,80 +228,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    const adminMailOptions = {
-      from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
-      to: ['Gkangwana@birdviewinsurance.com', 'pkihuria@birdviewinsurance.com',
-          'customerservice@birdviewinsurance.com', 'akinyanjui@birdviewinsurance.com'],
+    // ----------------------------
+    // ✅ Send Admin Email
+    // ----------------------------
+    await transporter.sendMail({
+      from: `"Birdview Insurance" <customerservice@birdviewinsurance.com>`,
+      to: [
+        "Gkangwana@birdviewinsurance.com",
+        "pkihuria@birdviewinsurance.com",
+        "customerservice@birdviewinsurance.com",
+        "akinyanjui@birdviewinsurance.com",
+      ],
       subject: `Updated Member Details from ${memberidno} - ${firstname}`,
-      text: `Please find the updated Excel sheet.\nDownload link:\n${fileUrl}`,
+      text: `Please find the updated Excel sheet attached.`,
       attachments,
-    };
+    });
 
-    try {
-      await transporter.sendMail(adminMailOptions);
-    } catch (emailError) {
-      console.error("⚠️ Admin email failed:", emailError);
-    }
+    // ----------------------------
+    // ✅ Send Member Confirmation Email
+    // ----------------------------
+    const fullName = `${firstname} ${middlename} ${lastname}`.trim();
 
-    const fullName = `${firstname} ${lastname} ${middlename || ''}`.trim();
-    const memberSubject = `${memberidno} - ${fullName} | Confirmation of Submission`;
-    const memberEmailBody = `
-Dear ${fullName},
+    await transporter.sendMail({
+      from: `"Birdview Insurance" <customerservice@birdviewinsurance.com>`,
+      to: eimail,
+      subject: `${memberidno} - ${fullName} | Confirmation of Submission`,
+      text: `Dear ${fullName},\n\nThank you for your submission.\n\nYour membership has been received.`,
+    });
 
-Thank you for your submission.
-
-📌 MEMBER DETAILS
-- Member ID: ${memberidno}
-- Group: ${groupname} (${groupnumber})
-- Name: ${title} ${firstname} ${middlename || ''} ${lastname}
-- ID: ${idtype} ${idno}
-- DOB: ${dateofbirth}
-- Gender: ${gender}
-- Contact: ${mobileno}, ${eimail}
-- Location: ${address}, ${city}, ${country}
-- Family Option: ${family_option}
-- Option : ${option}
-
-📌 DEPENDANTS
-${dependantsData.length > 0 ? dependantsData.map((d, i) => `
-Dependant ${i + 1}:
-- ${d.relationship} - ${d.title || ''} ${d.firstName} ${d.middleName || ''} ${d.surname || ''}`).join('\n') : 'None'}
-
-📌 BENEFICIARIES
-${beneficiariesData.length > 0 ? beneficiariesData.map((b, i) => `
-Beneficiary ${i + 1}:
-- ${b.relationship} - ${b.title || ''} ${b.beneficiary_fullname}
-- Phone: ${b.phone_number || ''} | Email: ${b.beneficiary_email || ''}`).join('\n') : 'None'}
-
-📌 PAYMENT INSTRUCTIONS
-
-Please make your membership payment using the bank details below:
-
-Account Name: CITYBOXCOURIERS  
-Sort code: 55 50 28  
-Account Number: 70161909
-
-⚠️ IMPORTANT: Use your Member ID Number (${memberidno}) as the Reference Number.
-
-⚠️ NOTE: Policy will be effective after uploading proof of payment.
-
-Warm regards,  
-Birdview Insurance`.trim();
-
-    try {
-      await transporter.sendMail({
-        from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
-        to: eimail,
-        subject: memberSubject,
-        text: memberEmailBody,
-      });
-    } catch (memberEmailErr) {
-      console.error("⚠️ Member email failed:", memberEmailErr);
-    }
-
-    return res.status(200).json({ message: 'Form sent successfully', fileUrl, reset: true });
-  } catch (error) {
-    console.error("❌ Error in handler:", error);
-    return res.status(500).json({ error: error.message || 'Unknown server error' });
+    return res.status(200).json({
+      message: "Form submitted successfully",
+      reset: true,
+    });
+  } catch (err: any) {
+    console.error("❌ Server Error:", err);
+    return res.status(500).json({ error: err.message || "Server error" });
   }
 }

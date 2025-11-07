@@ -6,8 +6,7 @@ export interface SendEmailForm {
   details: string;
   email: string;
   enquiryType: string;
-  if (req.method === 'POST') {
-    const { firstName: string;
+  firstName: string;
   lastName: string;
   phone: string;
 }
@@ -53,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Send the email
       await transporter.sendMail(mailOptions);
       res.status(200).json({ message: 'Form sent successfully' });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       res.status(500).json({ error: 'Error sending Form' });
     }

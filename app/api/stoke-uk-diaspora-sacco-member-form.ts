@@ -4,15 +4,30 @@ import * as fs from 'fs/promises';
 import * as XLSX from 'xlsx';
 import path from 'path';
 
+// --- Types ---
+type SheetMatrix = (string | number | null)[][];
+
+interface Dependant {
+  relationship: string;
+  title?: string;
+  firstName: string;
+  middleName?: string;
+  surname?: string;
+  idtypes?: string;
+  idnos?: string;
+  dob?: string;
+  gendere?: string;
+  countrye?: string;
+  cities?: string;
+}
 
 export interface StokeUkDiasporaSaccoMemberFormForm {
   address: string;
   city: string;
-  const { 
-      memberidno: string;
+  memberidno: string;
   country: number;
   dateofbirth: string;
-  dependantsData = []: string;
+  dependantsData: Dependant[];
   eimail: string;
   firstname: string;
   gender: string;
@@ -47,8 +62,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await fs.mkdir(publicDir, { recursive: true });
 
     const filePath = path.join(publicDir, 'stoke_uk_diaspora_sacco_member_details.xlsx');
-    let workbook;
-    let ws1, ws2;
+    let workbook: XLSX.WorkBook;
+    let ws1: XLSX.WorkSheet;
+    let ws2: XLSX.WorkSheet;
 
     let fileBuffer = await fs.readFile(filePath).catch(() => null);
 
@@ -82,17 +98,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       XLSX.utils.book_append_sheet(workbook, ws2, 'Dependants Details');
     }
 
-    const existingMemberData = XLSX.utils.sheet_to_json(ws1, { header: 1 });
+    const existingMemberData: SheetMatrix = XLSX.utils.sheet_to_json(ws1, { header: 1 }) as SheetMatrix;
     existingMemberData.push([
       memberidno, groupname, groupnumber, title, firstname, lastname,
       middlename, idtype, idno, dateofbirth, gender, country, city, address, mobileno, eimail,
     ]);
     workbook.Sheets['Member Details'] = XLSX.utils.aoa_to_sheet(existingMemberData);
 
-    const existingDependantsData = XLSX.utils.sheet_to_json(ws2, { header: 1 });
+    const existingDependantsData: SheetMatrix = XLSX.utils.sheet_to_json(ws2, { header: 1 }) as SheetMatrix;
 
     if (Array.isArray(dependantsData) && dependantsData.length > 0) {
-      dependantsData.forEach((dep, index) => {
+      dependantsData.forEach((dep: Dependant, index: number) => {
         if (!dep || !dep.relationship || !dep.firstName || !dep.idnos) {
           console.warn("⚠️ Skipping invalid dependant:", dep);
           return;
@@ -101,7 +117,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         existingDependantsData.push([
           memberidno, index + 1, dep.relationship, dep.title || "", 
           dep.firstName, dep.middleName || "", dep.surname || "", 
-          dep.idtypes, dep.idnos, dep.dob, dep.gendere, dep.countrye, dep.cities
+          dep.idtypes || "", dep.idnos || "", dep.dob || "", dep.gendere || "", dep.countrye || "", dep.cities || ""
         ]);
       });
 
@@ -143,11 +159,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       await transporter.sendMail(mailOptions);
       console.log("✅ Email sent to member");
-    } catch (emailError) {
+    } catch (emailError: any) {
       console.error("⚠️ Email failed to send to member:", emailError);
       const pendingEmailsPath = path.join(publicDir, 'pending_emails.json');
-      let pendingEmails = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
-      pendingEmails = JSON.parse(pendingEmails);
+      const pendingEmailsContent = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
+      const pendingEmails: any[] = JSON.parse(pendingEmailsContent);
       pendingEmails.push(mailOptions);
       await fs.writeFile(pendingEmailsPath, JSON.stringify(pendingEmails, null, 2));
       return res.status(202).json({ message: 'Form sent successfully, email to member pending', fileUrl });
@@ -182,19 +198,19 @@ Thank you for submitting your membership and dependants information. Below is a 
 
 📌 DEPENDANTS DETAILS
 ${dependantsData && dependantsData.length > 0 
-  ? dependantsData.map((d, i) => `
+  ? dependantsData.map((d: Dependant, i: number) => `
 Dependant ${i + 1}:
 - Relationship: ${d.relationship}
 - Title: ${d.title || '-'}
 - First Name: ${d.firstName}
 - Middle Name: ${d.middleName || '-'}
 - Last Name: ${d.surname || '-'}
-- ID Type: ${d.idtypes}
-- ID Number: ${d.idnos}
-- Date of Birth: ${d.dob}
-- Gender: ${d.gendere}
-- Country: ${d.countrye}
-- City: ${d.cities}
+- ID Type: ${d.idtypes || ''}
+- ID Number: ${d.idnos || ''}
+- Date of Birth: ${d.dob || ''}
+- Gender: ${d.gendere || ''}
+- Country: ${d.countrye || ''}
+- City: ${d.cities || ''}
 `).join('\n')
   : 'No dependants information provided.'}
 
@@ -219,8 +235,8 @@ Birdview Insurance
     }
 
     return res.status(200).json({ message: 'Form sent successfully', fileUrl });
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Full Error Details:", error);
-    return res.status(500).json({ error: error.message || 'Unknown error occurred' });
+    return res.status(500).json({ error: error?.message || 'Unknown error occurred' });
   }
 }

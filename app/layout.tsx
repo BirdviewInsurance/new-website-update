@@ -92,7 +92,7 @@ export default function RootLayout({
         </div>
 
         {/* ✅ Theming Provider */}
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <div className="flex flex-col min-h-screen relative z-10">
             <Navbar />
 
@@ -117,10 +117,11 @@ export default function RootLayout({
                     {[
                       { href: "/", label: "Home" },
                       { href: "/about", label: "About Us" },
-                      { href: "/leadership", label: "Our Leadership" },
-                      { href: "/management", label: "Our Management" },
+                      { href: "/our-leadership#board", label: "Our Leadership" },
+                      { href: "/our-leadership#executives", label: "Our Management" },
+                      { href: "/our-leadership#advisors", label: "Advisors" },
                       { href: "/careers", label: "Careers" },
-                      { href: "/contact", label: "Contact Us" },
+                      { href: "/contact-us", label: "Contact Us" },
                     ].map(({ href, label }) => (
                       <Link
                         key={label}
@@ -141,14 +142,14 @@ export default function RootLayout({
                   <h5 className="font-semibold text-lg mb-4">Products</h5>
                   <div className="flex flex-col gap-3">
                     {[
-                      { href: "/insurance/medical", label: "Medical Insurance" },
-                      { href: "/insurance/last-expense", label: "Last Expense Cover" },
-                      { href: "/insurance/personal-accident", label: "Personal Accident" },
-                      { href: "/insurance/hospital-cash", label: "Hospital Cash" },
-                      {
-                        href: "/insurance/evacuation-repatriation",
-                        label: "Evacuation & Repatriation",
-                      },
+                      { href: "/products/evacuation_and_repatriation", label: "Medical Insurance" },
+                      { href: "/products/last_expense", label: "Last Expense Cover" },
+                      { href: "/products/medical", label: "Medical" },
+                      { href: "/products/hospital_cash", label: "Hospital Cash" },
+                      { href: "/products/personal_accident", label: "Personal Accident" },
+                      { href: "/products/bodaboda_welfare", label: "BodaBoda Welfare Cover" },
+                      { href: "/products/tuktuk_welfare", label: "Tuktuk Welfare Cover" },
+                      { href: "/products/probation_guard", label: "Probation Guard" },
                     ].map(({ href, label }) => (
                       <Link
                         key={label}
@@ -192,9 +193,11 @@ export default function RootLayout({
                   <div className="flex flex-col gap-3">
                     {[
                       { href: "/blog", label: "Blogs" },
-                      { href: "/media/news", label: "News" },
+                      { href: "/newsroom", label: "News" },
                       { href: "/faq", label: "FAQ" },
                       { href: "/downloads", label: "Downloads" },
+                      { href: "/providers", label: "Providers" },
+                      { href: "/pictorial", label: "Pictorial" },
                     ].map(({ href, label }) => (
                       <Link
                         key={label}

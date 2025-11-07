@@ -4,10 +4,11 @@ import * as fs from 'fs/promises';
 import * as XLSX from 'xlsx';
 import path from 'path';
 
+// --- Types ---
+type SheetMatrix = (string | number | null)[][];
 
 export interface SubAgentFormForm {
-  const {
-      principal_id: string;
+  principal_id: string;
   email: string;
   first_name: string;
   middle_name: string;
@@ -60,8 +61,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await fs.mkdir(publicDir, { recursive: true });
 
     const filePath = path.join(publicDir, 'sub_agents.xlsx');
-    let workbook;
-    let worksheet;
+    let workbook: XLSX.WorkBook;
+    let worksheet: XLSX.WorkSheet;
 
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
 
@@ -78,7 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       XLSX.utils.book_append_sheet(workbook, worksheet, 'SubAgents');
     }
 
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const existingData: SheetMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as SheetMatrix;
     existingData.push([
       principal_id, first_name, middle_name, surname, email
     ]);
@@ -118,18 +119,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       await transporter.sendMail(mailOptions);
       console.log("✅ Email sent to team");
-    } catch (emailError) {
+    } catch (emailError: any) {
       console.error("⚠️ Email failed to send:", emailError);
       const pendingEmailsPath = path.join(publicDir, 'pending_subagent_emails.json');
-      let pendingEmails = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
-      pendingEmails = JSON.parse(pendingEmails);
+      const pendingEmailsContent = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
+      const pendingEmails: any[] = JSON.parse(pendingEmailsContent);
       pendingEmails.push(mailOptions);
       await fs.writeFile(pendingEmailsPath, JSON.stringify(pendingEmails, null, 2));
       return res.status(202).json({ message: 'Sub-agent submitted, email pending', fileUrl });
     }
 
     res.status(200).json({ message: 'Sub-agent submitted successfully!', data, fileUrl });
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Unexpected Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }

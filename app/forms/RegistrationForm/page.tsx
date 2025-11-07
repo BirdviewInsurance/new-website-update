@@ -57,22 +57,10 @@ const RegForm: React.FC = () => {
 
   // ✅ HeroUI Toast helpers
   const showSuccess = (message: string) =>
-    toast({
-      title: "Success",
-      description: message,
-      color: "success",
-      variant: "solid",
-      duration: 4000,
-    });
+    (toast as any).success(message);
 
   const showError = (message: string) =>
-    toast({
-      title: "Error",
-      description: message,
-      color: "danger",
-      variant: "solid",
-      duration: 6000,
-    });
+    (toast as any).error(message);
 
   const handlePhoneChange = (value: string) => {
     setFormData((prev) => ({ ...prev, mobileno: value }));
@@ -97,9 +85,11 @@ const RegForm: React.FC = () => {
       setFormData({ fullnames: "", mobileno: "", email: "", agencies: "" });
 
       if (res.status === 200) {
-        showSuccess(res.data.message || "Form submitted successfully!");
+        const data = res.data as any;
+        showSuccess(data?.message || "Form submitted successfully!");
       } else {
-        showError(res.data.error || "Something went wrong");
+        const data = res.data as any;
+        showError(data?.error || "Something went wrong");
       }
     } catch (error: any) {
       showError(error?.response?.data?.error || error.message || "Submission failed");

@@ -165,7 +165,7 @@ const MemberForm: React.FC = () => {
 
   const handleAddDependant = () => {
     if (dependentCount >= 7) {
-      toast({ title: "⚠️ Limit reached", description: "Maximum 7 dependants allowed.", variant: "warning" });
+      (toast as any).error("Maximum 7 dependants allowed.");
       return;
     }
     setDependentCount((prev) => prev + 1);
@@ -204,7 +204,7 @@ const MemberForm: React.FC = () => {
     handleCloseModal();
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission
     setLoaderIcon(true);
 
@@ -239,10 +239,10 @@ const MemberForm: React.FC = () => {
         setToasterOpen(true);
         setLoaderIcon(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       // Show error snackbar
       settoastType('error');
-      settoastMessage(`Error: ${error.message}`);
+      settoastMessage(`Error: ${error?.message || "An unexpected error occurred"}`);
       setToasterOpen(true);
       setLoaderIcon(false);
     }
@@ -306,11 +306,14 @@ const MemberForm: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Select
               label="Title"
-              value={formData.title}
-              onValueChange={(v) => handleChange({ target: { name: "title", value: v } } as any)}
+              selectedKeys={formData.title ? [formData.title] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "title", value: selected } } as any);
+              }}
             >
               {titles.map((t) => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
+                <SelectItem key={t}>{t}</SelectItem>
               ))}
             </Select>
             <Input label="First Name" name="firstname" value={formData.firstname} onChange={handleChange} required />
@@ -321,11 +324,14 @@ const MemberForm: React.FC = () => {
             <Input label="Middle Name" name="middlename" value={formData.middlename} onChange={handleChange} />
             <Select
               label="ID Type"
-              value={formData.idtype}
-              onValueChange={(v) => handleChange({ target: { name: "idtype", value: v } } as any)}
+              selectedKeys={formData.idtype ? [formData.idtype] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "idtype", value: selected } } as any);
+              }}
               required
             >
-              {idTypes.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+              {idTypes.map((id) => <SelectItem key={id}>{id}</SelectItem>)}
             </Select>
             <Input label="ID Number" name="idno" value={formData.idno} onChange={handleChange} required />
           </div>
@@ -334,16 +340,16 @@ const MemberForm: React.FC = () => {
             <Input type="date" max={today} label="Date of Birth" name="dateofbirth" value={formData.dateofbirth} onChange={handleChange} required />
             <Select
               label="Gender"
-              selectedKeys={[formData.gender]}
+              selectedKeys={formData.gender ? [formData.gender] : []}
               onSelectionChange={(keys) =>
                 handleChange({ target: { name: "gender", value: Array.from(keys)[0] } } as any)
               }
             >
-              {genders.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+              {genders.map((g) => <SelectItem key={g}>{g}</SelectItem>)}
             </Select>
             <Select
               label="Country"
-              selectedKeys={[formData.country]}
+              selectedKeys={formData.country ? [formData.country] : []}
               onSelectionChange={(keys) =>
                 handleChange({ target: { name: "country", value: Array.from(keys)[0] } } as any)
               }
@@ -424,21 +430,62 @@ const MemberForm: React.FC = () => {
                 <ModalContent>
                   <ModalHeader>Edit Dependant</ModalHeader>
                   <ModalBody className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Input label="Relationship" value={currentDependant.relationship} onChange={(e) => handleChangeDep(e)} />
-                    <Select label="Title" value={currentDependant.title} onValueChange={(v) => handleChangeDep({ name: "title", value: v })}>
-                      {titles.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    <Select 
+                      label="Relationship" 
+                      selectedKeys={currentDependant.relationship ? [currentDependant.relationship] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ name: "relationship", value: selected });
+                      }}
+                    >
+                      {relationships.map((r) => <SelectItem key={r}>{r}</SelectItem>)}
+                    </Select>
+                    <Select 
+                      label="Title" 
+                      selectedKeys={currentDependant.title ? [currentDependant.title] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ name: "title", value: selected });
+                      }}
+                    >
+                      {titles.map((t) => <SelectItem key={t}>{t}</SelectItem>)}
                     </Select>
                     <Input label="First Name" value={currentDependant.firstName} onChange={(e) => handleChangeDep(e)} />
                     <Input label="Middle Name" value={currentDependant.middleName} onChange={(e) => handleChangeDep(e)} />
                     <Input label="Surname" value={currentDependant.surname} onChange={(e) => handleChangeDep(e)} />
-                    <Select label="ID Type" value={currentDependant.idtypes} onValueChange={(v) => handleChangeDep({ name: "idtypes", value: v })}>
-                      {idTypes.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                    <Select 
+                      label="ID Type" 
+                      selectedKeys={currentDependant.idtypes ? [currentDependant.idtypes] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ name: "idtypes", value: selected });
+                      }}
+                    >
+                      {idTypes.map((id) => <SelectItem key={id}>{id}</SelectItem>)}
                     </Select>
                     <Input label="ID No" value={currentDependant.idnos} onChange={(e) => handleChangeDep(e)} />
                     <Input label="DOB" type="date" max={today} value={currentDependant.dob} onChange={(e) => handleChangeDep(e)} />
-                    <Select label="Gender" value={currentDependant.gendere} onValueChange={(v) => handleChangeDep({ name: "gendere", value: v })}>
-                      {["Male", "Female"].map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                    <Select 
+                      label="Gender" 
+                      selectedKeys={currentDependant.gendere ? [currentDependant.gendere] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ name: "gendere", value: selected });
+                      }}
+                    >
+                      {["Male", "Female"].map((g) => <SelectItem key={g}>{g}</SelectItem>)}
                     </Select>
+                    <Select 
+                      label="Country" 
+                      selectedKeys={currentDependant.countrye ? [currentDependant.countrye] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ name: "countrye", value: selected });
+                      }}
+                    >
+                      {countries.map((c) => <SelectItem key={c}>{c}</SelectItem>)}
+                    </Select>
+                    <Input label="City" value={currentDependant.cities || ""} onChange={(e) => handleChangeDep(e)} />
                   </ModalBody>
                   <ModalFooter>
                     <Button variant="light" onPress={handleCloseModal}>Cancel</Button>

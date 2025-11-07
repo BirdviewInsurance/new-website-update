@@ -4,20 +4,18 @@ import * as fs from 'fs/promises';
 import * as XLSX from 'xlsx';
 import path from 'path';
 
-
 export interface BrokerFormForm {
-  account_name: number;
+  account_name: string;
   account_number: number;
   bank_branch: string;
   bank_name: string;
   city: string;
   company_name: string;
   company_number: string;
-  const {
-      intermediary_type: string;
+  intermediary_type: string;
   country: number;
   dateofbirth: string;
-  eimail: string;
+  email: string;
   firstname: string;
   gender: string;
   idno: string;
@@ -30,20 +28,40 @@ export interface BrokerFormForm {
   title: string;
 }
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
   try {
+    // Destructure request body
     const {
-      intermediary_type, title, firstname, middlename, lastname,
-      gender, mobileno, postal_address, idtype, idno, pin_no, dateofbirth,
-      country, city, eimail, company_name, company_number,
-      bank_name, account_name, bank_branch, account_number
-    } = req.body;
+      intermediary_type,
+      title,
+      firstname,
+      middlename,
+      lastname,
+      gender,
+      mobileno,
+      postal_address,
+      idtype,
+      idno,
+      pin_no,
+      dateofbirth,
+      country,
+      city,
+      email,
+      company_name,
+      company_number,
+      bank_name,
+      account_name,
+      bank_branch,
+      account_number
+    } = req.body as BrokerFormForm;
 
     const sharedPayload = {
       title,
@@ -65,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       physical_address: 'N/A',
       mobile_no: mobileno,
       other_phone: '',
-      email: eimail,
+      email,
       id_type: idtype,
       company_name,
       commission: 10.0,
@@ -76,6 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       is_active: false
     };
 
+    // Determine endpoint
     const agentEndpoint = 'https://snownet-core-server.onrender.com/api/underwriting/collaborator/agents/create/';
     const brokerEndpoint = 'https://snownet-core-server.onrender.com/api/underwriting/collaborator/brokers/create/';
     const submitUrl = intermediary_type === 'Broker' ? brokerEndpoint : agentEndpoint;
@@ -86,43 +105,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       body: JSON.stringify(sharedPayload),
     });
 
-    // 📁 Excel Writing
+    // --- Excel Logic ---
     const publicDir = path.join(process.cwd(), 'public');
     await fs.mkdir(publicDir, { recursive: true });
     const filePath = path.join(publicDir, 'agent_data.xlsx');
-    let workbook;
-    let worksheet;
+
+    let workbook: XLSX.WorkBook;
+    let worksheet: XLSX.WorkSheet;
+
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
 
     if (fileBuffer) {
       workbook = XLSX.read(fileBuffer, { type: 'buffer' });
       worksheet = workbook.Sheets['Agent Data'] || XLSX.utils.aoa_to_sheet([
-        ['Type', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Gender', 'Mobile No', 'Postal Address',
-         'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
-         'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number']
+        [
+          'Type', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Gender', 'Mobile No',
+          'Postal Address', 'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
+          'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number'
+        ]
       ]);
     } else {
       workbook = XLSX.utils.book_new();
       worksheet = XLSX.utils.aoa_to_sheet([
-        ['Type', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Gender', 'Mobile No', 'Postal Address',
-         'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
-         'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number']
+        [
+          'Type', 'Title', 'First Name', 'Middle Name', 'Last Name', 'Gender', 'Mobile No',
+          'Postal Address', 'ID Type', 'ID No', 'PIN No', 'DOB', 'Country', 'City', 'Email',
+          'Company Name', 'Company Number', 'Bank Name', 'Account Name', 'Bank Branch', 'Account Number'
+        ]
       ]);
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Agent Data');
     }
 
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    // Convert worksheet to 2D array, append new row
+    const existingData: (string | number)[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
     existingData.push([
       intermediary_type, title, firstname, middlename, lastname, gender, mobileno, postal_address,
-      idtype, idno, pin_no, dateofbirth, country, city, eimail,
+      idtype, idno, pin_no, dateofbirth, country, city, email,
       company_name, company_number, bank_name, account_name, bank_branch, account_number
     ]);
+
+    // Convert back to worksheet
     workbook.Sheets['Agent Data'] = XLSX.utils.aoa_to_sheet(existingData);
     const updatedBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
     await fs.writeFile(filePath, updatedBuffer);
 
-    // 📬 Email Logic
-    const emailRecipients = {
+    // --- Email Logic ---
+    const emailRecipients: Record<string, string[]> = {
       'Diaspora Agent': ['AKinyanjui@birdviewinsurance.com'],
       'Agent': ['Omenjeri@birdviewinsurance.com', 'Jgatwiri@birdviewinsurance.com'],
       'Broker': ['Omenjeri@birdviewinsurance.com', 'Jgatwiri@birdviewinsurance.com'],
@@ -150,12 +178,13 @@ https://www.birdviewmicroinsurance.com/agent_data.xlsx`,
       ]
     };
 
-    const [submitRes, _] = await Promise.all([
+    const [submitRes] = await Promise.all([
       submissionPromise,
       transporter.sendMail(mailOptions).catch(async (emailError) => {
+        // Fallback: save pending emails
         const pendingPath = path.join(publicDir, 'pending_emails.json');
         const pending = await fs.readFile(pendingPath, 'utf-8').catch(() => '[]');
-        const pendingArr = JSON.parse(pending);
+        const pendingArr = JSON.parse(pending) as typeof mailOptions[];
         pendingArr.push(mailOptions);
         await fs.writeFile(pendingPath, JSON.stringify(pendingArr, null, 2));
       })
@@ -168,6 +197,7 @@ https://www.birdviewmicroinsurance.com/agent_data.xlsx`,
     }
 
     return res.status(200).json({ message: `${intermediary_type} submitted successfully!`, data });
+
   } catch (error) {
     console.error('❌ Internal Error:', error);
     return res.status(500).json({ error: 'Internal Server Error' });

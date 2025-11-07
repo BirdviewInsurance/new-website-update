@@ -1,6 +1,6 @@
 import React from "react";
 import ProductTemplate from "../components/ProductTemplate";
-import { HeartPulse, Tool } from "lucide-react";
+import { Stethoscope } from "lucide-react";
 
 export default function Page() {
     return (
@@ -17,7 +17,7 @@ export default function Page() {
                 ],
             }}
             benefits={[
-                { title: "Large Hospital Network", desc: "Cashless treatment across partner hospitals countrywide.", icon: <Tool /> },
+                { title: "Large Hospital Network", desc: "Cashless treatment across partner hospitals countrywide.", icon: <Stethoscope /> },
                 { title: "Flexible Plans", desc: "Multiple tiers to match budgets and health needs." },
                 { title: "Chronic Care Management", desc: "Support programs for diabetes, hypertension and other long-term conditions." },
             ]}

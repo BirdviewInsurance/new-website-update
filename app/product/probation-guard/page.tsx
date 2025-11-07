@@ -1,6 +1,5 @@
 import React from "react";
 import ProductTemplate from "../components/ProductTemplate";
-import { Tool } from "lucide-react";
 
 export default function Page() {
     return (

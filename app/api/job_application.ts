@@ -41,9 +41,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // Rename resume with a timestamp
-        const newFilename = `${Date.now()}-${resumeFile.originalFilename}`;
+        const resume = Array.isArray(resumeFile) ? resumeFile[0] : resumeFile;
+        const newFilename = `${Date.now()}-${resume.originalFilename}`;
         const newPath = path.join(uploadDir, newFilename);
-        fs.renameSync(resumeFile.filepath, newPath);
+        fs.renameSync(resume.filepath, newPath);
 
         // You can save this data to a database here or send an email notification.
 

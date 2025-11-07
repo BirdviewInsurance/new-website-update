@@ -14,6 +14,7 @@ import {
   Select,
   SelectItem,
   Modal,
+  ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
@@ -90,7 +91,7 @@ export interface FormdataType {
   selectedOption?: string;
 
   medical?: boolean;
-  medicalOption?: string;
+  medicalOption?: string | string[];
   principalAge?: string | number;
   ageGroup?: string;
   lastExpense?: boolean;
@@ -240,6 +241,10 @@ const KenyansInJapanMemberForm: React.FC = () => {
   const [fileError, setFileError] = useState<string | null>(null);
 
   const [isAdultRelationshipEligible, setIsAdultRelationshipEligible] = useState<boolean>(true);
+
+  const [medicalCover, setMedicalCover] = useState("");
+  const [lastExpenseCover, setLastExpenseCover] = useState("");
+  const [totalPremium, setTotalPremium] = useState(0);
 
   // form data
   const [formData, setFormData] = useState<FormdataType>({
@@ -434,6 +439,32 @@ const KenyansInJapanMemberForm: React.FC = () => {
     }, 0);
   };
 
+  useEffect(() => {
+    let total = 0;
+
+    // --- MEDICAL PREMIUM ---
+    if (formData.medical && formData.medicalOption) {
+      if (typeof formData.medicalOption === "string") {
+        // For <70 group (radio selection)
+        const match = formData.medicalOption.match(/Kshs\s*([\d,]+)/);
+        if (match) total += parseInt(match[1].replace(/,/g, ""), 10);
+      } else if (Array.isArray(formData.medicalOption)) {
+        // For >70 group (multiple selections)
+        formData.medicalOption.forEach((item: string) => {
+          const match = item.match(/Kshs\s*([\d,]+)/);
+          if (match) total += parseInt(match[1].replace(/,/g, ""), 10);
+        });
+      }
+    }
+
+    // --- LAST EXPENSE PREMIUM ---
+    if (formData.lastExpense) {
+      total += 31800; // Flat rate per family
+    }
+
+    setTotalPremium(total);
+  }, [formData.medical, formData.medicalOption, formData.lastExpense]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoaderIcon(true);
@@ -470,7 +501,21 @@ const KenyansInJapanMemberForm: React.FC = () => {
       }
 
       // amount calc
-      const amount = getAmountFromMedical(formData.medicalOption) + getAmountFromLastExpense(formData.lastExpenseOptions);
+      let medicalAmount = 0;
+      if (formData.medicalOption) {
+        if (typeof formData.medicalOption === "string") {
+          medicalAmount = getAmountFromMedical(formData.medicalOption);
+        } else if (Array.isArray(formData.medicalOption)) {
+          medicalAmount = formData.medicalOption.reduce((sum, opt) => {
+            const matchKsh = opt.match(/Kshs\s?([\d,]+)/i);
+            const matchGbp = opt.match(/GBP\s?([\d,]+)/i);
+            if (matchKsh) return sum + parseInt(matchKsh[1].replace(/,/g, ""), 10);
+            if (matchGbp) return sum + parseInt(matchGbp[1].replace(/,/g, ""), 10);
+            return sum;
+          }, 0);
+        }
+      }
+      const amount = medicalAmount + getAmountFromLastExpense(formData.lastExpenseOptions);
 
       if (!amount || amount <= 0) {
         toastApi.error("❌ Please select a Medical or Last Expense option before submitting.");
@@ -528,7 +573,7 @@ const KenyansInJapanMemberForm: React.FC = () => {
                 }
               }
 
-              fd.append("selectedMedicalOption", formData.medicalOption || "None");
+              fd.append("selectedMedicalOption", Array.isArray(formData.medicalOption) ? formData.medicalOption.join(", ") : (formData.medicalOption || "None"));
               fd.append("selectedLastExpenseOptions", (formData.lastExpenseOptions || []).join(", ") || "None");
               fd.append("totalPremium", String(amount));
 
@@ -864,9 +909,16 @@ const KenyansInJapanMemberForm: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700">Title</label>
-                <Select value={formData.title} name="title" onChange={(val: any) => setFormData((p) => ({ ...p, title: val }))} className="mt-2">
+                <Select 
+                  selectedKeys={formData.title ? [formData.title] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    setFormData((p) => ({ ...p, title: selected }));
+                  }} 
+                  className="mt-2"
+                >
                   {["Mr", "Master", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                    <SelectItem key={t}>{t}</SelectItem>
                   ))}
                 </Select>
               </div>
@@ -888,10 +940,17 @@ const KenyansInJapanMemberForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Identification Type</label>
-                <Select value={formData.idtype} name="idtype" onChange={(val: any) => setFormData((p) => ({ ...p, idtype: val }))} className="mt-2">
-                  <SelectItem value="National ID">National ID</SelectItem>
-                  <SelectItem value="Passport">Passport</SelectItem>
-                  <SelectItem value="Birth Certificate">Birth Certificate</SelectItem>
+                <Select 
+                  selectedKeys={formData.idtype ? [formData.idtype] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    setFormData((p) => ({ ...p, idtype: selected }));
+                  }} 
+                  className="mt-2"
+                >
+                  <SelectItem key="National ID">National ID</SelectItem>
+                  <SelectItem key="Passport">Passport</SelectItem>
+                  <SelectItem key="Birth Certificate">Birth Certificate</SelectItem>
                 </Select>
               </div>
 
@@ -925,17 +984,31 @@ const KenyansInJapanMemberForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Gender</label>
-                <Select value={formData.gender} name="gender" onChange={(val: any) => setFormData((p) => ({ ...p, gender: val }))} className="mt-2">
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Others">Others</SelectItem>
+                <Select 
+                  selectedKeys={formData.gender ? [formData.gender] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    setFormData((p) => ({ ...p, gender: selected }));
+                  }} 
+                  className="mt-2"
+                >
+                  <SelectItem key="Male">Male</SelectItem>
+                  <SelectItem key="Female">Female</SelectItem>
+                  <SelectItem key="Others">Others</SelectItem>
                 </Select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Country Of Residence</label>
-                <Select value={formData.country} name="country" onChange={(val: any) => setFormData((p) => ({ ...p, country: val }))} className="mt-2">
-                  {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                <Select 
+                  selectedKeys={formData.country ? [formData.country] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    setFormData((p) => ({ ...p, country: selected }));
+                  }} 
+                  className="mt-2"
+                >
+                  {countries.map((c) => <SelectItem key={c}>{c}</SelectItem>)}
                 </Select>
               </div>
 
@@ -960,50 +1033,6 @@ const KenyansInJapanMemberForm: React.FC = () => {
                 <label className="block text-sm font-medium text-slate-700">Email</label>
                 <Input name="eimail" value={formData.eimail} onChange={(e: any) => handleChange(e)} className="mt-2" />
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Family Option</label>
-                <Select value={formData.family_option || ""} name="family_option" onChange={(val: any) => {
-                  // reuse your existing logic but simplified
-                  setFormData((prev) => ({ ...prev, family_option: val, option: "" }));
-                }} className="mt-2">
-                  <SelectItem value="Individual">Individual</SelectItem>
-                  <SelectItem value="Nuclear Family">Nuclear Family</SelectItem>
-                  <SelectItem value="Extended Family">Extended Family</SelectItem>
-                </Select>
-              </div>
-
-              <div className="md:col-span-3">
-                {formData.family_option && (
-                  <div className="mt-2">
-                    <p className="text-sm font-medium text-slate-700 mb-2">Select Annual Benefit</p>
-                    <div className="flex flex-col gap-2">
-                      {(formData.family_option && {
-                        Individual: [
-                          "Annual Premium of GBP 15 per Principal Member",
-                          "Annual Premium of GBP 30 per Principal Member",
-                          "Annual Premium of GBP 51 per Principal Member",
-                        ],
-                        "Nuclear Family": [
-                          "Annual Premium of GBP 30 per Principal Member",
-                          "Annual Premium of GBP 60 per Principal Member",
-                          "Annual Premium of GBP 120 per Principal Member",
-                        ],
-                        "Extended Family": [
-                          "Annual Premium of GBP 150 per Principal Member",
-                          "Annual Premium of GBP 300 per Principal Member",
-                          "Annual Premium of GBP 500 per Principal Member",
-                        ],
-                      } as any)[formData.family_option].map((benefit: string, idx: number) => (
-                        <label key={idx} className="flex items-center gap-3">
-                          <input type="radio" name="option" value={benefit} checked={formData.option === benefit} onChange={(e) => handleChange(e)} />
-                          <span className="text-sm">{benefit}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* COVER OPTIONS CARD (medical & last expense) */}
@@ -1011,100 +1040,315 @@ const KenyansInJapanMemberForm: React.FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h4 className="text-lg font-semibold text-slate-800">Cover Options</h4>
-                  <p className="text-sm text-slate-500">Select optional covers and plans — modern, corporate rates shown below.</p>
+                  <p className="text-sm text-slate-500">
+                    Select optional covers and plans — modern, corporate rates shown below.
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Avatar size="sm" className="bg-blue-50 text-blue-700">£</Avatar>
-                  <span className="text-sm text-slate-500">Secure • Corporate • Clear pricing</span>
+                  <span className="text-sm text-slate-500">
+                    Secure • Corporate • Clear pricing
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* ---------------------- MEDICAL ---------------------- */}
                 <div className="col-span-1">
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={!!formData.medical} onChange={(e) => setFormData((p) => ({ ...p, medical: e.target.checked }))} />
+                    <input
+                      type="checkbox"
+                      checked={!!formData.medical}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, medical: e.target.checked }))
+                      }
+                    />
                     <span className="font-semibold">Medical</span>
                   </label>
 
                   {formData.medical && (
                     <div className="mt-3 space-y-2">
-                      <Input name="principalAge" type="number" label="Principal's Age" value={String(formData.principalAge || "")} onChange={(e: any) => setFormData((p) => ({ ...p, principalAge: e.target.value }))} />
+                      <Input
+                        name="principalAge"
+                        type="number"
+                        label="Principal's Age"
+                        value={String(formData.principalAge || "")}
+                        onChange={(e: any) =>
+                          setFormData((p) => ({ ...p, principalAge: e.target.value }))
+                        }
+                      />
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" onClick={() => setFormData((p) => ({ ...p, ageGroup: "<70", medicalOption: "" }))}> &lt; 70</Button>
-                        <Button variant="ghost" onClick={() => setFormData((p) => ({ ...p, ageGroup: ">70", medicalOption: "" }))}> &gt; 70</Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            setFormData((p) => ({
+                              ...p,
+                              ageGroup: "<70",
+                              medicalOption: "",
+                            }))
+                          }
+                        >
+                          &lt; 70
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            setFormData((p) => ({
+                              ...p,
+                              ageGroup: ">70",
+                              medicalOption: "",
+                            }))
+                          }
+                        >
+                          &gt; 70
+                        </Button>
                       </div>
                     </div>
                   )}
                 </div>
 
+                {/* ---------------------- LAST EXPENSE ---------------------- */}
                 <div className="col-span-1">
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={!!formData.lastExpense} onChange={(e) => setFormData((p) => ({ ...p, lastExpense: e.target.checked, lastExpenseOptions: [] }))} />
+                    <input
+                      type="checkbox"
+                      checked={!!formData.lastExpense}
+                      onChange={(e) =>
+                        setFormData((p) => ({
+                          ...p,
+                          lastExpense: e.target.checked,
+                        }))
+                      }
+                    />
                     <span className="font-semibold">Last Expense</span>
                   </label>
 
                   {formData.lastExpense && (
-                    <div className="mt-3 space-y-2">
-                      {[
-                        {
-                          id: "A",
-                          label: "Option A — 70-75 Years (Breakdown)",
-                          items: [
-                            "Principal - Kshs 1",
-                            "Spouse - Kshs 46,104",
-                            "Child - Kshs 6,429",
-                          ],
-                        },
-                        {
-                          id: "B",
-                          label: "Option B — 76-80 Years (Breakdown)",
-                          items: [
-                            "Principal - Kshs 76,695",
-                            "Spouse - Kshs 55,226",
-                            "Child - Kshs 6,429",
-                          ],
-                        },
-                      ].map((opt) => {
-                        const optionValue = opt.label;
-                        const checked = (formData.lastExpenseOptions || []).includes(optionValue);
-                        return (
-                          <div key={opt.id} className={`p-3 rounded-lg border ${checked ? "border-blue-200 bg-blue-50/30" : "border-gray-100 bg-white"}`}>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <div className="font-semibold">{opt.label}</div>
-                                <div className="text-xs text-slate-500">{opt.items.join(" • ")}</div>
-                              </div>
-                              <div>
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  onChange={(e) => {
-                                    setFormData((p) => {
-                                      const set = new Set(p.lastExpenseOptions || []);
-                                      if (e.target.checked) set.add(optionValue);
-                                      else set.delete(optionValue);
-                                      return { ...p, lastExpenseOptions: Array.from(set) };
-                                    });
-                                  }}
-                                />
-                              </div>
-                            </div>
+                    <div className="mt-3 p-3 rounded-lg border border-blue-200 bg-blue-50/30">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold text-slate-800">
+                            Family Cover — All-Inclusive
                           </div>
-                        );
-                      })}
+                          <div className="text-xs text-slate-500">
+                            Covers principal, spouse, children, parents & siblings
+                          </div>
+                        </div>
+                        <div className="text-blue-700 font-semibold">Kshs 31,800</div>
+                      </div>
                     </div>
                   )}
                 </div>
 
+
+                {/* ---------------------- SUMMARY ---------------------- */}
                 <div className="col-span-1">
-                  <div className="text-sm text-slate-600">Summary</div>
-                  <div className="mt-3 text-sm text-slate-700">
-                    Selected medical: <strong>{formData.medicalOption || "none"}</strong>
-                    <br />
-                    Selected last-expense: <strong>{(formData.lastExpenseOptions || []).length ? (formData.lastExpenseOptions || []).join(", ") : "none"}</strong>
+                  <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-red-600 text-white shadow-xl overflow-hidden">
+                    {/* Subtle frosted overlay */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-2xl"></div>
+
+                    <div className="relative z-10">
+                      <h3 className="text-lg font-bold tracking-wide flex items-center gap-2 mb-4">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-red-300"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 16h-1v-4h-1m1-4h.01M12 12h.01"
+                          />
+                        </svg>
+                        Summary
+                      </h3>
+
+                      <div className="space-y-3">
+                        {/* Medical Option */}
+                        <div className="flex items-center justify-between bg-white/10 rounded-lg px-3 py-2 shadow-sm hover:bg-white/20 transition-all duration-200">
+                          <span className="text-sm text-white/90">Selected Medical</span>
+                          <span className="font-semibold text-blue-200">
+                            {formData.medicalOption || "None"}
+                          </span>
+                        </div>
+
+                        {/* Last Expense Option */}
+                        <div className="flex items-center justify-between bg-white/10 rounded-lg px-3 py-2 shadow-sm hover:bg-white/20 transition-all duration-200">
+                          <span className="text-sm text-white/90">Selected Last Expense</span>
+                          <span className="font-semibold text-red-200">
+                            {formData.lastExpense
+                              ? "Family Cover — All-Inclusive"
+                              : "None"}
+                          </span>
+                        </div>
+
+                        {/* Total Premium */}
+                        {formData.totalPremium && (
+                          <div className="mt-4 border-t border-white/20 pt-3 flex items-center justify-between">
+                            <span className="text-sm text-white/80">Total Premium</span>
+                            <span className="text-lg font-extrabold text-green-300 drop-shadow-sm">
+                              Kshs {formData.totalPremium.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* ---------------------- MEDICAL RATE TABLES ---------------------- */}
+              {formData.medical && formData.ageGroup && (
+                <div className="mt-6">
+                  {formData.ageGroup === "<70" ? (
+                    <>
+                      <h5 className="font-semibold text-slate-700 mb-2">
+                        Standard Rates
+                      </h5>
+                      <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+                        <thead className="bg-blue-50">
+                          <tr>
+                            <th className="p-2 text-left font-semibold">Plan</th>
+                            <th className="p-2 text-left font-semibold">Premium</th>
+                            <th className="p-2 text-center font-semibold">Select</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { plan: "M", premium: "Kshs 28,000" },
+                            { plan: "M+1", premium: "Kshs 42,000" },
+                            { plan: "M+2", premium: "Kshs 50,400" },
+                            { plan: "M+3", premium: "Kshs 58,800" },
+                            { plan: "M+4", premium: "Kshs 67,200" },
+                            { plan: "M+5", premium: "Kshs 75,600" },
+                          ].map((row) => (
+                            <tr
+                              key={row.plan}
+                              className="hover:bg-blue-50/40 transition-colors"
+                            >
+                              <td className="p-2 font-semibold">{row.plan}</td>
+                              <td className="p-2 text-slate-600">{row.premium}</td>
+                              <td className="p-2 text-center">
+                                <input
+                                  type="radio"
+                                  checked={
+                                    formData.medicalOption ===
+                                    `${row.plan} - ${row.premium}`
+                                  }
+                                  onChange={() =>
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      medicalOption: `${row.plan} - ${row.premium}`,
+                                    }))
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+
+                      <div className="mt-3 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                        <p className="font-semibold text-yellow-800">Note:</p>
+                        <ul className="list-disc list-inside text-sm text-slate-600">
+                          <li>M means principal</li>
+                          <li>M+1 means principal and one dependent</li>
+                          <li>Dependents can only be a spouse and/or children.</li>
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h5 className="font-semibold text-slate-700 mb-2">
+                        Seniors Rates
+                      </h5>
+
+                      {[
+                        {
+                          id: "A",
+                          label: "Option A — 70-75 Years",
+                          breakdown: [
+                            { role: "Principal", amount: "Kshs 46,104" },
+                            { role: "Spouse", amount: "Kshs 46,104" },
+                            { role: "Child (up to 25 years)", amount: "Kshs 6,429" },
+                          ],
+                        },
+                        {
+                          id: "B",
+                          label: "Option B — 76-80 Years",
+                          breakdown: [
+                            { role: "Principal", amount: "Kshs 76,695" },
+                            { role: "Spouse", amount: "Kshs 55,226" },
+                            { role: "Child (up to 25 years)", amount: "Kshs 6,429" },
+                          ],
+                        },
+                      ].map((opt) => (
+                        <div
+                          key={opt.id}
+                          className="border border-gray-100 bg-gradient-to-b from-white to-blue-50/20 rounded-lg p-3 mb-4"
+                        >
+                          <h6 className="font-semibold text-slate-800 mb-2">{opt.label}</h6>
+                          <table className="w-full text-sm">
+                            <thead className="bg-blue-50">
+                              <tr>
+                                <th className="p-2 text-left font-semibold">Category</th>
+                                <th className="p-2 text-left font-semibold">Premium</th>
+                                <th className="p-2 text-center font-semibold">Select</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {opt.breakdown.map((row) => {
+                                const value = `${opt.label} - ${row.role} - ${row.amount}`;
+                                const currentOptions = Array.isArray(formData.medicalOption) ? formData.medicalOption : [];
+                                const checked = currentOptions.includes(value);
+                                return (
+                                  <tr key={row.role} className="hover:bg-blue-50/40">
+                                    <td className="p-2">{row.role}</td>
+                                    <td className="p-2 text-slate-600">{row.amount}</td>
+                                    <td className="p-2 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={(e) => {
+                                          setFormData((prev) => {
+                                            const current = Array.isArray(prev.medicalOption) ? prev.medicalOption : [];
+                                            const set = new Set(current);
+                                            if (e.target.checked) set.add(value);
+                                            else set.delete(value);
+                                            return {
+                                              ...prev,
+                                              medicalOption: Array.from(set) as string[],
+                                            };
+                                          });
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                    </>
+                  )}
+
+                  <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                    <span className="font-semibold text-blue-700">Total Premium: </span>
+                    {totalPremium > 0 ? (
+                      <span className="text-blue-700">
+                        Kshs {totalPremium.toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">No selection yet</span>
+                    )}
+                  </div>
+
+                </div>
+              )}
             </div>
 
             {/* Dependants section */}
@@ -1181,31 +1425,46 @@ const KenyansInJapanMemberForm: React.FC = () => {
             {/* Dependant Modal (HeroUI Modal with Framer Motion) */}
             <AnimatePresence>
               {openDialog && currentDependant && (
-                <Modal open={openDialog} onClose={handleCloseDialog}>
-                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
-                    <ModalHeader>
-                      <div className="text-lg font-semibold">Edit Dependant</div>
-                    </ModalHeader>
-                    <ModalBody>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700">Relationship</label>
-                          <Select value={currentDependant.relationship || ""} onChange={(val: any) => handleChangeDep({ target: { name: "relationship", value: val } })} className="mt-2">
-                            <SelectItem value="Spouse" disabled={isSpouseLimitReached || !isAdultRelationshipEligible}>Spouse</SelectItem>
-                            <SelectItem value="Parent" disabled={isNuclear || isParentLimitReached || !isAdultRelationshipEligible}>Parent</SelectItem>
-                            <SelectItem value="Child" disabled={isChildLimitReached}>Child</SelectItem>
-                            <SelectItem value="Sibling" disabled={isNuclear || isSiblingLimitReached}>Sibling</SelectItem>
-                          </Select>
-                          {errors.relationship && <div className="text-sm text-red-600 mt-1">{errors.relationship}</div>}
-                        </div>
+                <Modal isOpen={openDialog} onOpenChange={setOpenDialog}>
+                  <ModalContent>
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
+                      <ModalHeader>
+                        <div className="text-lg font-semibold">Edit Dependant</div>
+                      </ModalHeader>
+                      <ModalBody>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700">Relationship</label>
+                            <Select 
+                              selectedKeys={currentDependant.relationship ? [currentDependant.relationship] : []} 
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
+                                handleChangeDep({ target: { name: "relationship", value: selected } });
+                              }} 
+                              className="mt-2"
+                            >
+                              <SelectItem key="Spouse" isDisabled={isSpouseLimitReached || !isAdultRelationshipEligible}>Spouse</SelectItem>
+                              <SelectItem key="Parent" isDisabled={isNuclear || isParentLimitReached || !isAdultRelationshipEligible}>Parent</SelectItem>
+                              <SelectItem key="Child" isDisabled={isChildLimitReached}>Child</SelectItem>
+                              <SelectItem key="Sibling" isDisabled={isNuclear || isSiblingLimitReached}>Sibling</SelectItem>
+                            </Select>
+                            {errors.relationship && <div className="text-sm text-red-600 mt-1">{errors.relationship}</div>}
+                          </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700">Title</label>
-                          <Select value={currentDependant.title || ""} onChange={(val: any) => handleChangeDep({ target: { name: "title", value: val } })} className="mt-2">
-                            {["Mr", "Master", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                          </Select>
-                          {errors.title && <div className="text-sm text-red-600 mt-1">{errors.title}</div>}
-                        </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700">Title</label>
+                            <Select 
+                              selectedKeys={currentDependant.title ? [currentDependant.title] : []} 
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
+                                handleChangeDep({ target: { name: "title", value: selected } });
+                              }} 
+                              className="mt-2"
+                            >
+                              {["Mr", "Master", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => <SelectItem key={t}>{t}</SelectItem>)}
+                            </Select>
+                            {errors.title && <div className="text-sm text-red-600 mt-1">{errors.title}</div>}
+                          </div>
 
                         <div>
                           <label className="block text-sm font-medium text-slate-700">First Name</label>
@@ -1227,10 +1486,17 @@ const KenyansInJapanMemberForm: React.FC = () => {
 
                         <div>
                           <label className="block text-sm font-medium text-slate-700">ID Type</label>
-                          <Select value={currentDependant.idtypes || ""} onChange={(val: any) => handleChangeDep({ target: { name: "idtypes", value: val } })} className="mt-2">
-                            <SelectItem value="National ID">National ID</SelectItem>
-                            <SelectItem value="Passport">Passport</SelectItem>
-                            <SelectItem value="Birth Certificate">Birth Certificate</SelectItem>
+                          <Select 
+                            selectedKeys={currentDependant.idtypes ? [currentDependant.idtypes] : []} 
+                            onSelectionChange={(keys) => {
+                              const selected = Array.from(keys)[0] as string;
+                              handleChangeDep({ target: { name: "idtypes", value: selected } });
+                            }} 
+                            className="mt-2"
+                          >
+                            <SelectItem key="National ID">National ID</SelectItem>
+                            <SelectItem key="Passport">Passport</SelectItem>
+                            <SelectItem key="Birth Certificate">Birth Certificate</SelectItem>
                           </Select>
                           {errors.idtypes && <div className="text-sm text-red-600 mt-1">{errors.idtypes}</div>}
                         </div>
@@ -1249,17 +1515,31 @@ const KenyansInJapanMemberForm: React.FC = () => {
 
                         <div>
                           <label className="block text-sm font-medium text-slate-700">Gender</label>
-                          <Select value={currentDependant.gendere || ""} onChange={(val: any) => handleChangeDep({ target: { name: "gendere", value: val } })} className="mt-2">
-                            <SelectItem value="Male">Male</SelectItem>
-                            <SelectItem value="Female">Female</SelectItem>
+                          <Select 
+                            selectedKeys={currentDependant.gendere ? [currentDependant.gendere] : []} 
+                            onSelectionChange={(keys) => {
+                              const selected = Array.from(keys)[0] as string;
+                              handleChangeDep({ target: { name: "gendere", value: selected } });
+                            }} 
+                            className="mt-2"
+                          >
+                            <SelectItem key="Male">Male</SelectItem>
+                            <SelectItem key="Female">Female</SelectItem>
                           </Select>
                           {errors.gendere && <div className="text-sm text-red-600 mt-1">{errors.gendere}</div>}
                         </div>
 
                         <div>
                           <label className="block text-sm font-medium text-slate-700">Country</label>
-                          <Select value={currentDependant.countrye || ""} onChange={(val: any) => handleChangeDep({ target: { name: "countrye", value: val } })} className="mt-2">
-                            {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          <Select 
+                            selectedKeys={currentDependant.countrye ? [currentDependant.countrye] : []} 
+                            onSelectionChange={(keys) => {
+                              const selected = Array.from(keys)[0] as string;
+                              handleChangeDep({ target: { name: "countrye", value: selected } });
+                            }} 
+                            className="mt-2"
+                          >
+                            {countries.map((c) => <SelectItem key={c}>{c}</SelectItem>)}
                           </Select>
                           {errors.countrye && <div className="text-sm text-red-600 mt-1">{errors.countrye}</div>}
                         </div>
@@ -1270,12 +1550,13 @@ const KenyansInJapanMemberForm: React.FC = () => {
                           {errors.cities && <div className="text-sm text-red-600 mt-1">{errors.cities}</div>}
                         </div>
                       </div>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button variant="ghost" onClick={handleCloseDialog}>Cancel</Button>
-                      <Button onClick={handleSaveDependant}>Save</Button>
-                    </ModalFooter>
-                  </motion.div>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button variant="ghost" onPress={handleCloseDialog}>Cancel</Button>
+                        <Button onPress={handleSaveDependant}>Save</Button>
+                      </ModalFooter>
+                    </motion.div>
+                  </ModalContent>
                 </Modal>
               )}
             </AnimatePresence>
@@ -1354,32 +1635,47 @@ const KenyansInJapanMemberForm: React.FC = () => {
             {/* Beneficiary Modal */}
             <AnimatePresence>
               {openBeneficiaryDialog && currentBeneficiary && (
-                <Modal open={openBeneficiaryDialog} onClose={handleCloseBeneficiaryDialog}>
-                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
-                    <ModalHeader>
-                      <div className="text-lg font-semibold">Edit Beneficiary</div>
-                    </ModalHeader>
-                    <ModalBody>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700">Relationship</label>
-                          <Select value={currentBeneficiary.relationship || ""} onChange={(val: any) => handleChangeBeneficiary({ target: { name: "relationship", value: val } })} className="mt-2">
-                            <SelectItem value="Spouse">Spouse</SelectItem>
-                            <SelectItem value="Parent">Parent</SelectItem>
-                            <SelectItem value="Child">Child</SelectItem>
-                            <SelectItem value="Sibling">Sibling</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                          </Select>
-                          {errors.relationship && <div className="text-sm text-red-600 mt-1">{errors.relationship}</div>}
-                        </div>
+                <Modal isOpen={openBeneficiaryDialog} onOpenChange={setOpenBeneficiaryDialog}>
+                  <ModalContent>
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
+                      <ModalHeader>
+                        <div className="text-lg font-semibold">Edit Beneficiary</div>
+                      </ModalHeader>
+                      <ModalBody>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700">Relationship</label>
+                            <Select 
+                              selectedKeys={currentBeneficiary.relationship ? [currentBeneficiary.relationship] : []} 
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
+                                handleChangeBeneficiary({ target: { name: "relationship", value: selected } });
+                              }} 
+                              className="mt-2"
+                            >
+                              <SelectItem key="Spouse">Spouse</SelectItem>
+                              <SelectItem key="Parent">Parent</SelectItem>
+                              <SelectItem key="Child">Child</SelectItem>
+                              <SelectItem key="Sibling">Sibling</SelectItem>
+                              <SelectItem key="Other">Other</SelectItem>
+                            </Select>
+                            {errors.relationship && <div className="text-sm text-red-600 mt-1">{errors.relationship}</div>}
+                          </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700">Title</label>
-                          <Select value={currentBeneficiary.title || ""} onChange={(val: any) => handleChangeBeneficiary({ target: { name: "title", value: val } })} className="mt-2">
-                            {["Mr", "Master", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                          </Select>
-                          {errors.title && <div className="text-sm text-red-600 mt-1">{errors.title}</div>}
-                        </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700">Title</label>
+                            <Select 
+                              selectedKeys={currentBeneficiary.title ? [currentBeneficiary.title] : []} 
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
+                                handleChangeBeneficiary({ target: { name: "title", value: selected } });
+                              }} 
+                              className="mt-2"
+                            >
+                              {["Mr", "Master", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => <SelectItem key={t}>{t}</SelectItem>)}
+                            </Select>
+                            {errors.title && <div className="text-sm text-red-600 mt-1">{errors.title}</div>}
+                          </div>
 
                         <div>
                           <label className="block text-sm font-medium text-slate-700">Beneficiary Full Name</label>
@@ -1411,12 +1707,13 @@ const KenyansInJapanMemberForm: React.FC = () => {
                           {errors.beneficiary_email && <div className="text-sm text-red-600 mt-1">{errors.beneficiary_email}</div>}
                         </div>
                       </div>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button variant="ghost" onClick={handleCloseBeneficiaryDialog}>Cancel</Button>
-                      <Button onClick={handleSaveBeneficiary}>Save</Button>
-                    </ModalFooter>
-                  </motion.div>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button variant="ghost" onPress={handleCloseBeneficiaryDialog}>Cancel</Button>
+                        <Button onPress={handleSaveBeneficiary}>Save</Button>
+                      </ModalFooter>
+                    </motion.div>
+                  </ModalContent>
                 </Modal>
               )}
             </AnimatePresence>

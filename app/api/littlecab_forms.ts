@@ -4,25 +4,49 @@ import * as fs from 'fs/promises';
 import * as XLSX from 'xlsx';
 import path from 'path';
 
+// --- Types ---
+type SheetMatrix = (string | number | null)[][];
+
+interface Dependant {
+  relationship: string;
+  title?: string;
+  firstName: string;
+  middleName?: string;
+  surname?: string;
+  idtypes?: string;
+  idnos?: string;
+  dob?: string;
+  gendere?: string;
+}
+
+interface Beneficiary {
+  relationship: string;
+  beneficiary_fullname: string;
+  title?: string;
+  beneficiary_id?: string;
+  dob?: string;
+  phone_number?: string;
+  beneficiary_address?: string;
+  beneficiary_email?: string;
+}
 
 export interface LittlecabFormsForm {
-  beneficiariesData = []: string;
-  const {
-      memberidno: string;
-  dateofbirth: string;
-  dependantsData = []: string;
-  eimail: string;
+  memberidno: string;
+  title: string;
   firstname: string;
+  middlename: string;
+  lastname: string;
+  dateofbirth: string;
   gender: string;
   idno: string;
   idtype: string;
   kra_pin: string;
-  lastname: string;
-  middlename: string;
+  eimail: string;
   mobileno: string;
   option: string;
   other_mobileno: string;
-  title: string;
+  dependantsData: Dependant[];
+  beneficiariesData: Beneficiary[];
 }
 
 
@@ -47,7 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const filePath = path.join(publicDir, 'littlecab_member_details.xlsx');
     const pendingPath = path.join(publicDir, 'pending_emails.json');
 
-    let workbook;
+    let workbook: XLSX.WorkBook;
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
 
     if (fileBuffer) {
@@ -63,8 +87,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'KRA PIN', 'Mobile Number', 'Other Mobile No', 'Email', 'Option'
     ];
 
-    let memberSheetData = workbook.Sheets['Member Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Member Details'], { header: 1 })
+    let memberSheetData: SheetMatrix = workbook.Sheets['Member Details']
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets['Member Details'], { header: 1 }) as SheetMatrix)
       : [memberHeaders];
 
     memberSheetData.push([
@@ -85,11 +109,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'Last Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender'
     ];
 
-    let depSheetData = workbook.Sheets['Dependants Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Dependants Details'], { header: 1 })
+    let depSheetData: SheetMatrix = workbook.Sheets['Dependants Details']
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets['Dependants Details'], { header: 1 }) as SheetMatrix)
       : [depHeaders];
 
-    dependantsData.forEach((dep, index) => {
+    dependantsData.forEach((dep: Dependant, index: number) => {
       if (!dep || !dep.relationship || !dep.firstName || !dep.idnos) return;
 
       depSheetData.push([
@@ -119,11 +143,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'ID Number', 'Date Of Birth', 'Phone Number', 'Address', 'Email'
     ];
 
-    let benSheetData = workbook.Sheets['Beneficiaries Info']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Beneficiaries Info'], { header: 1 })
+    let benSheetData: SheetMatrix = workbook.Sheets['Beneficiaries Info']
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets['Beneficiaries Info'], { header: 1 }) as SheetMatrix)
       : [benHeaders];
 
-    beneficiariesData.forEach((ben, index) => {
+    beneficiariesData.forEach((ben: Beneficiary, index: number) => {
       if (!ben || !ben.relationship || !ben.beneficiary_fullname) return;
 
       benSheetData.push([
@@ -181,19 +205,19 @@ Thank you for your submission.
 - Option: ${option}
 
 📌 DEPENDANTS
-${dependantsData.length > 0 ? dependantsData.map((d, i) => `
+${dependantsData.length > 0 ? dependantsData.map((d: Dependant, i: number) => `
 Dependant ${i + 1}:
 - ${d.relationship} - ${d.title || ''} ${d.firstName} ${d.middleName || ''} ${d.surname || ''}`).join('\n') : 'None'}
 
 📌 BENEFICIARIES
-${beneficiariesData.length > 0 ? beneficiariesData.map((b, i) => `
+${beneficiariesData.length > 0 ? beneficiariesData.map((b: Beneficiary, i: number) => `
 Beneficiary ${i + 1}:
 - ${b.relationship} - ${b.title || ''} ${b.beneficiary_fullname}
 - Phone: ${b.phone_number || ''} | Email: ${b.beneficiary_email || ''}`).join('\n') : 'None'}
     `.trim();
 
     // --- SEND EMAILS ---
-    let pending = [];
+    let pending: any[] = [];
 
     // 1. Confirmation to member
     if (eimail && eimail.includes('@')) {
@@ -206,8 +230,8 @@ Beneficiary ${i + 1}:
       try {
         await transporter.sendMail(memberMail);
         console.log("✅ Member confirmation sent:", eimail);
-      } catch (err) {
-        console.error("❌ Failed to send member email:", err.message);
+      } catch (err: any) {
+        console.error("❌ Failed to send member email:", err?.message);
         pending.push(memberMail);
       }
     } else {
@@ -232,8 +256,8 @@ Beneficiary ${i + 1}:
     try {
       await transporter.sendMail(adminMail);
       console.log("✅ Admin email sent.");
-    } catch (err) {
-      console.error("❌ Failed to send admin email:", err.message);
+    } catch (err: any) {
+      console.error("❌ Failed to send admin email:", err?.message);
       pending.push(adminMail);
     }
 
@@ -241,18 +265,18 @@ Beneficiary ${i + 1}:
     if (pending.length > 0) {
       try {
         const existing = await fs.readFile(pendingPath, 'utf-8').catch(() => '[]');
-        const all = [...JSON.parse(existing), ...pending];
+        const all: any[] = [...JSON.parse(existing), ...pending];
         await fs.writeFile(pendingPath, JSON.stringify(all, null, 2));
         console.log("📦 Saved failed emails for retry.");
-      } catch (err) {
-        console.error("❌ Failed to save pending emails:", err.message);
+      } catch (err: any) {
+        console.error("❌ Failed to save pending emails:", err?.message);
       }
     }
 
     return res.status(200).json({ message: 'Form submitted successfully', fileUrl });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Handler error:", error);
-    return res.status(500).json({ error: error.message || 'Server error' });
+    return res.status(500).json({ error: error?.message || 'Server error' });
   }
 }

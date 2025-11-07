@@ -1,5 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm } from 'formidable';
+
+// Helper to parse formidable multipart form data in an async/await style
+function parseForm(req: NextApiRequest): Promise<{ fields: any; files: any; }> {
+  return new Promise((resolve, reject) => {
+    const form = new IncomingForm({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) return reject(err);
+      resolve({ fields, files });
+    });
+  });
+}
+
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 

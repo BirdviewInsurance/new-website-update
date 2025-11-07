@@ -42,7 +42,8 @@ const Medical: React.FC = () => {
                 const response = await axios.get(
                     "https://snownet-customer-quotation-server.onrender.com/api/underwriting/quotation/onlineQuotation/products/exchangeRate/"
                 );
-                const ratesArray = response.data?.data || [];
+                const responseData = response.data as any;
+                const ratesArray = responseData?.data || [];
                 const ratesMap: { [key: string]: number } = {};
                 for (let item of ratesArray) {
                     if (item.currency && item.x_rate) {

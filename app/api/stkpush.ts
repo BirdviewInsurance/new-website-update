@@ -2,9 +2,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from "axios";
 
 
+// Environment variable guards added automatically
+if (!process.env.MPESA_CALLBACK_URL) { throw new Error('Missing required environment variable: MPESA_CALLBACK_URL'); }
+if (!process.env.MPESA_CONSUMER_KEY) { throw new Error('Missing required environment variable: MPESA_CONSUMER_KEY'); }
+if (!process.env.MPESA_CONSUMER_SECRET) { throw new Error('Missing required environment variable: MPESA_CONSUMER_SECRET'); }
+if (!process.env.MPESA_PASSKEY) { throw new Error('Missing required environment variable: MPESA_PASSKEY'); }
+if (!process.env.MPESA_SHORTCODE) { throw new Error('Missing required environment variable: MPESA_SHORTCODE'); }
+
+
+
 export interface StkpushForm {
   amount: number;
-  const { phone: string;
+  phone: string;
   idno: string;
 }
 
@@ -41,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         headers: { Authorization: `Basic ${auth}` },
       }
     );
-    const accessToken = tokenRes.data.access_token;
+    const accessToken = (tokenRes.data as { access_token: string }).access_token;
 
     // 2. Create password
     const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14); // YYYYMMDDHHMMSS
@@ -81,20 +90,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     );
 
+    const stkData = stkRes.data as { CheckoutRequestID: string };
     return res.status(200).json({
       success: true,
-      checkoutRequestID: stkRes.data.CheckoutRequestID,
+      checkoutRequestID: stkData.CheckoutRequestID,
       message:
-        "STK push initiated. Check your phone (sandbox won’t prompt real devices).",
+        "STK push initiated. Check your phone (sandbox won't prompt real devices).",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       "STK Push Error Raw:",
-      JSON.stringify(error.response?.data || error.message, null, 2)
+      JSON.stringify(error?.response?.data || error?.message, null, 2)
     );
     return res.status(500).json({
       success: false,
-      error: error.response?.data || error.message,
+      error: error?.response?.data || error?.message,
     });
   }
 }

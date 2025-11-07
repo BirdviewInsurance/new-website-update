@@ -125,11 +125,11 @@ export default function MemberForm(): JSX.Element {
   }, []);
 
   const showToast = (type: "success" | "error", message: string) => {
-    toast({
-      title: type === "success" ? "Success" : "Error",
-      description: message,
-      color: type === "success" ? "success" : "danger",
-    });
+    if (type === "success") {
+      (toast as any).success(message);
+    } else {
+      (toast as any).error(message);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +196,7 @@ export default function MemberForm(): JSX.Element {
               <Input name="groupnumber" label="Group Number" value={formData.groupnumber} onChange={handleChange} />
               <Select
                 label="Relationship"
-                selectedKeys={[formData.relationship]}
+                selectedKeys={formData.relationship ? [formData.relationship] : []}
                 onSelectionChange={(keys) => setFormData((p) => ({ ...p, relationship: Array.from(keys)[0] as string }))}
               >
                 <SelectItem key="Principal">Principal</SelectItem>
@@ -204,7 +204,7 @@ export default function MemberForm(): JSX.Element {
               </Select>
               <Select
                 label="Title"
-                selectedKeys={[formData.title]}
+                selectedKeys={formData.title ? [formData.title] : []}
                 onSelectionChange={(keys) => setFormData((p) => ({ ...p, title: Array.from(keys)[0] as string }))}
               >
                 {["Mr", "Mrs", "Miss", "Dr", "Prof"].map((t) => (
@@ -218,7 +218,7 @@ export default function MemberForm(): JSX.Element {
               <Input name="dateofbirth" label="Date of Birth" type="date" max={today} value={formData.dateofbirth} onChange={handleChange} />
               <Select
                 label="Gender"
-                selectedKeys={[formData.gender]}
+                selectedKeys={formData.gender ? [formData.gender] : []}
                 onSelectionChange={(keys) => setFormData((p) => ({ ...p, gender: Array.from(keys)[0] as string }))}
               >
                 <SelectItem key="Male">Male</SelectItem>
@@ -227,7 +227,7 @@ export default function MemberForm(): JSX.Element {
               </Select>
               <Select
                 label="Country"
-                selectedKeys={[formData.country]}
+                selectedKeys={formData.country ? [formData.country] : []}
                 onSelectionChange={(keys) => setFormData((p) => ({ ...p, country: Array.from(keys)[0] as string }))}
               >
                 {countries.map((c) => (
@@ -310,24 +310,24 @@ export default function MemberForm(): JSX.Element {
                   <Input
                     label="First Name"
                     value={currentDependant?.firstName || ""}
-                    onChange={(e) => setCurrentDependant((p) => ({ ...(p ?? {}), firstName: e.target.value }))}
+                    onChange={(e) => setCurrentDependant((p) => p ? { ...p, firstName: e.target.value } : null)}
                   />
                   <Input
                     label="Surname"
                     value={currentDependant?.surname || ""}
-                    onChange={(e) => setCurrentDependant((p) => ({ ...(p ?? {}), surname: e.target.value }))}
+                    onChange={(e) => setCurrentDependant((p) => p ? { ...p, surname: e.target.value } : null)}
                   />
                   <Input
                     label="DOB"
                     type="date"
                     max={today}
                     value={currentDependant?.dob || ""}
-                    onChange={(e) => setCurrentDependant((p) => ({ ...(p ?? {}), dob: e.target.value }))}
+                    onChange={(e) => setCurrentDependant((p) => p ? { ...p, dob: e.target.value } : null)}
                   />
                   <Select
                     label="Gender"
-                    selectedKeys={[currentDependant?.gendere || ""]}
-                    onSelectionChange={(keys) => setCurrentDependant((p) => ({ ...(p ?? {}), gendere: Array.from(keys)[0] as string }))}
+                    selectedKeys={currentDependant?.gendere ? [currentDependant.gendere] : []}
+                    onSelectionChange={(keys) => setCurrentDependant((p) => p ? { ...p, gendere: Array.from(keys)[0] as string } : null)}
                   >
                     <SelectItem key="Male">Male</SelectItem>
                     <SelectItem key="Female">Female</SelectItem>
@@ -336,7 +336,15 @@ export default function MemberForm(): JSX.Element {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onOpenChange}>Cancel</Button>
-                <Button color="primary" onPress={onOpenChange}>Save</Button>
+                <Button color="primary" onPress={() => {
+                  if (currentDependant) {
+                    setFormData((p) => ({
+                      ...p,
+                      dependantsData: p.dependantsData.map((d) => d.id === currentDependant.id ? currentDependant : d)
+                    }));
+                  }
+                  onOpenChange();
+                }}>Save</Button>
               </ModalFooter>
             </ModalContent>
           </Modal>

@@ -39,6 +39,7 @@ const MobileMegaMenu = ({
   closeDrawer: () => void;
 }) => {
   const [openTop, setOpenTop] = useState<string | null>(null);
+  const router = useRouter();
   const [openColumns, setOpenColumns] = useState<{ [key: string]: number | null }>({});
 
   const topLevelItems = [
@@ -62,6 +63,7 @@ const MobileMegaMenu = ({
             <button
               onClick={() => {
                 if (!mega) {
+                  router.push(item.href);
                   closeDrawer();
                 } else {
                   setOpenTop(isOpen ? null : item.label);
@@ -196,14 +198,29 @@ export const Navbar = () => {
     };
   }, []);
 
+  // helper to close drawer
+  const closeDrawer = () => setIsDrawerOpen(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim() !== "") {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsDrawerOpen(false); // close mobile drawer if open
+    }
+  };
+
   const searchInput = (
     <Input
       aria-label="Search"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      onKeyDown={handleSearchSubmit}
       classNames={{
-        inputWrapper: "bg-default-100",
+        inputWrapper: "bg-default-100 rounded-lg border border-primary/20 shadow-sm",
         input: "text-sm placeholder:text-primary font-semibold",
       }}
-      labelPlacement="outside"
+      size="sm"
       placeholder="Search..."
       startContent={
         <SearchIcon className="text-base text-primary font-semibold pointer-events-none flex-shrink-0" />
@@ -212,17 +229,18 @@ export const Navbar = () => {
     />
   );
 
-  const retrieveInput = (
-    <Input
-      aria-label="Retrieve"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm placeholder:text-primary font-semibold",
-      }}
-      placeholder="Retrieve Policy / ID..."
-      type="text"
-    />
-  );
+
+  // const retrieveInput = (
+  //   <Input
+  //     aria-label="Retrieve"
+  //     classNames={{
+  //       inputWrapper: "bg-default-100",
+  //       input: "text-sm placeholder:text-primary font-semibold",
+  //     }}
+  //     placeholder="Retrieve Policy / ID..."
+  //     type="text"
+  //   />
+  // );
 
 
   const megaMenus = {
@@ -472,7 +490,6 @@ export const Navbar = () => {
           { label: "Privacy Policy", href: "/privacy-policy" },
           { label: "Terms of Service", href: "/terms-of-service" },
           { label: "Regulatory Info", href: "/regulatory-info" },
-          { label: "Sitemap", href: "/sitemap" },
         ],
       },
       {
@@ -495,93 +512,49 @@ export const Navbar = () => {
       {
         title: "Resources", links: [
           { label: "Blog", href: "/blog" },
-          { label: "Newsroom", href: "/media/news" },
+          { label: "Newsroom", href: "/newsroom" },
           { label: "FAQs", href: "/faqs" },
         ],
       },
     ],
   };
 
-  // helper to close drawer
-  const closeDrawer = () => setIsDrawerOpen(false);
-
   return (
     <>
       {/* Topbar */}
-      <div className="w-full bg-primary text-white text-sm px-6 py-2 flex items-center justify-between relative z-50">
+      <div className="w-full bg-primary text-white text-sm px-4 py-5 flex items-center justify-between flex-wrap md:flex-nowrap relative z-50">
         {/* Left: Full-height white logo section */}
         <div className="hidden md:flex items-center gap-2 flex-shrink-0 bg-white h-full absolute left-0 top-0 px-4">
           <Link href="/" className="flex items-center gap-2 h-full">
             <img
               src="/images/logo1.png"
               alt="Birdview Logo"
-              className="h-full w-auto object-contain"
+              className="h-16 md:h-22 w-auto md:w-38 object-contain"
             />
             <span className="font-semibold text-primary"></span>
           </Link>
         </div>
 
         {/* Center: Menu links */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-wrap gap-4 justify-center">
+        <div
+          className="
+    flex flex-wrap 
+    justify-center items-center 
+    w-full 
+    gap-3 md:gap-6 lg:gap-10
+    text-center 
+    mx-auto
+  "
+        >
           {["Newsroom", "Careers", "Blog", "Complaints", "Contact Us"].map((item) => (
             <Link
               key={item}
               href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
-              className="hover:underline text-white whitespace-nowrap"
+              className="hover:underline text-white font-medium tracking-wide transition-colors duration-300"
             >
               {item}
             </Link>
           ))}
-        </div>
-
-        {/* Right: Portals dropdown */}
-        <div className="flex items-center gap-4 relative flex-shrink-0 ml-auto" ref={menuRef}>
-          <Button
-            onPress={() => setOpenMenu(openMenu === "portals" ? null : "portals")}
-            className="bg-danger text-white font-semibold px-4 py-2 rounded-md transition-all duration-300"
-          >
-            Portals
-            <span
-              className={clsx(
-                "inline-block ml-2 transition-transform duration-300",
-                openMenu === "portals" ? "rotate-180" : "rotate-0"
-              )}
-            >
-              ▼
-            </span>
-          </Button>
-
-          <AnimatePresence>
-            {openMenu === "portals" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={submenuVariants}
-                className="absolute right-0 top-full mt-2 z-50 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
-              >
-                {[
-                  { name: "Agent Portal", path: "/agent-portal" },
-                  { name: "Broker Portal", path: "/broker-portal" },
-                  { name: "Provider Portal", path: "/provider-portal" },
-                  { name: "Intermediary Registration", path: "/intermediary-registration" },
-                  { name: "Agent Registration", path: "/agent-registration" },
-                  { name: "Group Registration", path: "/group-registration" },
-                ].map((item) => (
-                  <div
-                    key={item.name}
-                    className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors"
-                    onClick={() => {
-                      router.push(item.path);
-                      setOpenMenu(null);
-                    }}
-                  >
-                    {item.name}
-                  </div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
 
@@ -607,7 +580,7 @@ export const Navbar = () => {
           </NavbarBrand>
 
           {/* Desktop / Tablet Nav Items (visible from md upwards) */}
-          <ul className="hidden md:flex gap-6 justify-start ml-4 relative">
+          <ul className="hidden md:flex gap-4 justify-start ml-4 relative">
             {[
               { label: "Home", href: "/" },
               { label: "Services", href: "/services", mega: true, megaItems: megaMenus.Services },
@@ -620,7 +593,14 @@ export const Navbar = () => {
               return (
                 <NavbarItem key={item.href} className="relative group">
                   <button
-                    onClick={() => item.mega && setOpenMenu(openMenu === item.label ? null : item.label)}
+                    onClick={() => {
+                      if (item.label === "Home") {
+                        router.push("/"); // ✅ navigate to homepage
+                        setOpenMenu(null);
+                      } else if (item.mega) {
+                        setOpenMenu(openMenu === item.label ? null : item.label);
+                      }
+                    }}
                     className={clsx(
                       "flex items-center gap-1 text-white relative transition-colors duration-300",
                       isActive ? "font-semibold" : "font-medium"
@@ -693,25 +673,122 @@ export const Navbar = () => {
 
         {/* Right side (search + retrieve + theme) visible md+ */}
         <NavbarContent className="hidden md:flex basis-1/5 md:basis-full" justify="end">
-          <NavbarItem className="hidden lg:flex font-semibold text-primary">
+          <NavbarItem className="w-[220px] lg:w-[320px] font-semibold text-primary">
             {searchInput}
           </NavbarItem>
 
-          <NavbarItem className="hidden lg:flex font-semibold text-primary">
+          {/* <NavbarItem className="hidden lg:flex font-semibold text-primary">
             {retrieveInput}
-          </NavbarItem>
+          </NavbarItem> */}
 
           <NavbarItem className="hidden md:flex gap-2">
-            <ThemeSwitch />
+            <div
+              className="flex items-center justify-center md:justify-end gap-2 relative flex-shrink-0 ml-auto"
+              ref={menuRef}
+            >
+              <Button
+                onPress={() => setOpenMenu(openMenu === 'portals' ? null : 'portals')}
+                className="bg-primary text-white font-semibold px-3 py-1.5 rounded-md transition-all duration-300 text-sm"
+              >
+                Portals
+                <span
+                  className={clsx(
+                    'inline-block ml-1 transition-transform duration-300',
+                    openMenu === 'portals' ? 'rotate-180' : 'rotate-0'
+                  )}
+                >
+                  ▼
+                </span>
+              </Button>
+
+              <AnimatePresence>
+                {openMenu === 'portals' && (
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={submenuVariants}
+                    className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                  >
+                    {[
+                      { name: 'Agent Portal', path: '/agent-portal' },
+                      { name: 'Broker Portal', path: '/broker-portal' },
+                      { name: 'Provider Portal', path: '/provider-portal' },
+                      { name: 'Intermediary Registration', path: '/intermediary-registration' },
+                      { name: 'Agent Registration', path: '/agent-registration' },
+                      { name: 'Group Registration', path: '/group-registration' },
+                    ].map((item) => (
+                      <div
+                        key={item.name}
+                        className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors"
+                        onClick={() => {
+                          router.push(item.path);
+                          setOpenMenu(null);
+                        }}
+                      >
+                        {item.name}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </NavbarItem>
         </NavbarContent>
 
         {/* Mobile icons + Hamburger (visible on small screens only) */}
         <NavbarContent className="md:hidden basis-1 pl-4" justify="end">
-          <Link isExternal aria-label="Github" href="https://github.com/">
-            <GithubIcon className="text-white" />
-          </Link>
-          <ThemeSwitch />
+          <div
+            className="flex items-center justify-center md:justify-end gap-2 relative flex-shrink-0 ml-auto"
+            ref={menuRef}
+          >
+            <Button
+              onPress={() => setOpenMenu(openMenu === 'portals' ? null : 'portals')}
+              className="bg-primary text-white font-semibold px-3 py-1.5 rounded-md transition-all duration-300 text-sm"
+            >
+              Portals
+              <span
+                className={clsx(
+                  'inline-block ml-1 transition-transform duration-300',
+                  openMenu === 'portals' ? 'rotate-180' : 'rotate-0'
+                )}
+              >
+                ▼
+              </span>
+            </Button>
+
+            <AnimatePresence>
+              {openMenu === 'portals' && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={submenuVariants}
+                  className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                >
+                  {[
+                    { name: 'Agent Portal', path: '/agent-portal' },
+                    { name: 'Broker Portal', path: '/broker-portal' },
+                    { name: 'Provider Portal', path: '/provider-portal' },
+                    { name: 'Intermediary Registration', path: '/intermediary-registration' },
+                    { name: 'Agent Registration', path: '/agent-registration' },
+                    { name: 'Group Registration', path: '/group-registration' },
+                  ].map((item) => (
+                    <div
+                      key={item.name}
+                      className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        router.push(item.path);
+                        setOpenMenu(null);
+                      }}
+                    >
+                      {item.name}
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           {/* Mobile menu toggle */}
           <button
             aria-label={isDrawerOpen ? "Close menu" : "Open menu"}

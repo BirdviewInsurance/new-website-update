@@ -30,24 +30,28 @@ export default function EvacuationRepatriationClaimForm() {
     } = useForm({ mode: "onBlur" });
 
     // local state
-    const [files, setFiles] = useState([]);
-    const [signatureUrl, setSignatureUrl] = useState(null);
+    const [files, setFiles] = useState<File[]>([]);
+    const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
     const [loadingPdf, setLoadingPdf] = useState(false);
 
     // toast state (center-fade single toast)
-    const [toast, setToast] = useState({
+    const [toast, setToast] = useState<{
+        open: boolean;
+        type: "success" | "error" | "info";
+        message: string;
+    }>({
         open: false,
         type: "success", // success | error | info
         message: "",
     });
 
     // refs for canvas and form (PDF export)
-    const canvasRef = useRef(null);
-    const formRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const formRef = useRef<HTMLFormElement | null>(null);
     const drawing = useRef(false);
 
     // helper: show toast
-    const showToast = (type, message, duration = 4000) => {
+    const showToast = (type: "success" | "error" | "info", message: string, duration = 4000) => {
         setToast({ open: true, type, message });
         if (duration > 0) {
             setTimeout(() => setToast((t) => ({ ...t, open: false })), duration);
@@ -55,30 +59,37 @@ export default function EvacuationRepatriationClaimForm() {
     };
 
     // files handlers
-    const handleFilesChange = (e) => {
+    const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newFiles = Array.from(e.target.files || []);
         setFiles((p) => [...p, ...newFiles]);
     };
-    const removeFile = (index) => setFiles((p) => p.filter((_, i) => i !== index));
+    const removeFile = (index: number) => setFiles((p) => p.filter((_, i) => i !== index));
 
     // signature drawing handlers
-    const startDraw = (e) => {
+    const startDraw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        if (!canvasRef.current) return;
         drawing.current = true;
         const rect = canvasRef.current.getBoundingClientRect();
         const ctx = canvasRef.current.getContext("2d");
+        if (!ctx) return;
         ctx.lineWidth = 2.6;
         ctx.lineCap = "round";
         ctx.beginPath();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
         ctx.moveTo(x, y);
     };
-    const draw = (e) => {
-        if (!drawing.current) return;
+    const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        if (!drawing.current || !canvasRef.current) return;
         const rect = canvasRef.current.getBoundingClientRect();
         const ctx = canvasRef.current.getContext("2d");
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        if (!ctx) return;
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
         ctx.lineTo(x, y);
         ctx.strokeStyle = "#111827"; // near-black stroke for clarity
         ctx.stroke();
@@ -88,6 +99,7 @@ export default function EvacuationRepatriationClaimForm() {
     const clearSignature = () => {
         if (!canvasRef.current) return;
         const ctx = canvasRef.current.getContext("2d");
+        if (!ctx) return;
         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         setSignatureUrl(null);
     };
@@ -118,7 +130,7 @@ export default function EvacuationRepatriationClaimForm() {
             pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
             pdf.save("evacuation-repatriation-claim.pdf");
             showToast("success", "PDF generated and downloaded.");
-        } catch (err) {
+        } catch (err: any) {
             console.error("PDF export error:", err);
             showToast("error", "Failed to generate PDF.");
         } finally {
@@ -127,7 +139,7 @@ export default function EvacuationRepatriationClaimForm() {
     };
 
     // Submit handler (multipart form with signature & files)
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: Record<string, any>) => {
         if (!signatureUrl) {
             showToast("error", "Please save your signature before submitting.");
             return;
@@ -135,7 +147,14 @@ export default function EvacuationRepatriationClaimForm() {
         try {
             const fd = new FormData();
             // append fields
-            Object.entries(data).forEach(([k, v]) => fd.append(k, v ?? ""));
+            Object.entries(data).forEach(([k, v]) => {
+                const value = v ?? "";
+                if (typeof value === "string" || value instanceof Blob) {
+                    fd.append(k, value);
+                } else {
+                    fd.append(k, String(value));
+                }
+            });
             // append files
             files.forEach((f) => fd.append("supportingFiles[]", f));
             // append signature as blob
@@ -154,9 +173,9 @@ export default function EvacuationRepatriationClaimForm() {
             reset();
             setFiles([]);
             clearSignature();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Submission failed:", err);
-            showToast("error", err.message || "Submission failed.");
+            showToast("error", err?.message || "Submission failed.");
         }
     };
 
@@ -169,12 +188,13 @@ export default function EvacuationRepatriationClaimForm() {
         canvas.width = Math.floor(rect.width * dpr);
         canvas.height = Math.floor(rect.height * dpr);
         const ctx = canvas.getContext("2d");
+        if (!ctx) return;
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }, []);
 
     // small helper component for required label
-    const RequiredLabel = ({ text }) => (
+    const RequiredLabel = ({ text }: { text: string }) => (
         <span className="flex items-center gap-1">
             <span>{text}</span>
             <span className="text-rose-500 font-semibold">*</span>
@@ -264,29 +284,29 @@ export default function EvacuationRepatriationClaimForm() {
                                                 <Input
                                                     label={<RequiredLabel text="Insured Person's Full Name" />}
                                                     {...register("insuredName", { required: "This field is required" })}
-                                                    invalid={!!errors.insuredName}
-                                                    helperText={errors.insuredName?.message}
+                                                    isInvalid={!!errors.insuredName}
+                                                    errorMessage={errors.insuredName?.message as string}
                                                 />
                                                 <Input
                                                     label={<RequiredLabel text="Policy Number" />}
                                                     {...register("policyNumber", { required: "This field is required" })}
-                                                    invalid={!!errors.policyNumber}
-                                                    helperText={errors.policyNumber?.message}
+                                                    isInvalid={!!errors.policyNumber}
+                                                    errorMessage={errors.policyNumber?.message as string}
                                                 />
                                                 <Input
                                                     label={<RequiredLabel text="Date of Birth" />}
                                                     type="date"
                                                     {...register("dob", { required: "This field is required" })}
-                                                    invalid={!!errors.dob}
-                                                    helperText={errors.dob?.message}
+                                                    isInvalid={!!errors.dob}
+                                                    errorMessage={errors.dob?.message as string}
                                                 />
                                                 <Input
                                                     label={<RequiredLabel text="Contact (phone & email)" />}
                                                     placeholder="+254 7xx xxx xxx | email@domain.com"
                                                     className="md:col-span-2"
                                                     {...register("contactInfo", { required: "This field is required" })}
-                                                    invalid={!!errors.contactInfo}
-                                                    helperText={errors.contactInfo?.message}
+                                                    isInvalid={!!errors.contactInfo}
+                                                    errorMessage={errors.contactInfo?.message as string}
                                                 />
                                                 <Input
                                                     label="Permanent Address"
@@ -312,14 +332,15 @@ export default function EvacuationRepatriationClaimForm() {
                                                     label={<RequiredLabel text="Claimant / Primary Insured Email" />}
                                                     type="email"
                                                     {...register("claimantEmail", { required: "This field is required" })}
-                                                    invalid={!!errors.claimantEmail}
-                                                    helperText={errors.claimantEmail?.message}
+                                                    isInvalid={!!errors.claimantEmail}
+                                                    errorMessage={errors.claimantEmail?.message as string}
                                                 />
                                                 <div className="col-span-full md:col-span-1">
                                                     <Select
                                                         label={<RequiredLabel text="Claimant Relationship" />}
                                                         {...register("claimantRelationship", { required: "This field is required" })}
-                                                        invalid={!!errors.claimantRelationship}
+                                                        isInvalid={!!errors.claimantRelationship}
+                                                        errorMessage={errors.claimantRelationship?.message as string}
                                                     >
                                                         <SelectItem key="SELF">Self</SelectItem>
                                                         <SelectItem key="RECRUITING_AGENCY">Recruiting Agency</SelectItem>
@@ -327,9 +348,6 @@ export default function EvacuationRepatriationClaimForm() {
                                                         <SelectItem key="SIBLING">Sibling</SelectItem>
                                                         <SelectItem key="PARENT">Parent</SelectItem>
                                                     </Select>
-                                                    {errors.claimantRelationship && (
-                                                        <p className="text-rose-600 text-xs mt-1">{errors.claimantRelationship.message}</p>
-                                                    )}
                                                 </div>
                                             </div>
                                         </section>
@@ -354,14 +372,14 @@ export default function EvacuationRepatriationClaimForm() {
                                                 <Input
                                                     label={<RequiredLabel text="Trip Destination (Country)" />}
                                                     {...register("destinationCountry", { required: "This field is required" })}
-                                                    invalid={!!errors.destinationCountry}
-                                                    helperText={errors.destinationCountry?.message}
+                                                    isInvalid={!!errors.destinationCountry}
+                                                    errorMessage={errors.destinationCountry?.message as string}
                                                 />
                                                 <Input
                                                     label={<RequiredLabel text="Reason for Travel" />}
                                                     {...register("reasonForTravel", { required: "This field is required" })}
-                                                    invalid={!!errors.reasonForTravel}
-                                                    helperText={errors.reasonForTravel?.message}
+                                                    isInvalid={!!errors.reasonForTravel}
+                                                    errorMessage={errors.reasonForTravel?.message as string}
                                                 />
                                                 <Input label="Travel Agent / Tour Operator" {...register("travelAgent")} />
                                                 <Input label="Travel Start Date" type="date" {...register("travelStart")} />
@@ -370,8 +388,8 @@ export default function EvacuationRepatriationClaimForm() {
                                                     label={<RequiredLabel text="Incident Date" />}
                                                     type="date"
                                                     {...register("incidentDate", { required: "This field is required" })}
-                                                    invalid={!!errors.incidentDate}
-                                                    helperText={errors.incidentDate?.message}
+                                                    isInvalid={!!errors.incidentDate}
+                                                    errorMessage={errors.incidentDate?.message as string}
                                                 />
                                             </div>
                                         </section>
@@ -397,8 +415,8 @@ export default function EvacuationRepatriationClaimForm() {
                                                     label={<RequiredLabel text="Circumstances of Incident" />}
                                                     rows={4}
                                                     {...register("incidentCircumstances", { required: "This field is required" })}
-                                                    invalid={!!errors.incidentCircumstances}
-                                                    helperText={errors.incidentCircumstances?.message}
+                                                    isInvalid={!!errors.incidentCircumstances}
+                                                    errorMessage={errors.incidentCircumstances?.message as string}
                                                 />
                                             </div>
                                             <br />
@@ -406,8 +424,8 @@ export default function EvacuationRepatriationClaimForm() {
                                                 <Input
                                                     label={<RequiredLabel text="Reason for Evacuation / Repatriation" />}
                                                     {...register("evacuationReason", { required: "This field is required" })}
-                                                    invalid={!!errors.evacuationReason}
-                                                    helperText={errors.evacuationReason?.message}
+                                                    isInvalid={!!errors.evacuationReason}
+                                                    errorMessage={errors.evacuationReason?.message as string}
                                                 />
                                                 <Input label="Initial Medical Treatment (date & place)" {...register("initialTreatment")} />
                                                 <Input label="Treating Physician's Name" {...register("treatingPhysician")} />
@@ -417,7 +435,7 @@ export default function EvacuationRepatriationClaimForm() {
                                                         <SelectItem key="YES">Yes</SelectItem>
                                                         <SelectItem key="NO">No</SelectItem>
                                                     </Select>
-                                                    <Input label="Notification Date / Confirmation #" type="date" {...register(" notificationInfo")} />
+                                                    <Input label="Notification Date / Confirmation #" type="date" {...register("notificationInfo")} />
                                                 </div>
                                             </div>
                                         </section>
@@ -476,20 +494,20 @@ export default function EvacuationRepatriationClaimForm() {
                                                 <Input
                                                     label={<RequiredLabel text="Preferred Payment Method" />}
                                                     {...register("paymentMethod", { required: "This field is required" })}
-                                                    invalid={!!errors.paymentMethod}
-                                                    helperText={errors.paymentMethod?.message}
+                                                    isInvalid={!!errors.paymentMethod}
+                                                    errorMessage={errors.paymentMethod?.message as string}
                                                 />
                                                 <Input
                                                     label={<RequiredLabel text="Bank Name" />}
                                                     {...register("bankName", { required: "This field is required" })}
-                                                    invalid={!!errors.bankName}
-                                                    helperText={errors.bankName?.message}
+                                                    isInvalid={!!errors.bankName}
+                                                    errorMessage={errors.bankName?.message as string}
                                                 />
                                                 <Input
                                                     label={<RequiredLabel text="Account Number" />}
                                                     {...register("accountNumber", { required: "This field is required" })}
-                                                    invalid={!!errors.accountNumber}
-                                                    helperText={errors.accountNumber?.message}
+                                                    isInvalid={!!errors.accountNumber}
+                                                    errorMessage={errors.accountNumber?.message as string}
                                                 />
                                                 <Input label="Account Holder Name" {...register("accountHolder")} />
                                                 <Input label="SWIFT / IBAN" {...register("swiftIban")} />
@@ -538,8 +556,8 @@ export default function EvacuationRepatriationClaimForm() {
                                                 <div className="ml-auto flex items-center gap-2">
                                                     <Button
                                                         onClick={exportPdf}
-                                                        variant="outlined"
-                                                        className="px-3 py-2 flex items-center gap-2 border-primary text-primary hover:bg-primary/10 transition outline-primary"
+                                                        variant="bordered"
+                                                        className="px-3 py-2 flex items-center gap-2 border-primary text-primary hover:bg-primary/10 transition"
                                                     >
                                                         <DownloadCloud size={14} /> {loadingPdf ? "Generating..." : "Export PDF"}
                                                     </Button>
@@ -590,7 +608,7 @@ export default function EvacuationRepatriationClaimForm() {
 
                                                     <div className="flex gap-2 mt-2">
                                                         <Button
-                                                            variant="outline"
+                                                            variant="bordered"
                                                             onClick={clearSignature}
                                                             className="px-3 py-2 flex items-center gap-2 text-primary border border-primary hover:bg-primary/10 transition"
                                                         >
@@ -618,8 +636,8 @@ export default function EvacuationRepatriationClaimForm() {
                                                         type="date"
                                                         className="mt-3"
                                                         {...register("declarationDate", { required: "This field is required" })}
-                                                        invalid={!!errors.declarationDate}
-                                                        helperText={errors.declarationDate?.message}
+                                                        isInvalid={!!errors.declarationDate}
+                                                        errorMessage={errors.declarationDate?.message as string}
                                                     />
                                                 </div>
                                             </div>

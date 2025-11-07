@@ -4,11 +4,12 @@ import * as XLSX from 'xlsx';
 import { promises as fs } from 'fs';
 import path from 'path';
 
+// --- Types ---
+type SheetMatrix = (string | number | null)[][];
 
 export interface RegistrationFormForm {
   agencies: number;
-  const { 
-      fullnames: string;
+  fullnames: string;
   email: string;
   mobileno: string;
 }
@@ -63,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ];
 
     // ✅ Convert worksheet to JSON and append new row
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const existingData: SheetMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as SheetMatrix;
     existingData.push(newRow);
     const updatedWorksheet = XLSX.utils.aoa_to_sheet(existingData);
     workbook.Sheets['Registration Data'] = updatedWorksheet;
@@ -101,8 +102,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: 'Form sent successfully' });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Full Error Details:', error);
-    res.status(500).json({ error: error.message || 'Unknown error occurred' });
+    res.status(500).json({ error: error?.message || 'Unknown error occurred' });
   }
 }

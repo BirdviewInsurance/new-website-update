@@ -4,27 +4,42 @@ import * as fs from 'fs/promises';
 import * as XLSX from 'xlsx';
 import path from 'path';
 
+// --- Types ---
+type SheetMatrix = (string | number | null)[][];
+
+interface Dependant {
+  relationship: string;
+  title?: string;
+  firstName: string;
+  middleName?: string;
+  surname?: string;
+  idtypes?: string;
+  idnos?: string;
+  dob?: string;
+  gendere?: string;
+  countrye?: string;
+  cities?: string;
+}
 
 export interface LdskcfMemberFormForm {
-  address: string;
-  city: string;
-  const { 
-      memberidno: string;
-  country: number;
-  dateofbirth: string;
-  dependantsData = []: string;
-  eimail: string;
-  firstname: string;
-  gender: string;
+  memberidno: string;
   groupname: string;
-  groupnumber: string;
-  idno: string;
-  idtype: string;
-  lastname: string;
-  middlename: string;
-  mobileno: string;
+  groupnumber: string; 
   relationship: string;
   title: string;
+  firstname: string;
+  middlename: string;
+  lastname: string;
+  idtype: string;
+  idno: string;
+  dateofbirth: string;
+  gender: string;
+  country: string;
+  city: string;
+  address: string;
+  mobileno: string;
+  eimail: string;
+  dependantsData: Dependant[];
 }
 
 
@@ -83,14 +98,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       XLSX.utils.book_append_sheet(workbook, ws2, 'Dependants Details');
     }
 
-    const existingMemberData = XLSX.utils.sheet_to_json(ws1, { header: 1 });
+    const existingMemberData: SheetMatrix = XLSX.utils.sheet_to_json(ws1, { header: 1 }) as SheetMatrix;
     existingMemberData.push([
       memberidno, groupname, groupnumber, relationship, title, firstname, lastname,
       middlename, idtype, idno, dateofbirth, gender, country, city, address, mobileno, eimail,
     ]);
     workbook.Sheets['Member Details'] = XLSX.utils.aoa_to_sheet(existingMemberData);
 
-    const existingDependantsData = XLSX.utils.sheet_to_json(ws2, { header: 1 });
+    const existingDependantsData: SheetMatrix = XLSX.utils.sheet_to_json(ws2, { header: 1 }) as SheetMatrix;
 
     if (Array.isArray(dependantsData) && dependantsData.length > 0) {
       dependantsData.forEach((dep, index) => {
@@ -147,8 +162,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (emailError) {
       console.error("⚠️ Email failed to send to member:", emailError);
       const pendingEmailsPath = path.join(publicDir, 'pending_emails.json');
-      let pendingEmails = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
-      pendingEmails = JSON.parse(pendingEmails);
+      const pendingEmailsContent = await fs.readFile(pendingEmailsPath, 'utf-8').catch(() => '[]');
+      const pendingEmails: any[] = JSON.parse(pendingEmailsContent);
       pendingEmails.push(mailOptions);
       await fs.writeFile(pendingEmailsPath, JSON.stringify(pendingEmails, null, 2));
       return res.status(202).json({ message: 'Form sent successfully, email to member pending', fileUrl });
@@ -184,7 +199,7 @@ Thank you for submitting your membership and dependants information. Below is a 
 
 📌 DEPENDANTS DETAILS
 ${dependantsData && dependantsData.length > 0 
-  ? dependantsData.map((d, i) => `
+  ? dependantsData.map((d: Dependant, i: number) => `
 Dependant ${i + 1}:
 - Relationship: ${d.relationship}
 - Title: ${d.title || '-'}
@@ -221,8 +236,8 @@ Birdview Insurance
     }
 
     return res.status(200).json({ message: 'Form sent successfully', fileUrl });
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Full Error Details:", error);
-    return res.status(500).json({ error: error.message || 'Unknown error occurred' });
+    return res.status(500).json({ error: error?.message || 'Unknown error occurred' });
   }
 }

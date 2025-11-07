@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ];
 
     // ✅ Append new row to worksheet
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
     existingData.push(newRow);
     const updatedWorksheet = XLSX.utils.aoa_to_sheet(existingData);
     workbook.Sheets['Enquiry Data'] = updatedWorksheet;
@@ -115,8 +115,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       downloadUrl: fileUrl
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Full Error Details:', error);
-    res.status(500).json({ error: error.message || 'Unknown error occurred' });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    res.status(500).json({ error: errorMessage });
   }
 }

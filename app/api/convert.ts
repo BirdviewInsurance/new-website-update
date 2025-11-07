@@ -1,14 +1,18 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export interface ConvertForm {
-  amount: number;
-  const { from: string;
-  to: string;
+    amount: number;
+    from: string;
+    to: string;
 }
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { from, to, amount } = req.query;
+    let { from, to, amount } = req.query;
+
+    // Normalize query params to string
+    if (Array.isArray(from)) from = from[0];
+    if (Array.isArray(to)) to = to[0];
+    if (Array.isArray(amount)) amount = amount[0];
 
     if (!from || !to || !amount) {
         return res.status(400).json({ error: "Missing required parameters" });
@@ -40,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             rate,
         });
     } catch (error) {
+        console.error("Conversion error:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 }

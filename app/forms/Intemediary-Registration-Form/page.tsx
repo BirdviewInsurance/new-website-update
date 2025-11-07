@@ -13,6 +13,7 @@ import {
   Card,
   CardBody,
   Modal,
+  ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
@@ -143,22 +144,10 @@ const AgentForm: React.FC = () => {
      Toast helpers (Hero UI toast object)
      ============================ */
   const notifySuccess = (message: string) =>
-    toast({
-      title: "Success",
-      description: message,
-      color: "success",
-      duration: 4500,
-      variant: "solid",
-    });
+    (toast as any).success(message);
 
   const notifyError = (message: string) =>
-    toast({
-      title: "Error",
-      description: message,
-      color: "danger",
-      duration: 6000,
-      variant: "solid",
-    });
+    (toast as any).error(message);
 
   /* ============================
      Helpers: auto-focus + scroll to first invalid field
@@ -245,10 +234,10 @@ const AgentForm: React.FC = () => {
 
       if (res.status === 200) {
         localStorage.setItem("subAgentSubmitted", "true");
-        notifySuccess(res.data.message || "Form submitted successfully!");
+        notifySuccess((res.data as any).message || "Form submitted successfully!");
         setTimeout(() => router.push("/"), 8000);
       } else {
-        notifyError(res.data.error || "Something went wrong");
+        notifyError((res.data as any).error || "Something went wrong");
       }
     } catch (err: any) {
       notifyError(err?.response?.data?.error || err.message || "Submission failed");
@@ -346,10 +335,10 @@ const AgentForm: React.FC = () => {
 
       if (res.status === 200) {
         localStorage.setItem("intermediarySubmitted", "true");
-        notifySuccess(res.data.message || "Form submitted successfully!");
+        notifySuccess((res.data as any).message || "Form submitted successfully!");
         setTimeout(() => router.push("/"), 8000);
       } else {
-        notifyError(res.data.error || "Something went wrong");
+        notifyError((res.data as any).error || "Something went wrong");
       }
     } catch (err: any) {
       console.error("Submission failed:", err);
@@ -410,8 +399,9 @@ const AgentForm: React.FC = () => {
           )}
 
           {/* Hero UI Modal (glassy corporate pop) */}
-          <Modal open={openRegistration} onClose={closeModal} className="backdrop-blur-sm">
-            <ModalHeader>
+          <Modal isOpen={openRegistration} onOpenChange={setOpenRegistration} className="backdrop-blur-sm">
+            <ModalContent>
+              <ModalHeader>
               <div className="relative flex flex-col items-center py-2">
                 <div className="mb-2">
                   <Image src="/images/logo.jpeg" alt="Logo" width={220} height={60} />
@@ -467,7 +457,7 @@ const AgentForm: React.FC = () => {
                     <Button type="submit" className="bg-gradient-to-r from-blue-600 to-sky-600 text-white">
                       {loaderIcon ? "Submitting..." : "Submit Sub Agent Form"}
                     </Button>
-                    <Button variant="outline" onClick={() => setIsSimpleForm(false)}>
+                    <Button variant="bordered" onPress={() => setIsSimpleForm(false)}>
                       Cancel
                     </Button>
                   </div>
@@ -477,20 +467,34 @@ const AgentForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-gray-700">Intermediary Type</label>
-                      <Select name="intermediary_type" value={formData.intermediary_type} onChange={handleChange}>
-                        <SelectItem value="Diaspora Agent">Diaspora Agent</SelectItem>
-                        <SelectItem value="Agent">Agent</SelectItem>
-                        <SelectItem value="Recruitment Agent">Recruitment Agent</SelectItem>
-                        <SelectItem value="Broker">Broker</SelectItem>
+                      <Select 
+                        name="intermediary_type" 
+                        selectedKeys={formData.intermediary_type ? [formData.intermediary_type] : []} 
+                        onSelectionChange={(keys) => {
+                          const selected = Array.from(keys)[0] as string;
+                          handleChange({ target: { name: "intermediary_type", value: selected } } as any);
+                        }}
+                      >
+                        <SelectItem key="Diaspora Agent">Diaspora Agent</SelectItem>
+                        <SelectItem key="Agent">Agent</SelectItem>
+                        <SelectItem key="Recruitment Agent">Recruitment Agent</SelectItem>
+                        <SelectItem key="Broker">Broker</SelectItem>
                       </Select>
                     </div>
 
                     {showPersonalFields && (
                       <div>
                         <label className="text-sm font-medium text-gray-700">Title</label>
-                        <Select name="title" value={formData.title} onChange={handleChange}>
+                        <Select 
+                          name="title" 
+                          selectedKeys={formData.title ? [formData.title] : []} 
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            handleChange({ target: { name: "title", value: selected } } as any);
+                          }}
+                        >
                           {["Mr", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => (
-                            <SelectItem key={t} value={t}>
+                            <SelectItem key={t}>
                               {t}
                             </SelectItem>
                           ))}
@@ -522,10 +526,17 @@ const AgentForm: React.FC = () => {
                     {showPersonalFields && (
                       <div>
                         <label className="text-sm font-medium text-gray-700">Gender</label>
-                        <Select name="gender" value={formData.gender} onChange={handleChange}>
-                          <SelectItem value="M">M</SelectItem>
-                          <SelectItem value="F">F</SelectItem>
-                          <SelectItem value="Others">Others</SelectItem>
+                        <Select 
+                          name="gender" 
+                          selectedKeys={formData.gender ? [formData.gender] : []} 
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            handleChange({ target: { name: "gender", value: selected } } as any);
+                          }}
+                        >
+                          <SelectItem key="M">M</SelectItem>
+                          <SelectItem key="F">F</SelectItem>
+                          <SelectItem key="Others">Others</SelectItem>
                         </Select>
                       </div>
                     )}
@@ -557,9 +568,16 @@ const AgentForm: React.FC = () => {
                     {showPersonalFields && (
                       <div>
                         <label className="text-sm font-medium text-gray-700">Identification Type</label>
-                        <Select name="idtype" value={formData.idtype} onChange={handleChange}>
-                          <SelectItem value="nID">nID (National ID)</SelectItem>
-                          <SelectItem value="pID">pID (Passport)</SelectItem>
+                        <Select 
+                          name="idtype" 
+                          selectedKeys={formData.idtype ? [formData.idtype] : []} 
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            handleChange({ target: { name: "idtype", value: selected } } as any);
+                          }}
+                        >
+                          <SelectItem key="nID">nID (National ID)</SelectItem>
+                          <SelectItem key="pID">pID (Passport)</SelectItem>
                         </Select>
                       </div>
                     )}
@@ -585,9 +603,16 @@ const AgentForm: React.FC = () => {
 
                     <div>
                       <label className="text-sm font-medium text-gray-700">Country of Residence</label>
-                      <Select name="country" value={formData.country} onChange={handleChange}>
+                      <Select 
+                        name="country" 
+                        selectedKeys={formData.country ? [formData.country] : []} 
+                        onSelectionChange={(keys) => {
+                          const selected = Array.from(keys)[0] as string;
+                          handleChange({ target: { name: "country", value: selected } } as any);
+                        }}
+                      >
                         {filteredCountries.map((c) => (
-                          <SelectItem value={c} key={c}>
+                          <SelectItem key={c}>
                             {c}
                           </SelectItem>
                         ))}
@@ -674,7 +699,7 @@ const AgentForm: React.FC = () => {
                     <Button type="submit" className="bg-gradient-to-r from-green-500 to-sky-600 text-white px-6 py-3">
                       {loaderIcon ? "Submitting..." : "Submit Registration"}
                     </Button>
-                    <Button variant="outline" onClick={closeModal}>
+                    <Button variant="bordered" onPress={closeModal}>
                       Cancel
                     </Button>
                   </div>
@@ -683,6 +708,7 @@ const AgentForm: React.FC = () => {
             </ModalBody>
 
             <ModalFooter />
+            </ModalContent>
           </Modal>
 
           {/* Hero CTA behind modal */}

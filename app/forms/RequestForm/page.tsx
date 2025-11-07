@@ -49,25 +49,13 @@ const Request: React.FC = () => {
 
       const data = await res.json();
       if (res.ok) {
-        toast({
-          title: "✅ Request Submitted",
-          description: data.message || "Your request has been sent successfully.",
-          variant: "success",
-        });
+        (toast as any).success(data?.message || "Your request has been sent successfully.");
         handleReset();
       } else {
-        toast({
-          title: "❌ Submission Failed",
-          description: data.error || "Something went wrong. Please try again.",
-          variant: "destructive",
-        });
+        (toast as any).error(data?.error || "Something went wrong. Please try again.");
       }
     } catch (err: any) {
-      toast({
-        title: "⚠️ Error",
-        description: err.message || "Network error. Please try again.",
-        variant: "destructive",
-      });
+      (toast as any).error(err?.message || "Network error. Please try again.");
     } finally {
       setLoading(false);
     }

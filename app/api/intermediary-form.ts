@@ -13,8 +13,7 @@ export interface IntermediaryFormForm {
   city: string;
   company_name: string;
   company_number: string;
-  const {
-      intermediary_type: string;
+  intermediary_type: string;
   country: number;
   dateofbirth: string;
   eimail: string;
@@ -45,43 +44,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       bank_name, account_name, bank_branch, account_number
     } = req.body;
 
-  const isValidDate = (date) => {
-    const parsed = new Date(date);
-    return parsed instanceof Date && !isNaN(parsed);
-  };
+    const isValidDate = (date: string): boolean => {
+      const parsed: Date = new Date(date);
+      return parsed instanceof Date && !isNaN(parsed.getTime());
+    };
 
-  const cleanDateOfBirth = isValidDate(dateofbirth) ? new Date(dateofbirth).toISOString().split('T')[0] : null;
+    const cleanDateOfBirth = isValidDate(dateofbirth) ? new Date(dateofbirth).toISOString().split('T')[0] : null;
 
-  const agentPayload = {
-    intermidiary_type:intermediary_type,
-    title,
-    first_name: firstname,
-    middle_name: middlename,
-    surname: lastname,
-    dob: cleanDateOfBirth,  // ✅ Date fixed
-    gender,
-    nationality: 'Kenyan',
-    country_of_residence: country,
-    national_id_passport_no: idno,
-    nhif: 'N/A',
-    pin: pin_no,
-    employer: company_name,
-    postal_address,
-    code: '00100',
-    town: city,
-    physical_address: 'N/A',
-    mobile_no: mobileno,
-    other_phone: '',
-    email: eimail,
-    id_type: idtype,
-    company_name,
-    commission: 10.0,
-    bank_name,
-    bank_account_name: account_name,
-    bank_account_number: account_number,
-    bank_branch,
-    is_active: false
-  };
+    const agentPayload = {
+      intermidiary_type: intermediary_type,
+      title,
+      first_name: firstname,
+      middle_name: middlename,
+      surname: lastname,
+      dob: cleanDateOfBirth,  // ✅ Date fixed
+      gender,
+      nationality: 'Kenyan',
+      country_of_residence: country,
+      national_id_passport_no: idno,
+      nhif: 'N/A',
+      pin: pin_no,
+      employer: company_name,
+      postal_address,
+      code: '00100',
+      town: city,
+      physical_address: 'N/A',
+      mobile_no: mobileno,
+      other_phone: '',
+      email: eimail,
+      id_type: idtype,
+      company_name,
+      commission: 10.0,
+      bank_name,
+      bank_account_name: account_name,
+      bank_account_number: account_number,
+      bank_branch,
+      is_active: false
+    };
 
     // 📤 Submit to main API
     const primaryResponse = await fetch('https://snownet-core-server.onrender.com/api/underwriting/collaborator/agents/create/', {
@@ -130,7 +129,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       XLSX.utils.book_append_sheet(workbook, worksheet, intermediary_type);
     }
 
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
     existingData.push([
       title, firstname, middlename, lastname, gender, mobileno, postal_address,
       idtype, idno, pin_no, dateofbirth, country, city, eimail,
@@ -158,8 +157,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       "Recruitment Agent": "New Recruitment Agent Submission"
     };
 
-    const recipients = emailMap[intermediary_type] || [];
-    const subject = subjectMap[intermediary_type] || "New Intermediary Submission";
+    type IntermediaryType = keyof typeof emailMap;
+    const recipients = emailMap[intermediary_type as IntermediaryType] || [];
+    const subject = subjectMap[intermediary_type as IntermediaryType] || "New Intermediary Submission";
 
     const transporter = nodemailer.createTransport({
       host: 'mail5016.site4now.net',

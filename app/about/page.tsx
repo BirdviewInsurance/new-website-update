@@ -54,24 +54,42 @@ export default function AboutPage() {
     <div className="space-y-32 w-full overflow-x-hidden">
 
       {/* Hero Section with CTA */}
-      <section className="relative w-full bg-gradient-to-r from-primary/20 via-white to-primary/10 py-32">
+      <section
+        className="relative w-full bg-gradient-to-r from-primary/30 via-white/80 to-primary/20 py-32 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/images/backdrop2.jpg')", // 🖼️ Replace with your actual image path
+        }}
+      >
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/50 via-white/30 to-red-600/40 backdrop-blur-sm -z-10"></div>
+
+        {/* Decorative top skew */}
         <div className="absolute top-0 left-0 w-full h-64 bg-primary/10 -skew-y-3 origin-top-left -z-10"></div>
-        <div className="w-full flex flex-col items-center text-center px-6">
-          <Image src={LogoImg} alt="Birdview Logo" width={120} height={120} className="mx-auto mb-6" />
-          <h1 className={`${title()} text-4xl md:text-6xl font-extrabold text-gray-900 max-w-4xl`}>
+
+        {/* Content */}
+        <div className="relative z-10 w-full flex flex-col items-center text-center px-6">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white max-w-4xl">
             About Birdview Insurance
           </h1>
-          <p className="mt-6 text-gray-700 text-lg md:text-xl leading-relaxed max-w-3xl">
+
+          <p className="mt-6 text-gray-700 dark:text-gray-300 text-lg md:text-xl leading-relaxed max-w-3xl">
             Birdview Insurance is a Kenyan diaspora-driven initiative providing essential financial
             security to Kenyans both locally and globally. We offer professional, affordable, and
-            compassionate solutions in evacuation, medical insurance, and last expense services — ensuring
-            help is available, reliable, and dignified when crisis strikes.
+            compassionate solutions in evacuation, medical insurance, and last expense services —
+            ensuring help is available, reliable, and dignified when crisis strikes.
           </p>
+
           <div className="flex justify-center gap-6 mt-8 flex-wrap">
-            <Link href="/get-quote" className="px-6 py-3 rounded-full bg-primary text-white font-semibold shadow-lg hover:scale-105 transition">
+            <Link
+              href="/get-quote"
+              className="px-6 py-3 rounded-full border bg-primary border-danger text-white font-semibold shadow-lg hover:scale-105 transition"
+            >
               Get a Quote
             </Link>
-            <Link href="/contact" className="px-6 py-3 rounded-full border border-primary text-primary font-semibold hover:bg-primary hover:text-white transition">
+            <Link
+              href="/contact"
+              className="px-6 py-3 rounded-full border bg-danger border-primary text-white font-semibold hover:bg-primary hover:text-white transition"
+            >
               Contact Us
             </Link>
           </div>
@@ -97,7 +115,7 @@ export default function AboutPage() {
 
           {/* Image */}
           <div className="flex-1 relative w-full h-80 md:h-96 -mr-6 md:-mr-12 rounded-xl overflow-hidden shadow-lg">
-            <Image src="/images/about-story.jpg" alt="Our Story" fill className="object-cover" />
+            <Image src="/images/faq-bg.png" alt="Our Story" fill className="object-cover" />
           </div>
         </div>
 
@@ -111,7 +129,7 @@ export default function AboutPage() {
           Mission & Vision
         </h2>
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          <Card shadow="lg" hoverShadow="xl" className="transition-transform hover:-translate-y-2 p-6 rounded-xl">
+          <Card shadow="lg" className="transition-transform hover:shadow-xl hover:-translate-y-2 p-6 rounded-xl">
             <CardHeader>
               <h3 className="text-xl font-semibold">Our Mission</h3>
             </CardHeader>
@@ -123,7 +141,7 @@ export default function AboutPage() {
             </CardBody>
           </Card>
 
-          <Card shadow="lg" hoverShadow="xl" className="transition-transform hover:-translate-y-2 p-6 rounded-xl">
+          <Card shadow="lg" className="transition-transform hover:shadow-xl hover:-translate-y-2 p-6 rounded-xl">
             <CardHeader>
               <h3 className="text-xl font-semibold">Our Vision</h3>
             </CardHeader>
@@ -143,7 +161,7 @@ export default function AboutPage() {
         <h2 className="text-4xl font-semibold text-primary border-l-4 border-primary pl-4 mb-12 text-center md:text-left">Core Objectives</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {objectives.map((obj, idx) => (
-            <Card key={idx} shadow="md" hoverShadow="lg" className="transition-transform hover:-translate-y-2 p-6 rounded-xl">
+            <Card key={idx} shadow="md" className="transition-transform hover:shadow-xl hover:-translate-y-2 p-6 rounded-xl">
               <CardHeader>
                 <h4 className="font-semibold text-lg text-primary">{obj.title}</h4>
               </CardHeader>

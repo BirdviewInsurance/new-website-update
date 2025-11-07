@@ -28,20 +28,10 @@ const VehicleInsuranceForm: React.FC = () => {
 
   // Use toast.* in place of snackbar
   const showError = (msg: string) =>
-    toast({
-      description: msg,
-      color: "danger",
-      duration: 5000,
-      variant: "solid",
-    });
+    (toast as any).error(msg);
 
   const showSuccess = (msg: string) =>
-    toast({
-      description: msg,
-      color: "success",
-      duration: 4500,
-      variant: "solid",
-    });
+    (toast as any).success(msg);
 
   const validateStep0 = () => {
     const requiredFields = ["products", "pinNumber", "policyHolder", "eimail"];

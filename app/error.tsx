@@ -11,21 +11,47 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    /* eslint-disable no-console */
     console.error(error);
   }, [error]);
 
   return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
-      >
-        Try again
-      </button>
+    <div
+      className="relative min-h-screen flex flex-col items-center justify-center text-center text-white px-6"
+      style={{
+        backgroundImage: "url('/images/error-bg.png')", // 🔹 Replace with your image path
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-black/70 to-primary/90 backdrop-blur-sm -z-10" />
+
+      <div className="max-w-lg mx-auto space-y-6">
+        <h2 className="text-4xl text-black md:text-5xl font-bold drop-shadow-lg">
+          Something went wrong!
+        </h2>
+        <p className="text-black text-lg font-medium drop-shadow-lg">
+          We encountered an unexpected error. You can try again or go back home.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+          <button
+            onClick={() => reset()}
+            className="px-6 py-3 rounded-full bg-danger hover:bg-white/40 border border-white/30 
+                       transition-all duration-300 text-white font-semibold"
+          >
+            🔄 Try Again
+          </button>
+
+          <a
+            href="/"
+            className="px-6 py-3 rounded-full bg-primary hover:bg-primary/80 text-white 
+                       font-semibold transition-all duration-300"
+          >
+            Go Home
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

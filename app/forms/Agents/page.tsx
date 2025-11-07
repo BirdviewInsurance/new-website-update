@@ -17,7 +17,14 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { UserPlus, CheckCircle, AlertTriangle } from "lucide-react";
 
-const Toast = ({ open, type, message, onClose }) => {
+interface ToastProps {
+    open: boolean;
+    type: "success" | "error";
+    message: string;
+    onClose: () => void;
+}
+
+const Toast: React.FC<ToastProps> = ({ open, type, message, onClose }) => {
     const variants = {
         hidden: { opacity: 0, y: 40, scale: 0.9 },
         visible: { opacity: 1, y: 0, scale: 1 },
@@ -47,7 +54,7 @@ const Toast = ({ open, type, message, onClose }) => {
                     animate="visible"
                     exit="exit"
                     transition={{ type: "spring", stiffness: 120, damping: 12 }}
-                    className={`fixed bottom-8 right-8 z-50 shadow-2xl rounded-2xl px-5 py-4 flex items-center gap-3 ${bgColors[type]} `}
+                    className={`fixed bottom-8 right-8 z-50 shadow-2xl rounded-2xl px-5 py-4 flex items-center gap-3 ${bgColors[type as keyof typeof bgColors]} `}
                 >
                     {type === "success" ? (
                         <CheckCircle className="text-white" size={24} />
@@ -61,11 +68,24 @@ const Toast = ({ open, type, message, onClose }) => {
     );
 };
 
+interface RepStream {
+    stream_name: string;
+    source?: string;
+}
+
+interface FormErrors {
+    [key: string]: string;
+}
+
 const CreateAgent = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [repStreams, setRepStreams] = useState([]);
-    const [errors, setErrors] = useState({});
-    const [toast, setToast] = useState({
+    const [repStreams, setRepStreams] = useState<RepStream[]>([]);
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [toast, setToast] = useState<{
+        open: boolean;
+        type: "success" | "error";
+        message: string;
+    }>({
         open: false,
         type: "success",
         message: "",
@@ -89,7 +109,7 @@ const CreateAgent = () => {
         partner_email: "",
         role: "agent",
         source: "",
-        rep_streams: [],
+        rep_streams: [] as RepStream[],
         created_at: "",
     });
 
@@ -97,14 +117,14 @@ const CreateAgent = () => {
         loadRepStreams();
     }, []);
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
         setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
     const validateForm = () => {
-        const newErrors = {};
+        const newErrors: FormErrors = {};
         if (!formData.first_name.trim())
             newErrors.first_name = "First name is required";
         if (!formData.surname.trim()) newErrors.surname = "Surname is required";
@@ -146,7 +166,7 @@ const CreateAgent = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) return;
 
@@ -197,15 +217,15 @@ const CreateAgent = () => {
                 partner_email: "",
                 role: "agent",
                 source: "",
-                rep_streams: [],
+                rep_streams: [] as RepStream[],
                 created_at: "",
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
             setToast({
                 open: true,
                 type: "error",
-                message: error.message || "Failed to create agent.",
+                message: error?.message || "Failed to create agent.",
             });
         } finally {
             setIsSubmitting(false);
@@ -271,10 +291,11 @@ const CreateAgent = () => {
                                 <Select
                                     label="Gender"
                                     name="gender"
-                                    selectedKeys={[formData.gender]}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({ ...prev, gender: e.target.value }))
-                                    }
+                                    selectedKeys={formData.gender ? [formData.gender] : []}
+                                    onSelectionChange={(keys) => {
+                                        const selected = Array.from(keys)[0] as string;
+                                        setFormData((prev) => ({ ...prev, gender: selected }));
+                                    }}
                                     isRequired
                                     errorMessage={errors.gender}
                                 >
@@ -324,13 +345,14 @@ const CreateAgent = () => {
                                 <Select
                                     label="ID Type"
                                     name="id_type"
-                                    selectedKeys={[formData.id_type]}
-                                    onChange={(e) =>
+                                    selectedKeys={formData.id_type ? [formData.id_type] : []}
+                                    onSelectionChange={(keys) => {
+                                        const selected = Array.from(keys)[0] as string;
                                         setFormData((prev) => ({
                                             ...prev,
-                                            id_type: e.target.value,
-                                        }))
-                                    }
+                                            id_type: selected,
+                                        }));
+                                    }}
                                     isRequired
                                     errorMessage={errors.id_type}
                                 >
@@ -358,10 +380,11 @@ const CreateAgent = () => {
                                 <Select
                                     label="Partner Source"
                                     name="source"
-                                    selectedKeys={[formData.source]}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({ ...prev, source: e.target.value }))
-                                    }
+                                    selectedKeys={formData.source ? [formData.source] : []}
+                                    onSelectionChange={(keys) => {
+                                        const selected = Array.from(keys)[0] as string;
+                                        setFormData((prev) => ({ ...prev, source: selected }));
+                                    }}
                                     isRequired
                                     errorMessage={errors.source}
                                 >
@@ -369,29 +392,31 @@ const CreateAgent = () => {
                                     <SelectItem key="welfare">Welfare</SelectItem>
                                 </Select>
 
-                                <Autocomplete
+                                <Select
                                     label="Streams"
-                                    multiple
-                                    selectedKeys={formData.rep_streams.map((s) => s.stream_name)}
-                                    onSelectionChange={(keys) =>
+                                    selectionMode="multiple"
+                                    selectedKeys={new Set(formData.rep_streams.map((s) => s.stream_name))}
+                                    onSelectionChange={(keys) => {
+                                        const selectedNames = Array.from(keys) as string[];
                                         setFormData((prev) => ({
                                             ...prev,
-                                            rep_streams: Array.from(keys).map((name) => ({
+                                            rep_streams: selectedNames.map((name) => ({
                                                 stream_name: name,
+                                                source: formData.source,
                                             })),
-                                        }))
-                                    }
+                                        }));
+                                    }}
                                     placeholder="Select streams"
                                     errorMessage={errors.rep_streams}
                                 >
                                     {repStreams
                                         .filter((s) => s.source === formData.source)
                                         .map((s) => (
-                                            <AutocompleteItem key={s.stream_name}>
+                                            <SelectItem key={s.stream_name}>
                                                 {s.stream_name}
-                                            </AutocompleteItem>
+                                            </SelectItem>
                                         ))}
-                                </Autocomplete>
+                                </Select>
                             </div>
 
                             <CardFooter className="flex justify-center pt-8">

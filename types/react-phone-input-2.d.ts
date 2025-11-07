@@ -8,12 +8,14 @@ declare module "react-phone-input-2" {
         inputStyle?: React.CSSProperties;
         buttonStyle?: React.CSSProperties;
         containerStyle?: React.CSSProperties;
+        containerClass?: string;
         dropdownStyle?: React.CSSProperties;
         placeholder?: string;
         inputProps?: { name?: string; required?: boolean; autoFocus?: boolean };
         specialLabel?: string;
         enableSearch?: boolean;
         disableDropdown?: boolean;
+        disabled?: boolean;
     }
 
     const PhoneInput: React.FC<PhoneInputProps>;

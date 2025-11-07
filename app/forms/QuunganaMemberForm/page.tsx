@@ -282,7 +282,7 @@ const QuunganaMemberForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    toast({ title: "Form submitted", description: "Check console for output", variant: "success" });
+    (toast as any).success("Form submitted. Check console for output");
   };
 
   return (
@@ -298,8 +298,15 @@ const QuunganaMemberForm: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Select label="Title" value={formData.title} onValueChange={(v) => handleChange({ target: { name: "title", value: v } } as any)}>
-              {titles.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            <Select 
+              label="Title" 
+              selectedKeys={formData.title ? [formData.title] : []} 
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "title", value: selected } } as any);
+              }}
+            >
+              {titles.map(t => <SelectItem key={t}>{t}</SelectItem>)}
             </Select>
             <Input label="First Name" name="firstname" value={formData.firstname} onChange={handleChange} />
             <Input label="Last Name" name="lastname" value={formData.lastname} onChange={handleChange} />
@@ -307,19 +314,40 @@ const QuunganaMemberForm: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input label="Middle Name" name="middlename" value={formData.middlename} onChange={handleChange} />
-            <Select label="ID Type" value={formData.idtype} onValueChange={(v) => handleChange({ target: { name: "idtype", value: v } } as any)}>
-              {idTypes.map(id => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+            <Select 
+              label="ID Type" 
+              selectedKeys={formData.idtype ? [formData.idtype] : []} 
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "idtype", value: selected } } as any);
+              }}
+            >
+              {idTypes.map(id => <SelectItem key={id}>{id}</SelectItem>)}
             </Select>
             <Input label="ID Number" name="idno" value={formData.idno} onChange={handleChange} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input label="Date of Birth" type="date" max={today} name="dateofbirth" value={formData.dateofbirth} onChange={handleChange} />
-            <Select label="Gender" value={formData.gender} onValueChange={(v) => handleChange({ target: { name: "gender", value: v } } as any)}>
-              {genders.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            <Select 
+              label="Gender" 
+              selectedKeys={formData.gender ? [formData.gender] : []} 
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "gender", value: selected } } as any);
+              }}
+            >
+              {genders.map(g => <SelectItem key={g}>{g}</SelectItem>)}
             </Select>
-            <Select label="Country" value={formData.country} onValueChange={(v) => handleChange({ target: { name: "country", value: v } } as any)}>
-              {countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            <Select 
+              label="Country" 
+              selectedKeys={formData.country ? [formData.country] : []} 
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "country", value: selected } } as any);
+              }}
+            >
+              {countries.map(c => <SelectItem key={c}>{c}</SelectItem>)}
             </Select>
           </div>
 
@@ -394,20 +422,26 @@ const QuunganaMemberForm: React.FC = () => {
             <ModalBody className="grid grid-cols-1 md:grid-cols-3 gap-4 px-6 py-4">
               <Select
                 label="Relationship"
-                value={currentDependant?.relationship || ""}
-                onValueChange={(v) => handleChangeDep({ name: "relationship", value: v })}
+                selectedKeys={currentDependant?.relationship ? [currentDependant.relationship] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeDep({ name: "relationship", value: selected });
+                }}
               >
                 {relationships.map((r) => (
-                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                  <SelectItem key={r}>{r}</SelectItem>
                 ))}
               </Select>
 
               <Select
                 label="Title"
-                value={currentDependant?.title || ""}
-                onValueChange={(v) => handleChangeDep({ name: "title", value: v })}
+                selectedKeys={currentDependant?.title ? [currentDependant.title] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeDep({ name: "title", value: selected });
+                }}
               >
-                {titles.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                {titles.map((t) => <SelectItem key={t}>{t}</SelectItem>)}
               </Select>
 
               <Input
@@ -430,10 +464,13 @@ const QuunganaMemberForm: React.FC = () => {
 
               <Select
                 label="ID Type"
-                value={currentDependant?.idtypes || ""}
-                onValueChange={(v) => handleChangeDep({ name: "idtypes", value: v })}
+                selectedKeys={currentDependant?.idtypes ? [currentDependant.idtypes] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeDep({ name: "idtypes", value: selected });
+                }}
               >
-                {idTypes.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                {idTypes.map((id) => <SelectItem key={id}>{id}</SelectItem>)}
               </Select>
 
               <Input
@@ -452,18 +489,24 @@ const QuunganaMemberForm: React.FC = () => {
 
               <Select
                 label="Gender"
-                value={currentDependant?.gendere || ""}
-                onValueChange={(v) => handleChangeDep({ name: "gendere", value: v })}
+                selectedKeys={currentDependant?.gendere ? [currentDependant.gendere] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeDep({ name: "gendere", value: selected });
+                }}
               >
-                {genders.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                {genders.map((g) => <SelectItem key={g}>{g}</SelectItem>)}
               </Select>
 
               <Select
                 label="Country"
-                value={currentDependant?.countrye || "Kenya"}
-                onValueChange={(v) => handleChangeDep({ name: "countrye", value: v })}
+                selectedKeys={currentDependant?.countrye ? [currentDependant.countrye] : ["Kenya"]}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeDep({ name: "countrye", value: selected });
+                }}
               >
-                {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                {countries.map((c) => <SelectItem key={c}>{c}</SelectItem>)}
               </Select>
 
               <Input
@@ -496,18 +539,26 @@ const QuunganaMemberForm: React.FC = () => {
             </ModalHeader>
 
             <ModalBody className="grid grid-cols-1 md:grid-cols-3 gap-4 px-6 py-4">
-              <Input
+              <Select
                 label="Relationship"
-                value={currentBeneficiary?.relationship || ""}
-                onChange={(e) => handleChangeBen(e)}
-              />
+                selectedKeys={currentBeneficiary?.relationship ? [currentBeneficiary.relationship] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeBen({ name: "relationship", value: selected });
+                }}
+              >
+                {relationships.map((r) => <SelectItem key={r}>{r}</SelectItem>)}
+              </Select>
 
               <Select
                 label="Title"
-                value={currentBeneficiary?.title || ""}
-                onValueChange={(v) => handleChangeBen({ name: "title", value: v })}
+                selectedKeys={currentBeneficiary?.title ? [currentBeneficiary.title] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChangeBen({ name: "title", value: selected });
+                }}
               >
-                {titles.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                {titles.map((t) => <SelectItem key={t}>{t}</SelectItem>)}
               </Select>
 
               <Input

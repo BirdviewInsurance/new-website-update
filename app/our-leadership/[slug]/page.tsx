@@ -10,12 +10,12 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const allLeaders = [
     {
-        name: "Dr. Jane Mwangi",
-        slug: "jane-mwangi",
-        role: "Chairperson",
+        name: "Geoffery kangwana",
+        slug: "geoffery-kangwana",
+        role: "Chairman - Board Of Directors",
         category: "Board of Directors",
         bio: "A visionary leader in governance and innovation, Dr. Jane Mwangi brings over 25 years of experience steering global organizations toward sustainable growth. Her passion for integrity, inclusion, and progress defines her leadership ethos.",
-        image: "/assets/managementPhotos/Ann-Kinyanjui.png",
+        image: "/assets/managementPhotos/Geoffrey-Kangwana.png",
         cta: {
             title: "Championing Visionary Leadership",
             text: "Dr. Mwangi continues to inspire transformative leadership through ethical governance and a human-first approach to growth.",
@@ -24,12 +24,12 @@ const allLeaders = [
         },
     },
     {
-        name: "Michael Otieno",
-        slug: "michael-otieno",
-        role: "Vice Chair",
+        name: "Richard Muiru",
+        slug: "richard-muiru",
+        role: "Director",
         category: "Board of Directors",
         bio: "Michael is a catalyst for operational excellence and digital transformation, driving purpose-led innovation across industries. His hands-on leadership ensures agility and resilience in dynamic markets.",
-        image: "/assets/managementPhotos/Obed-Menjeri.png",
+        image: "/assets/managementPhotos/Richard-Muiru.png",
         cta: {
             title: "Driving Digital Transformation",
             text: "Michael advocates for intelligent automation and sustainable innovation to redefine the modern corporate experience.",
@@ -38,12 +38,40 @@ const allLeaders = [
         },
     },
     {
-        name: "Dr. Amina Noor",
-        slug: "amina-noor",
-        role: "Non-Executive Director",
+        name: "James Kimani",
+        slug: "james-kimani",
+        role: "Director",
         category: "Board of Directors",
         bio: "Dr. Noor is a governance expert and human capital strategist dedicated to fostering ethical leadership and equitable organizational growth. Her work bridges purpose, performance, and people.",
-        image: "/assets/managementPhotos/Mary-Mundia.png",
+        image: "/assets/managementPhotos/James-Kimani.png",
+        cta: {
+            title: "Empowering Human-Centric Governance",
+            text: "Through her work, Dr. Noor champions inclusion, mentorship, and transformative leadership across all levels of management.",
+            button: "Discover Dr. Noor’s Governance Framework",
+            link: "/insights/amina-noor-governance",
+        },
+    },
+    {
+        name: "Obed Menjeri",
+        slug: "obed-menjeri",
+        role: "Director",
+        category: "Board of Directors",
+        bio: "Dr. Noor is a governance expert and human capital strategist dedicated to fostering ethical leadership and equitable organizational growth. Her work bridges purpose, performance, and people.",
+        image: "/assets/managementPhotos/Obed-Menjeri.png",
+        cta: {
+            title: "Empowering Human-Centric Governance",
+            text: "Through her work, Dr. Noor champions inclusion, mentorship, and transformative leadership across all levels of management.",
+            button: "Discover Dr. Noor’s Governance Framework",
+            link: "/insights/amina-noor-governance",
+        },
+    },
+    {
+        name: "James Nyakundi",
+        slug: "james-nyakundi",
+        role: "Director",
+        category: "Board of Directors",
+        bio: "Dr. Noor is a governance expert and human capital strategist dedicated to fostering ethical leadership and equitable organizational growth. Her work bridges purpose, performance, and people.",
+        image: "/assets/managementPhotos/James-Nyakundi.png",
         cta: {
             title: "Empowering Human-Centric Governance",
             text: "Through her work, Dr. Noor champions inclusion, mentorship, and transformative leadership across all levels of management.",

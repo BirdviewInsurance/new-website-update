@@ -1,45 +1,57 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import * as XLSX from 'xlsx';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-
-export interface DataFormForm {
-  atendeeRegNo: string;
-  const { 
-      agencyName: number;
-  contactPerson: string;
-  disclaimer: boolean;
-  email: string;
-  estimation: string;
+// Define interfaces
+interface FormData {
+  agencyName: string;
   location: string;
+  contactPerson: string;
+  email: string;
   mobileno: string;
+  atendeeRegNo: string;
+  estimation: string;
+  disclaimer: string;
 }
 
+interface NextApiRequest {
+  method: string;
+  body: FormData;
+}
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+interface NextApiResponse {
+  setHeader: (name: string, value: string[]) => void;
+  status: (code: number) => {
+    json: (data: any) => void;
+  };
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 
   try {
-    const { 
+    const {
       agencyName, location, contactPerson, email, mobileno, atendeeRegNo, estimation, disclaimer
-    } = req.body;
+    }: FormData = req.body;
 
     // ✅ Ensure public directory exists
-    const publicDir = path.join(process.cwd(), 'public');
+    const publicDir: string = path.join(process.cwd(), 'public');
     await fs.mkdir(publicDir, { recursive: true });
 
-    const filePath = path.join(publicDir, 'dataCollection_data.xlsx');
+    const filePath: string = path.join(publicDir, 'dataCollection_data.xlsx');
 
-    let workbook;
-    
+    let workbook: XLSX.WorkBook;
+
     // ✅ Check if the Excel file exists
-    const fileBuffer = await fs.readFile(filePath).catch(() => null);
-    
+    const fileBuffer: Buffer | null = await fs.readFile(filePath).catch(() => null);
+
     if (fileBuffer) {
       // ✅ Load existing workbook
       workbook = XLSX.read(fileBuffer, { type: 'buffer' });
@@ -49,33 +61,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // ✅ Get or create the worksheet
-    let worksheet;
+    let worksheet: XLSX.WorkSheet;
     if (workbook.Sheets['Agency Data']) {
       worksheet = workbook.Sheets['Agency Data'];
     } else {
       worksheet = XLSX.utils.aoa_to_sheet([
         [
-          'Agency Name', 'Location', 'Contact Person','Email', 'Phone Number', 'Attendee Registration No',
-           'Estimated Number Of People Exported Per Month'
+          'Agency Name', 'Location', 'Contact Person', 'Email', 'Phone Number', 'Attendee Registration No',
+          'Estimated Number Of People Exported Per Month'
         ]
       ]);
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Agency Data');
     }
 
     // ✅ Append new row
-    const newRow = [
+    const newRow: (string)[] = [
       agencyName, location, contactPerson, email, mobileno, atendeeRegNo, estimation, disclaimer
     ];
 
     // ✅ Convert worksheet to JSON and append new row
-    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const existingData: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
     existingData.push(newRow);
-    const updatedWorksheet = XLSX.utils.aoa_to_sheet(existingData);
+    const updatedWorksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(existingData);
     workbook.Sheets['Agency Data'] = updatedWorksheet;
 
     // ✅ Write updated workbook to file
-    const updatedBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-    await fs.writeFile(filePath, updatedBuffer);
+    const updatedBuffer: Buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    await fs.writeFile(filePath, new Uint8Array(updatedBuffer));
 
     console.log('✅ Data successfully saved to Excel.');
 
@@ -91,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // ✅ Email Options
-    const mailOptions = {
+    const mailOptions: nodemailer.SendMailOptions = {
       from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
       to: 'customerservice@birdviewinsurance.com',
       subject: `Updated Registration Details from ${agencyName} - ${email}`,
@@ -109,15 +121,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await transporter.sendMail(mailOptions);
       console.log('✅ Email sent successfully.');
       return res.status(200).json({ message: 'Form sent successfully' });
-    } catch (emailError) {
+    } catch (emailError: any) {
       console.error('❌ Failed to send email:', emailError.message);
-      return res.status(200).json({ 
-        message: 'Form saved successfully.', 
-        emailError: emailError.message 
+      return res.status(200).json({
+        message: 'Form saved successfully.',
+        emailError: emailError.message
       });
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Full Error Details:', error);
     return res.status(500).json({ error: error.message || 'Unknown error occurred' });
   }

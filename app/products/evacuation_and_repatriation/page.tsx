@@ -52,7 +52,8 @@ const EvacAndRepatriation = () => {
                     "https://snownet-customer-quotation-server.onrender.com/api/underwriting/quotation/onlineQuotation/products/exchangeRate/"
                 );
                 const ratesMap: Record<string, number> = {};
-                for (let item of response.data?.data || []) {
+                const data = (response.data as any)?.data || [];
+                for (let item of data) {
                     if (item.currency && item.x_rate) {
                         ratesMap[item.currency] = parseFloat(item.x_rate);
                     }

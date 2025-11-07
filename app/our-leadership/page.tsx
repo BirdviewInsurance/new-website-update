@@ -11,15 +11,19 @@ export default function OurLeadership() {
     const makeSlug = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
     const board = [
-        { name: "Dr. Jane Mwangi", title: "Chairperson", img: "/assets/managementPhotos/Ann-Kinyanjui.png" },
-        { name: "Michael Otieno", title: "Vice Chair", img: "/assets/managementPhotos/Obed-Menjeri.png" },
-        { name: "Dr. Amina Noor", title: "Non-Executive Director", img: "/assets/managementPhotos/Mary-Mundia.png" },
+        { name: "Geoffery Kangwana", title: "Chairman - Board Of Directors", img: "/assets/managementPhotos/Geoffrey-Kangwana.png" },
+        { name: "Richard Muiru", title: "Director", img: "/assets/managementPhotos/Richard-Muiru.png" },
+        { name: "James Kimani", title: "Director", img: "/assets/managementPhotos/James-Kimani.png" },
+        { name: "Obed Menjeri", title: "Director", img: "/assets/managementPhotos/Obed-Menjeri.png" },
+        { name: "James Nyakundi", title: "Director", img: "/assets/managementPhotos/James-Nyakundi.png" },
     ];
 
     const executives = [
-        { name: "Peter Kamau", title: "Chief Executive Officer", img: "/assets/managementPhotos/Geoffrey-Kangwana.png" },
-        { name: "Grace Njoroge", title: "Chief Operations Officer", img: "/assets/managementPhotos/Esdor-Yahuma.png" },
-        { name: "Brian Kibet", title: "Chief Finance Officer", img: "/assets/managementPhotos/James-Nyakundi.png" },
+        { name: "Rodgers Moindi", title: "Chief Executive Officer", img: "/assets/managementPhotos/Rodgers-Moindi.png" },
+        { name: "Mary Mundia", title: "Finance Manager", img: "/assets/managementPhotos/Mary-Mundia.png" },
+        { name: "Kevin Osiga", title: "Underwriting Manager", img: "/assets/managementPhotos/Kevin-Osiga.png" },
+        { name: "Esdor Yahuma", title: "Business Development Manager", img: "/assets/managementPhotos/Esdor-Yahuma.png" },
+        { name: "Ann Kinyanjui", title: "Diaspora Business Development Manager", img: "/assets/managementPhotos/Ann-Kinyanjui.png" },
     ];
 
     const advisors = [

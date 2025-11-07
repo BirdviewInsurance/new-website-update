@@ -35,13 +35,13 @@ export default function ContactSupportPage() {
                 </p>
 
                 <form className="space-y-6 bg-white/70 p-8 rounded-2xl backdrop-blur-md border border-default-200 shadow-sm">
-                    <Input label="Full Name" placeholder="Jane Doe" required fullWidth />
-                    <Input label="Email Address" type="email" placeholder="jane.doe@example.com" required fullWidth />
+                    <Input label="Full Name" placeholder="Enter your Fullname" required fullWidth />
+                    <Input label="Email Address" type="email" placeholder="Enter your Email" required fullWidth />
                     <Textarea label="Message" rows={5} placeholder="How can we help you?" required fullWidth />
                     <Button
                         color="primary"
                         size="lg"
-                        className="rounded-xl w-full"
+                        className="rounded-xl w-full text-white font-semibold"
                         isLoading={loading}
                         onPress={() => setLoading(true)}
                     >

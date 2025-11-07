@@ -42,7 +42,8 @@ const BodaBodaWelfareContent: React.FC = () => {
                 const response = await axios.get(
                     "https://snownet-customer-quotation-server.onrender.com/api/underwriting/quotation/onlineQuotation/products/exchangeRate/"
                 );
-                const ratesArray = response.data?.data || [];
+                const responseData = response.data as any;
+                const ratesArray = responseData?.data || [];
                 const ratesMap: ExchangeRates = {};
                 for (let item of ratesArray) {
                     if (item.currency && item.x_rate) {
@@ -71,7 +72,7 @@ const BodaBodaWelfareContent: React.FC = () => {
         window.location.href = "https://quote.birdviewinsurance.com/?ProductID=4";
     };
 
-    const gradientClass = "bg-gradient-to-r from-indigo-700 via-blue-600 to-sky-500";
+    const gradientClass = "bg-gradient-to-r from-blue-600 via-blue-600 to-blue-500";
 
     const sections = [
         {
@@ -192,10 +193,10 @@ const BodaBodaWelfareContent: React.FC = () => {
                                         className="text-center min-w-max"
                                     >
                                         <TableHeader className="bg-transparent">
-                                            <TableColumn className="text-white font-semibold text-center">
+                                            <TableColumn className="text-primary font-semibold text-left">
                                                 Benefit
                                             </TableColumn>
-                                            <TableColumn className="text-white font-semibold text-center">
+                                            <TableColumn className="text-primary font-semibold text-center">
                                                 Value
                                             </TableColumn>
                                         </TableHeader>
@@ -235,7 +236,7 @@ const BodaBodaWelfareContent: React.FC = () => {
             >
                 <Card
                     shadow="lg"
-                    className="max-w-4xl mx-auto border-0 rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 text-white"
+                    className="max-w-4xl mx-auto border-0 rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-blue-600 to-blue-500 text-white"
                 >
                     <CardBody className="px-10 py-12 space-y-6">
                         <h3 className="text-3xl font-extrabold tracking-tight">

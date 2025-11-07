@@ -35,6 +35,11 @@ export interface FormdataType {
   competencies: string;
 }
 
+interface ApiResponse {
+  message?: string;
+  error?: string;
+}
+
 const JobApplicationForm: React.FC = () => {
   const countries = ["Kenya", "Uganda", "Tanzania", "Rwanda"];
   const router = useRouter();
@@ -87,37 +92,19 @@ const JobApplicationForm: React.FC = () => {
     });
 
     try {
-      const res = await axios.post("/api/job-apply", data, {
+      const res = await axios.post<ApiResponse>("/api/job-apply", data, {
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 10000,
       });
 
       if (res.status === 200) {
-        toast({
-          title: "✅ Application Submitted",
-          description: res.data.message || "Your application has been received.",
-          color: "success",
-          variant: "solid",
-          placement: "top-right",
-          classNames: {
-            base: "animate-slide-in-right shadow-lg border-l-4 border-green-500",
-          },
-        });
+        (toast as any).success(res.data.message || "✅ Application Submitted: Your application has been received.");
         setTimeout(() => router.push("/"), 3000);
       } else {
         throw new Error(res.data.error || "Unknown error");
       }
     } catch (error: any) {
-      toast({
-        title: "❌ Submission Failed",
-        description: error.response?.data?.error || error.message,
-        color: "danger",
-        variant: "solid",
-        placement: "top-right",
-        classNames: {
-          base: "animate-slide-in-right shadow-lg border-l-4 border-red-500",
-        },
-      });
+      (toast as any).error(error.response?.data?.error || error.message || "❌ Submission Failed");
     } finally {
       setLoaderIcon(false);
     }

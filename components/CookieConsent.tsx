@@ -10,7 +10,7 @@ export default function CookieConsent() {
     const [analytics, setAnalytics] = useState(true);
     const [marketing, setMarketing] = useState(false);
 
-    const BRAND_COLOR = "#0057b7"; // 💙 Replace with your brand’s primary color
+    const BRAND_COLOR = "#0057b7"; // 💙 Replace with your brand’s color
 
     useEffect(() => {
         const consent = localStorage.getItem("cookieConsent");
@@ -46,35 +46,56 @@ export default function CookieConsent() {
                     className="fixed bottom-0 left-0 right-0 z-[9999]"
                 >
                     <div
-                        className="backdrop-blur-md shadow-xl border-t-4 p-5 md:p-6"
+                        className="shadow-xl border-t-4 p-5 md:p-6 transition-colors duration-300
+                                   backdrop-blur-md bg-gradient-to-r
+                                   from-white/95 to-neutral-50/90
+                                   dark:from-neutral-900/90 dark:to-neutral-800/90"
                         style={{
                             borderColor: BRAND_COLOR,
-                            background:
-                                "linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(250,250,250,0.92) 100%)",
                         }}
                     >
                         <div className="mx-auto max-w-6xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div className="text-sm md:text-base text-neutral-800 dark:text-neutral-100 leading-relaxed">
-                                <span className="font-semibold text-[15px]" style={{ color: BRAND_COLOR }}>
+                                <span
+                                    className="font-semibold text-[15px]"
+                                    style={{ color: BRAND_COLOR }}
+                                >
                                     We respect your privacy.
                                 </span>{" "}
-                                We use cookies to personalize content, enhance your experience, and analyze traffic.
-                                You can manage your preferences or accept all cookies below.
+                                We use cookies to personalize content, enhance your experience, and
+                                analyze traffic. You can manage your preferences or accept all
+                                cookies below.
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3 justify-center md:justify-end">
-                                <Button
-                                    size="sm"
-                                    variant="flat"
-                                    onPress={() => setShowPrefs(!showPrefs)}
-                                    style={{
-                                        color: BRAND_COLOR,
-                                        borderColor: BRAND_COLOR,
-                                    }}
-                                    className="border-2 font-medium hover:brightness-110 transition-all"
-                                >
-                                    Manage Preferences
-                                </Button>
+                            <Button
+                                size="sm"
+                                variant="flat"
+                                onPress={() => setShowPrefs(!showPrefs)}
+                                style={{
+                                    color: BRAND_COLOR,
+                                    borderColor: BRAND_COLOR,
+                                    backgroundColor: "transparent",
+                                    transition: "all 0.3s ease",
+                                }}
+                                className={`
+                                    border-2 font-medium
+                                    hover:text-white
+                                    hover:shadow-[0_0_10px_${BRAND_COLOR}50]
+                                    transition-all duration-300
+                                    dark:hover:brightness-110
+                                `}
+                                onMouseEnter={(e) => {
+                                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = BRAND_COLOR;
+                                    (e.currentTarget as HTMLButtonElement).style.color = "white";
+                                }}
+                                onMouseLeave={(e) => {
+                                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+                                    (e.currentTarget as HTMLButtonElement).style.color = BRAND_COLOR;
+                                }}
+                            >
+                                Manage Preferences
+                            </Button>
 
                                 <Button
                                     size="sm"
@@ -109,10 +130,16 @@ export default function CookieConsent() {
                                 animate={{ y: 0, opacity: 1 }}
                                 exit={{ y: "100%", opacity: 0 }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
-                                className="fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 shadow-2xl p-6 md:p-8 z-[10000]"
+                                className="fixed bottom-0 left-0 right-0 border-t shadow-2xl p-6 md:p-8 z-[10000]
+                                           transition-colors duration-300
+                                           bg-white dark:bg-neutral-900
+                                           border-neutral-200 dark:border-neutral-800"
                             >
                                 <div className="mx-auto max-w-4xl">
-                                    <h3 className="text-lg font-semibold mb-4" style={{ color: BRAND_COLOR }}>
+                                    <h3
+                                        className="text-lg font-semibold mb-4"
+                                        style={{ color: BRAND_COLOR }}
+                                    >
                                         Cookie Preferences
                                     </h3>
 
@@ -166,7 +193,7 @@ export default function CookieConsent() {
                                         <Button
                                             variant="ghost"
                                             onPress={() => setShowPrefs(false)}
-                                            className="text-neutral-700 dark:text-neutral-200"
+                                            className="text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                         >
                                             Cancel
                                         </Button>

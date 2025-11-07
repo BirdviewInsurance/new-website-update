@@ -3,6 +3,7 @@ export type SiteConfig = typeof siteConfig;
 export const siteConfig = {
   name: "Birdview Microinsurance",
   description: "Exceeding Your Expectations.",
+  url: "https://www.birdviewinsurance.com",
   navItems: [
     {
       label: "Home",

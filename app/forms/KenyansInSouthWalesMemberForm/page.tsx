@@ -15,6 +15,7 @@ import {
   Select,
   SelectItem,
   Modal,
+  ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
@@ -31,7 +32,9 @@ import {
 // @ts-ignore
 import { Country } from "country-state-city";
 
-export interface ErrorsType { }
+export interface ErrorsType {
+  [key: string]: string;
+}
 
 export interface FormdataType {
   memberidno: string;
@@ -238,7 +241,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
     const oversized = files.filter((f) => f.size > maxSize);
     if (oversized.length) {
       setFileError("One or more files exceed the 5MB size limit.");
-      toast.error("One or more files exceed the 5MB size limit.");
+      (toast as any).error("One or more files exceed the 5MB size limit.");
       return;
     }
     setFileError("");
@@ -316,7 +319,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
       if (!isAtLeastOneMonthOld(ben.dob)) {
         settoastType("error");
         settoastMessage(`Beneficiary "${ben.beneficiary_fullname}" must be at least 1 month old.`);
-        toast.error(`Beneficiary "${ben.beneficiary_fullname}" must be at least 1 month old.`);
+        (toast as any).error(`Beneficiary "${ben.beneficiary_fullname}" must be at least 1 month old.`);
         setLoaderIcon(false);
         return;
       }
@@ -327,7 +330,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
       if (age < 18) {
         settoastType("error");
         settoastMessage("You must add another beneficiary who is at least 18 years old if the only one is below 18.");
-        toast.error("You must add another beneficiary who is at least 18 years old if the only one is below 18.");
+        (toast as any).error("You must add another beneficiary who is at least 18 years old if the only one is below 18.");
         setLoaderIcon(false);
         return;
       }
@@ -338,7 +341,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
       if (!hasAdult) {
         settoastType("error");
         settoastMessage("At least one beneficiary must be 18 years or older.");
-        toast.error("At least one beneficiary must be 18 years or older.");
+        (toast as any).error("At least one beneficiary must be 18 years or older.");
         setLoaderIcon(false);
         return;
       }
@@ -365,19 +368,19 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
       if (res.ok) {
         settoastType("success");
         settoastMessage(data.message || "Form submitted successfully");
-        toast.success(data.message || "Form submitted successfully");
+        (toast as any).success(data.message || "Form submitted successfully");
         setLoaderIcon(false);
         handleReset();
       } else {
         settoastType("error");
         settoastMessage(`Error: ${data.error}`);
-        toast.error(`Error: ${data.error}`);
+        (toast as any).error(`Error: ${data.error}`);
         setLoaderIcon(false);
       }
     } catch (error: any) {
       settoastType("error");
       settoastMessage(`Error: ${error.message}`);
-      toast.error(`Error: ${error.message}`);
+      (toast as any).error(`Error: ${error?.message || "An unexpected error occurred"}`);
       setLoaderIcon(false);
     }
   };
@@ -445,7 +448,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
     });
 
     handleCloseDialog();
-    toast.success("Dependant saved");
+    (toast as any).success("Dependant saved");
   };
 
   const handleChangeDep = (e: any) => {
@@ -522,7 +525,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
     });
 
     handleCloseBeneficiaryDialog();
-    toast.success("Beneficiary saved");
+    (toast as any).success("Beneficiary saved");
   };
 
   const handleChangeBeneficiary = (e: any) => {
@@ -651,7 +654,15 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700">Title</label>
-                <Select name="title" value={formData.title} onChange={handleChange} className="mt-2">
+                <Select 
+                  name="title" 
+                  selectedKeys={formData.title ? [formData.title] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    handleChange({ target: { name: "title", value: selected } } as any);
+                  }} 
+                  className="mt-2"
+                >
                   {[
                     "Mr",
                     "Master",
@@ -661,7 +672,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
                     "Dr",
                     "Prof",
                   ].map((t) => (
-                    <SelectItem key={t} value={t}>
+                    <SelectItem key={t}>
                       {t}
                     </SelectItem>
                   ))}
@@ -685,10 +696,18 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Identification Type</label>
-                <Select name="idtype" value={formData.idtype} onChange={handleChange} className="mt-2">
-                  <SelectItem value="National ID">National ID</SelectItem>
-                  <SelectItem value="Passport">Passport</SelectItem>
-                  <SelectItem value="Birth Certificate">Birth Certificate</SelectItem>
+                <Select 
+                  name="idtype" 
+                  selectedKeys={formData.idtype ? [formData.idtype] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    handleChange({ target: { name: "idtype", value: selected } } as any);
+                  }} 
+                  className="mt-2"
+                >
+                  <SelectItem key="National ID">National ID</SelectItem>
+                  <SelectItem key="Passport">Passport</SelectItem>
+                  <SelectItem key="Birth Certificate">Birth Certificate</SelectItem>
                 </Select>
               </div>
 
@@ -713,7 +732,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
                     const actualAge = hasHadBirthdayThisYear ? age : age - 1;
 
                     if (actualAge < 18) {
-                      toast.error("You must be at least 18 years old.");
+                      (toast as any).error("You must be at least 18 years old.");
                       return;
                     }
 
@@ -725,18 +744,34 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Gender</label>
-                <Select name="gender" value={formData.gender} onChange={handleChange} className="mt-2">
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Others">Others</SelectItem>
+                <Select 
+                  name="gender" 
+                  selectedKeys={formData.gender ? [formData.gender] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    handleChange({ target: { name: "gender", value: selected } } as any);
+                  }} 
+                  className="mt-2"
+                >
+                  <SelectItem key="Male">Male</SelectItem>
+                  <SelectItem key="Female">Female</SelectItem>
+                  <SelectItem key="Others">Others</SelectItem>
                 </Select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Country Of Residence</label>
-                <Select name="country" value={formData.country} onChange={handleChange} className="mt-2">
+                <Select 
+                  name="country" 
+                  selectedKeys={formData.country ? [formData.country] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    handleChange({ target: { name: "country", value: selected } } as any);
+                  }} 
+                  className="mt-2"
+                >
                   {countries.map((c) => (
-                    <SelectItem key={c} value={c}>
+                    <SelectItem key={c}>
                       {c}
                     </SelectItem>
                   ))}
@@ -772,10 +807,18 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Family Option</label>
-                <Select name="family_option" value={formData.family_option} onChange={handleChange} className="mt-2">
-                  <SelectItem value="Individual">Individual</SelectItem>
-                  <SelectItem value="Nuclear Family">Nuclear Family</SelectItem>
-                  <SelectItem value="Extended Family">Extended Family</SelectItem>
+                <Select 
+                  name="family_option" 
+                  selectedKeys={formData.family_option ? [formData.family_option] : []} 
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    handleChange({ target: { name: "family_option", value: selected } } as any);
+                  }} 
+                  className="mt-2"
+                >
+                  <SelectItem key="Individual">Individual</SelectItem>
+                  <SelectItem key="Nuclear Family">Nuclear Family</SelectItem>
+                  <SelectItem key="Extended Family">Extended Family</SelectItem>
                 </Select>
               </div>
 
@@ -807,7 +850,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h4 className="text-xl font-semibold text-slate-800">Dependant Details</h4>
                 <div className="flex items-center gap-3">
-                  <Button onClick={() => { if (formData.family_option !== 'Individual') { setDependentCount((p) => p + 1); toast.success('New dependant slot created'); } else { toast.error('Dependants are only allowed for Nuclear or Extended Family.'); } }}>
+                  <Button onClick={() => { if (formData.family_option !== 'Individual') { setDependentCount((p) => p + 1); (toast as any).success('New dependant slot created'); } else { (toast as any).error('Dependants are only allowed for Nuclear or Extended Family.'); } }}>
                     Add Dependant
                   </Button>
                 </div>
@@ -867,101 +910,143 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
             </div>
 
             {/* Dependant edit modal */}
-            <Modal open={openDialog} onClose={handleCloseDialog}>
-              <ModalHeader>
-                <h3 className="text-lg font-semibold">Edit Dependant</h3>
-              </ModalHeader>
-              <ModalBody>
+            <Modal isOpen={openDialog} onOpenChange={setOpenDialog}>
+              <ModalContent>
+                <ModalHeader>
+                  <h3 className="text-lg font-semibold">Edit Dependant</h3>
+                </ModalHeader>
+                <ModalBody>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Relationship</label>
-                    <Select name="relationship" value={currentDependant?.relationship || ""} onChange={(e: any) => handleChangeDep(e)} className="mt-2">
-                      <SelectItem value="Spouse" disabled={isSpouseLimitReached || !isAdultRelationshipEligible}>Spouse</SelectItem>
-                      <SelectItem value="Parent" disabled={isNuclear || isParentLimitReached || !isAdultRelationshipEligible}>Parent</SelectItem>
-                      <SelectItem value="Child" disabled={isChildLimitReached}>Child</SelectItem>
-                      <SelectItem value="Sibling" disabled={isNuclear || isSiblingLimitReached}>Sibling</SelectItem>
+                    <Select 
+                      name="relationship" 
+                      selectedKeys={currentDependant?.relationship ? [currentDependant.relationship] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ target: { name: "relationship", value: selected } } as any);
+                      }} 
+                      className="mt-2"
+                    >
+                      <SelectItem key="Spouse" isDisabled={isSpouseLimitReached || !isAdultRelationshipEligible}>Spouse</SelectItem>
+                      <SelectItem key="Parent" isDisabled={isNuclear || isParentLimitReached || !isAdultRelationshipEligible}>Parent</SelectItem>
+                      <SelectItem key="Child" isDisabled={isChildLimitReached}>Child</SelectItem>
+                      <SelectItem key="Sibling" isDisabled={isNuclear || isSiblingLimitReached}>Sibling</SelectItem>
                     </Select>
-                    {errors.relationship && <div className="text-sm text-red-600 mt-1">{(errors as any).relationship}</div>}
+                    {errors.relationship && <div className="text-sm text-red-600 mt-1">{errors.relationship}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Title</label>
-                    <Select name="title" value={currentDependant?.title || ""} onChange={(e: any) => handleChangeDep(e)} className="mt-2">
+                    <Select 
+                      name="title" 
+                      selectedKeys={currentDependant?.title ? [currentDependant.title] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ target: { name: "title", value: selected } } as any);
+                      }} 
+                      className="mt-2"
+                    >
                       {["Mr", "Master", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => (
-                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                        <SelectItem key={t}>{t}</SelectItem>
                       ))}
                     </Select>
-                    {errors.title && <div className="text-sm text-red-600 mt-1">{(errors as any).title}</div>}
+                    {errors.title && <div className="text-sm text-red-600 mt-1">{errors.title}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">First Name</label>
                     <Input name="firstName" value={currentDependant?.firstName || ""} onChange={handleChangeDep} className="mt-2" />
-                    {errors.firstName && <div className="text-sm text-red-600 mt-1">{(errors as any).firstName}</div>}
+                    {errors.firstName && <div className="text-sm text-red-600 mt-1">{errors.firstName}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Middle Name</label>
                     <Input name="middleName" value={currentDependant?.middleName || ""} onChange={handleChangeDep} className="mt-2" />
-                    {errors.middleName && <div className="text-sm text-red-600 mt-1">{(errors as any).middleName}</div>}
+                    {errors.middleName && <div className="text-sm text-red-600 mt-1">{errors.middleName}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Surname</label>
                     <Input name="surname" value={currentDependant?.surname || ""} onChange={handleChangeDep} className="mt-2" />
-                    {errors.surname && <div className="text-sm text-red-600 mt-1">{(errors as any).surname}</div>}
+                    {errors.surname && <div className="text-sm text-red-600 mt-1">{errors.surname}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">ID Type</label>
-                    <Select name="idtypes" value={currentDependant?.idtypes || ""} onChange={handleChangeDep} className="mt-2">
-                      <SelectItem value="National ID">National ID</SelectItem>
-                      <SelectItem value="Passport">Passport</SelectItem>
-                      <SelectItem value="Birth Certificate">Birth Certificate</SelectItem>
+                    <Select 
+                      name="idtypes" 
+                      selectedKeys={currentDependant?.idtypes ? [currentDependant.idtypes] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ target: { name: "idtypes", value: selected } } as any);
+                      }} 
+                      className="mt-2"
+                    >
+                      <SelectItem key="National ID">National ID</SelectItem>
+                      <SelectItem key="Passport">Passport</SelectItem>
+                      <SelectItem key="Birth Certificate">Birth Certificate</SelectItem>
                     </Select>
-                    {errors.idtypes && <div className="text-sm text-red-600 mt-1">{(errors as any).idtypes}</div>}
+                    {errors.idtypes && <div className="text-sm text-red-600 mt-1">{errors.idtypes}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">ID Number</label>
                     <Input name="idnos" value={currentDependant?.idnos || ""} onChange={handleChangeDep} className="mt-2" />
-                    {errors.idnos && <div className="text-sm text-red-600 mt-1">{(errors as any).idnos}</div>}
+                    {errors.idnos && <div className="text-sm text-red-600 mt-1">{errors.idnos}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">DOB</label>
                     <Input name="dob" type="date" value={currentDependant?.dob || ""} onChange={handleChangeDep} className="mt-2" max={today} />
-                    {errors.dob && <div className="text-sm text-red-600 mt-1">{(errors as any).dob}</div>}
+                    {errors.dob && <div className="text-sm text-red-600 mt-1">{errors.dob}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Gender</label>
-                    <Select name="gendere" value={currentDependant?.gendere || ""} onChange={handleChangeDep} className="mt-2">
-                      <SelectItem value="Male">Male</SelectItem>
-                      <SelectItem value="Female">Female</SelectItem>
+                    <Select 
+                      name="gendere" 
+                      selectedKeys={currentDependant?.gendere ? [currentDependant.gendere] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ target: { name: "gendere", value: selected } } as any);
+                      }} 
+                      className="mt-2"
+                    >
+                      <SelectItem key="Male">Male</SelectItem>
+                      <SelectItem key="Female">Female</SelectItem>
                     </Select>
-                    {errors.gendere && <div className="text-sm text-red-600 mt-1">{(errors as any).gendere}</div>}
+                    {errors.gendere && <div className="text-sm text-red-600 mt-1">{errors.gendere}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Country</label>
-                    <Select name="countrye" value={currentDependant?.countrye || ""} onChange={handleChangeDep} className="mt-2">
-                      {countries.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    <Select 
+                      name="countrye" 
+                      selectedKeys={currentDependant?.countrye ? [currentDependant.countrye] : []} 
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        handleChangeDep({ target: { name: "countrye", value: selected } } as any);
+                      }} 
+                      className="mt-2"
+                    >
+                      {countries.map((c) => <SelectItem key={c}>{c}</SelectItem>)}
                     </Select>
-                    {errors.countrye && <div className="text-sm text-red-600 mt-1">{(errors as any).countrye}</div>}
+                    {errors.countrye && <div className="text-sm text-red-600 mt-1">{errors.countrye}</div>}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700">City</label>
                     <Input name="cities" value={currentDependant?.cities || ""} onChange={handleChangeDep} className="mt-2" />
-                    {errors.cities && <div className="text-sm text-red-600 mt-1">{(errors as any).cities}</div>}
+                    {errors.cities && <div className="text-sm text-red-600 mt-1">{errors.cities}</div>}
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter>
-                <Button variant="ghost" onClick={handleCloseDialog}>Cancel</Button>
-                <Button onClick={handleSave}>Save</Button>
-              </ModalFooter>
+                <ModalFooter>
+                  <Button variant="light" onPress={handleCloseDialog}>Cancel</Button>
+                  <Button onPress={handleSave}>Save</Button>
+                </ModalFooter>
+              </ModalContent>
             </Modal>
 
             {/* Beneficiary section (very similar to dependants) */}
@@ -969,7 +1054,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h4 className="text-xl font-semibold text-slate-800">Beneficiary / Next of Kin Details</h4>
                 <div className="flex items-center gap-3">
-                  <Button onClick={() => { if (formData.family_option !== 'Individual') { setBeneficiaryCount((p) => p + 1); toast.success('New beneficiary slot created'); } else { toast.error('Beneficiaries are only allowed for Nuclear or Extended Family.'); } }}>
+                  <Button onClick={() => { if (formData.family_option !== 'Individual') { setBeneficiaryCount((p) => p + 1); (toast as any).success('New beneficiary slot created'); } else { (toast as any).error('Beneficiaries are only allowed for Nuclear or Extended Family.'); } }}>
                     Add Beneficiary
                   </Button>
                 </div>
@@ -1058,7 +1143,7 @@ const KenyansInSouthWalesMemberForm: React.FC = () => {
             {/* Submit / Reset */}
             <div className="flex items-center justify-center gap-6 mt-8">
               <Button type="submit" className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg">Submit</Button>
-              <Button variant="destructive" onClick={handleReset} className="px-8 py-3 rounded-xl">Reset</Button>
+              <Button color="danger" onClick={handleReset} className="px-8 py-3 rounded-xl">Reset</Button>
             </div>
           </form>
 

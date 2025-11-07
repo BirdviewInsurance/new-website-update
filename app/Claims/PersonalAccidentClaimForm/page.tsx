@@ -72,9 +72,9 @@ export default function PersonalAccidentClaimForm(): JSX.Element {
         const { name, value } = e.target;
         if (name === "age") {
             const n = value === "" ? "" : Number(value);
-            setFormData((prev) => ({ ...prev, [name]: n }));
+            setFormData((prev: FormdataType) => ({ ...prev, [name]: n }));
         } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
+            setFormData((prev: FormdataType) => ({ ...prev, [name]: value }));
         }
     };
 
@@ -91,35 +91,14 @@ export default function PersonalAccidentClaimForm(): JSX.Element {
             });
             const data = await res.json();
             if (res.ok) {
-                toast({
-                    title: "✅ Claim submitted",
-                    description:
-                        data.message || "Your claim was submitted successfully.",
-                    color: "success",
-                    variant: "solid",
-                    placement: "top-right",
-                });
+                (toast as any).success((data as any).message || "Your claim was submitted successfully.");
                 setFormData(initialForm());
                 setStep(1);
             } else {
-                toast({
-                    title: "❌ Submission failed",
-                    description:
-                        data.error || "Unable to submit claim — please try again.",
-                    color: "danger",
-                    variant: "solid",
-                    placement: "top-right",
-                });
+                (toast as any).error((data as any).error || "Unable to submit claim — please try again.");
             }
         } catch (err: any) {
-            toast({
-                title: "⚠️ Network error",
-                description:
-                    err?.message || "Please check your connection and try again.",
-                color: "danger",
-                variant: "solid",
-                placement: "top-right",
-            });
+            (toast as any).error(err?.message || "Please check your connection and try again.");
         } finally {
             setLoading(false);
         }
@@ -130,13 +109,7 @@ export default function PersonalAccidentClaimForm(): JSX.Element {
         setFormData(initialForm());
         setStep(1);
         setResetOpen(false);
-        toast({
-            title: "Reset",
-            description: "Form cleared.",
-            color: "success",
-            variant: "solid",
-            placement: "top-right",
-        });
+        (toast as any).success("Form cleared.");
     };
 
     return (
@@ -364,7 +337,7 @@ export default function PersonalAccidentClaimForm(): JSX.Element {
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 if (file) {
-                                                    setFormData((prev) => ({
+                                                    setFormData((prev: FormdataType) => ({
                                                         ...prev,
                                                         doctorSignatureFile: file,
                                                     }));

@@ -83,14 +83,14 @@ export default function LastExpenseClaimForm() {
             });
             const data = await res.json();
             if (res.ok) {
-                toast.success("Last Expense Claim submitted ✅");
+                (toast as any).success("Last Expense Claim submitted ✅");
                 setFormData({});
                 setActiveStep(0);
             } else {
-                toast.error(data.error || "Submission failed ❌");
+                (toast as any).error((data as any).error || "Submission failed ❌");
             }
         } catch {
-            toast.error("Server error. Try again later.");
+            (toast as any).error("Server error. Try again later.");
         } finally {
             setLoading(false);
         }

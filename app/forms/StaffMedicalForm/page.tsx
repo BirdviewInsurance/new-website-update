@@ -132,11 +132,7 @@ const StaffMedicalForm: React.FC = () => {
 
   const handleAddDependant = () => {
     if (formData.dependantsData.length >= 7) {
-      toast({
-        title: "⚠️ Limit reached",
-        description: "You can only add up to 7 dependants.",
-        variant: "warning",
-      });
+      (toast as any).error("You can only add up to 7 dependants.");
       return;
     }
     setDependentCount((prev) => prev + 1);
@@ -199,31 +195,13 @@ const StaffMedicalForm: React.FC = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        toast({
-          title: "✅ Success",
-          description: data.message,
-          color: "success",
-          variant: "solid",
-          placement: "top-right",
-        });
+        (toast as any).success(data?.message || "Form submitted successfully");
         handleReset();
       } else {
-        toast({
-          title: "❌ Error",
-          description: data.error,
-          color: "danger",
-          variant: "solid",
-          placement: "top-right",
-        });
+        (toast as any).error(data?.error || "Something went wrong");
       }
     } catch (err: any) {
-      toast({
-        title: "❌ Error",
-        description: err.message,
-        color: "danger",
-        variant: "solid",
-        placement: "top-right",
-      });
+      (toast as any).error(err?.message || "Network error. Please try again.");
     } finally {
       setLoaderIcon(false);
     }
@@ -303,13 +281,14 @@ const StaffMedicalForm: React.FC = () => {
             <Select
               label="Title"
               name="title"
-              value={formData.title}
-              onValueChange={(v) =>
-                handleChange({ target: { name: "title", value: v } } as any)
-              }
+              selectedKeys={formData.title ? [formData.title] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "title", value: selected } } as any);
+              }}
             >
               {["Mr", "Mrs", "Miss", "Ms", "Dr", "Prof"].map((t) => (
-                <SelectItem key={t} value={t}>
+                <SelectItem key={t}>
                   {t}
                 </SelectItem>
               ))}
@@ -341,14 +320,15 @@ const StaffMedicalForm: React.FC = () => {
             <Select
               label="ID Type"
               name="idtype"
-              value={formData.idtype}
-              onValueChange={(v) =>
-                handleChange({ target: { name: "idtype", value: v } } as any)
-              }
+              selectedKeys={formData.idtype ? [formData.idtype] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "idtype", value: selected } } as any);
+              }}
               required
             >
               {["National ID", "Passport", "Birth Certificate"].map((t) => (
-                <SelectItem key={t} value={t}>
+                <SelectItem key={t}>
                   {t}
                 </SelectItem>
               ))}
@@ -375,14 +355,15 @@ const StaffMedicalForm: React.FC = () => {
             <Select
               label="Gender"
               name="gender"
-              value={formData.gender}
-              onValueChange={(v) =>
-                handleChange({ target: { name: "gender", value: v } } as any)
-              }
+              selectedKeys={formData.gender ? [formData.gender] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange({ target: { name: "gender", value: selected } } as any);
+              }}
               required
             >
               {["Male", "Female", "Others"].map((g) => (
-                <SelectItem key={g} value={g}>
+                <SelectItem key={g}>
                   {g}
                 </SelectItem>
               ))}
@@ -502,17 +483,22 @@ const StaffMedicalForm: React.FC = () => {
                   <ModalBody className="max-h-[70vh] overflow-y-auto">
                     {currentDependant && (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Input
+                        <Select
                           label="Relationship"
-                          name="relationship"
-                          value={currentDependant.relationship}
-                          onChange={handleChangeDep}
-                          errorMessage={errors.relationship}
-                        />
+                          selectedKeys={currentDependant.relationship ? [currentDependant.relationship] : []}
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            handleChangeDep({ name: "relationship", value: selected });
+                          }}
+                        >
+                          {["Spouse", "Parent", "Child", "Sibling", "Next Of Kin"].map((r) => (
+                            <SelectItem key={r}>{r}</SelectItem>
+                          ))}
+                        </Select>
 
                         <Select
                           label="Title"
-                          selectedKeys={[currentDependant.title]}
+                          selectedKeys={currentDependant.title ? [currentDependant.title] : []}
                           onSelectionChange={(keys) =>
                             handleChangeDep({
                               name: "title",
@@ -522,7 +508,7 @@ const StaffMedicalForm: React.FC = () => {
                         >
                           {["Mr", "Mrs", "Miss", "Dr", "Prof", "Ms", "Master"].map(
                             (t) => (
-                              <SelectItem key={t} value={t}>
+                              <SelectItem key={t}>
                                 {t}
                               </SelectItem>
                             )
@@ -555,7 +541,7 @@ const StaffMedicalForm: React.FC = () => {
 
                         <Select
                           label="ID Type"
-                          selectedKeys={[currentDependant.idtypes]}
+                          selectedKeys={currentDependant.idtypes ? [currentDependant.idtypes] : []}
                           onSelectionChange={(keys) =>
                             handleChangeDep({
                               name: "idtypes",
@@ -565,7 +551,7 @@ const StaffMedicalForm: React.FC = () => {
                         >
                           {["National ID", "Passport", "Birth Certificate"].map(
                             (t) => (
-                              <SelectItem key={t} value={t}>
+                              <SelectItem key={t}>
                                 {t}
                               </SelectItem>
                             )
@@ -592,7 +578,7 @@ const StaffMedicalForm: React.FC = () => {
 
                         <Select
                           label="Gender"
-                          selectedKeys={[currentDependant.gendere]}
+                          selectedKeys={currentDependant.gendere ? [currentDependant.gendere] : []}
                           onSelectionChange={(keys) =>
                             handleChangeDep({
                               name: "gendere",
@@ -601,7 +587,7 @@ const StaffMedicalForm: React.FC = () => {
                           }
                         >
                           {["Male", "Female"].map((g) => (
-                            <SelectItem key={g} value={g}>
+                            <SelectItem key={g}>
                               {g}
                             </SelectItem>
                           ))}

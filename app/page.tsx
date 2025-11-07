@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAnimation } from "framer-motion";
 import { useRef } from "react";
 
+import QRCode from "react-qr-code";
+
 import { siteConfig } from "@/config/site";
 import {
   Users,
@@ -15,9 +17,16 @@ import {
   Star,
   Handshake,
   Clock,
+  TrendingUp,
+  Users2,
+  Activity,
 } from "lucide-react";
 
 import LiquidRingLoader from "@/components/LiquidRingLoader";
+
+// import { useTawk } from "./hooks/useTawk";
+
+import { useLiveChat } from "./hooks/useLiveChat";
 
 // Animated counter component
 interface StatItem {
@@ -28,12 +37,60 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { label: "Active Clients", value: 1200, suffix: "+", icon: <Users className="w-8 h-8 text-danger" /> },
-  { label: "Policies Issued", value: 4500, suffix: "+", icon: <FileText className="w-8 h-8 text-danger" /> },
-  { label: "Claims Settled", value: 3200, suffix: "+", icon: <Wallet className="w-8 h-8 text-danger" /> },
-  { label: "Customer Satisfaction", value: 98, suffix: "%", icon: <Star className="w-8 h-8 text-danger" /> },
-  { label: "Partner Agencies", value: 85, suffix: "+", icon: <Handshake className="w-8 h-8 text-danger" /> },
-  { label: "Years of Service", value: 10, suffix: "+", icon: <Clock className="w-8 h-8 text-danger" /> },
+  {
+    label: "Active Clients",
+    value: 350,
+    suffix: "+",
+    icon: <Users className="w-8 h-8 text-primary" />, // blue tone for trust
+  },
+  {
+    label: "Policies Issued",
+    value: 1200,
+    suffix: "+",
+    icon: <FileText className="w-8 h-8 text-danger" />,
+  },
+  {
+    label: "Claims Settled",
+    value: 250,
+    suffix: "+",
+    icon: <Wallet className="w-8 h-8 text-success" />,
+  },
+  {
+    label: "Monthly Growth Rate",
+    value: 22,
+    suffix: "%",
+    icon: <TrendingUp className="w-8 h-8 text-success" />,
+  },
+  {
+    label: "Team Members",
+    value: 18,
+    suffix: "+",
+    icon: <Users2 className="w-8 h-8 text-success" />,
+  },
+  {
+    label: "Daily Policy Requests",
+    value: 40,
+    suffix: "+",
+    icon: <Activity className="w-8 h-8 text-success" />,
+  },
+  {
+    label: "Customer Satisfaction",
+    value: 97,
+    suffix: "%",
+    icon: <Star className="w-8 h-8 text-warning" />,
+  },
+  {
+    label: "Partner Agencies",
+    value: 25,
+    suffix: "+",
+    icon: <Handshake className="w-8 h-8 text-primary" />,
+  },
+  {
+    label: "Years of Service",
+    value: 1,
+    suffix: "+",
+    icon: <Clock className="w-8 h-8 text-danger" />,
+  },
 ];
 
 function StatCard({ label, value, suffix, icon }: StatItem) {
@@ -91,21 +148,37 @@ function StatCard({ label, value, suffix, icon }: StatItem) {
 }
 
 export default function Home() {
+  // useTawk("6698d0b232dca6db2cb191f0", "1i3fh201c");
+
+  useLiveChat(19361155);
+
   const allProducts = [
-    { title: "Evacuation and Repatriation", img: "/assets/productsPhotos/Evacuation-and-Repatriation.png", desc: "This cover is crafted to intervene and rescue situations of citizens being either stranded or deceased abroad." },
-    { title: "Last Expense", img: "/assets/productsPhotos/last-expense.png", desc: "Our last expense/funeral expense cover pays a specified cash amount within 48 hours of notification of death." },
-    { title: "Medical", img: "/assets/productsPhotos/medical.png", desc: "Our medical insurance products include inpatient (With In-built Maternity), Outpatient, Dental, and Optical." },
-    { title: "Hospital Cash", img: "/assets/productsPhotos/hospital-cash.png", desc: "Daily payments for insureds admitted in hospital for up to a maximum of 10 payments per year or admission." },
-    { title: "Personal Accident", img: "/assets/productsPhotos/personal-accident.png", desc: "Plan provides fixed sum payout on death, permanent disablement, and medical expenses arising because of an accident." },
-    { title: "Motorbike/Bodaboda Insurance Welfare Cover", img: "/assets/productsPhotos/motorbike.jpg", desc: "Covers your motorbike against damage, theft, or loss, including third-party liability." },
-    { title: "TukTuk Insurance Welfare Cover", img: "/assets/productsPhotos/tuktuk.png", desc: "This insurance offers both Third Party and Comprehensive cover—protecting against damage or loss, third party liability." },
-    { title: "Probation Guard", img: "/assets/productsPhotos/prob_guard.png", desc: "This enhancement to our existing Evacuation and Repatriation Cover includes a new component." },
-    { title: "AQUABIMA Insurance", img: "/assets/productsPhotos/aqua_culture.jpeg", desc: "AQUABIMA is a tailored insurance solution for cage and pond farmers, ensuring guaranteed returns on investment." },
+    { title: "Evacuation and Repatriation", slug: "evacuation_and_repatriation", img: "/assets/productsPhotos/Evacuation-and-Repatriation.png", desc: "This cover is crafted to intervene and rescue situations of citizens being either stranded or deceased abroad." },
+    { title: "Last Expense", slug: "last_expense", img: "/assets/productsPhotos/last-expense.png", desc: "Our last expense/funeral expense cover pays a specified cash amount within 48 hours of notification of death." },
+    { title: "Medical", slug: "medical", img: "/assets/productsPhotos/medical.png", desc: "Our medical insurance products include inpatient (With In-built Maternity), Outpatient, Dental, and Optical." },
+    { title: "Hospital Cash", slug: "hospital_cash", img: "/assets/productsPhotos/hospital-cash.png", desc: "Daily payments for insureds admitted in hospital for up to a maximum of 10 payments per year or admission." },
+    { title: "Personal Accident", slug: "personal_accident", img: "/assets/productsPhotos/personal-accident.png", desc: "Plan provides fixed sum payout on death, permanent disablement, and medical expenses arising because of an accident." },
+    { title: "Motorbike/Bodaboda Insurance Welfare Cover", slug: "bodaboda_welfare", img: "/assets/productsPhotos/motorbike.jpg", desc: "Covers your motorbike against damage, theft, or loss, including third-party liability." },
+    { title: "TukTuk Insurance Welfare Cover", slug: "tuktuk_welfare", img: "/assets/productsPhotos/tuktuk.png", desc: "This insurance offers both Third Party and Comprehensive cover—protecting against damage or loss, third party liability." },
+    { title: "Probation Guard", slug: "probation_guard", img: "/assets/productsPhotos/prob_guard.png", desc: "This enhancement to our existing Evacuation and Repatriation Cover includes a new component." },
+    { title: "AQUABIMA Insurance", slug: "aquaculture", img: "/assets/productsPhotos/aqua_culture.jpeg", desc: "AQUABIMA is a tailored insurance solution for cage and pond farmers, ensuring guaranteed returns on investment." },
   ];
 
-  const testimonials = [
-    { name: "Alice Mwangi", role: "Software Engineer", avatar: "/assets/managementPhotos/Ann-Kinyanjui.png", text: "Birdview Insurance made choosing the right plan incredibly easy. Highly recommend!" },
-    { name: "John Kamau", role: "Business Owner", avatar: "/assets/managementPhotos/Richard-Muiru.png", text: "Fast, reliable, and trustworthy. Their coverage saved us during an unexpected event." },
+  interface Testimonial {
+    name: string;
+    role: string;
+    avatar: string;
+    text: string;
+    companyLogo?: string;
+  }
+
+  const testimonials: Testimonial[] = [
+    {
+      name: "Alice Mwangi", role: "Software Engineer", avatar: "/assets/managementPhotos/Ann-Kinyanjui.png", text: "Birdview Insurance made choosing the right plan incredibly easy. Highly recommend!"
+    },
+    {
+      name: "John Kamau", role: "Business Owner", avatar: "/assets/managementPhotos/Richard-Muiru.png", text: "Fast, reliable, and trustworthy. Their coverage saved us during an unexpected event."
+    },
     { name: "Grace Njeri", role: "Freelancer", avatar: "/assets/managementPhotos/Mary-Mundia.png", text: "Excellent customer service and flexible plans that fit my needs perfectly." },
   ];
 
@@ -122,7 +195,7 @@ export default function Home() {
     },
     {
       title: "24/7 Support",
-      icon: "/icons/support.svg",
+      icon: "/icons/clock.svg",
       desc: "We’re here for you anytime, anywhere."
     },
     {
@@ -268,29 +341,94 @@ export default function Home() {
             your needs — simple, transparent, and accessible.
           </motion.p>
 
-          {/* Buttons */}
+          {/* Buttons + QR code */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 1 }}
-            className="flex gap-4 mt-8 flex-wrap justify-center"
+            className="flex items-center gap-4 mt-8 flex-wrap justify-center"
           >
+            {/* Get Covered Today button */}
             <Link
               href={(siteConfig.links as any)?.getQuote || "#"}
               className="relative px-6 py-3 rounded-full text-white font-semibold bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-500 shadow-lg"
             >
               Get Covered Today
             </Link>
-            <Link
-              href={(siteConfig.links as any)?.services || "#"}
-              className="relative px-6 py-3 rounded-full text-white font-semibold bg-red-600 hover:bg-red-700 hover:scale-105 transition-all duration-500 shadow-lg"
+
+            {/* Explore Plans button + QR code */}
+            <div
+              className="flex flex-col sm:flex-row items-center sm:gap-3 gap-5 sm:gap-3 mt-4 sm:mt-0"
             >
-              Explore Plans
-            </Link>
+              {/* Explore Plans button */}
+              <Link
+                href={(siteConfig.links as any)?.services || "#"}
+                className="relative px-6 py-3 rounded-full text-white font-semibold bg-red-600 hover:bg-red-700 hover:scale-105 transition-all duration-500 shadow-lg"
+              >
+                Explore Plans
+              </Link>
+
+              {/* ✅ QR code moves below on mobile */}
+              <div className="flex flex-col items-center gap-3">
+                {/* Animated QR Code */}
+                <motion.div
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1, 1.07, 1] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="relative flex items-center justify-center rounded-xl p-[3px]
+     bg-gradient-to-r from-blue-600 via-pink-500 to-red-600
+     shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+                >
+                  <Link
+                    href="https://quote.birdviewinsurance.com/"
+                    target="_blank"
+                    className="relative flex items-center justify-center bg-white/90 backdrop-blur-lg
+         rounded-xl p-2 shadow-lg transition-transform duration-500"
+                  >
+                    <Image
+                      src="/images/qr-quote.jpg"
+                      alt="Scan to Get a Quote"
+                      width={120}
+                      height={120}
+                      className="rounded-lg"
+                      priority
+                    />
+
+                    {/* Soft glow animation overlay */}
+                    <motion.div
+                      className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/30 to-red-500/30"
+                      animate={{ opacity: [0.2, 0.5, 0.2] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  </Link>
+                </motion.div>
+
+                {/* Text below the QR */}
+                <p className="mt-2">
+                  <motion.span
+                    className="text-xl text-white font-semibold"
+                    animate={{
+                      opacity: [1, 0.5, 1],
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    Scan to Get a Quick Quote
+                  </motion.span>
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
-
 
       {/* Products Section */}
       <Card
@@ -375,6 +513,26 @@ export default function Home() {
                 <CardBody className="text-gray-200 px-4 pb-6 relative z-10">
                   {product.desc}
                 </CardBody>
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="group inline-flex items-center gap-2 mt-4 px-4 py-2 text-sm font-semibold rounded-full 
+                  bg-white/20 hover:bg-white/40 text-white 
+                  backdrop-blur-md border border-white/30 
+                  transition-all duration-300"
+                >
+                  <span>Read More</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+
               </Card>
             </motion.div>
           ))}
@@ -404,7 +562,7 @@ export default function Home() {
       {/* Testimonial Carousel */}
       <Card
         shadow="lg"
-        radius="xl"
+        radius="lg"
         className="w-full relative overflow-hidden py-20"
       >
         {/* Background Image + Brand Gradient Overlay */}
@@ -480,7 +638,7 @@ export default function Home() {
       {/* Why Choose Us / Benefits */}
       <Card
         shadow="lg"
-        radius="xl"
+        radius="lg"
         className="relative w-full py-20 overflow-hidden border-0"
       >
         {/* Background */}
@@ -526,7 +684,7 @@ export default function Home() {
       {/* Partners Section */}
       <Card
         shadow="lg"
-        radius="xl"
+        radius="lg"
         className="w-full relative overflow-hidden py-20 px-6 md:px-12 border border-white/20"
         style={{
           backgroundImage: "url('/images/partner.png')",
@@ -607,7 +765,7 @@ export default function Home() {
       { /* STATS */}
       <Card
         shadow="lg"
-        radius="xl"
+        radius="lg"
         className="relative overflow-hidden w-full text-white py-20 px-6 md:px-12 border border-white/20"
         style={{
           backgroundImage: "url('/images/stats.png')",
@@ -636,6 +794,147 @@ export default function Home() {
           </div>
         </div>
       </Card>
+
+      {/* ESG SECTION - PREMIUM CORPORATE DESIGN */}
+      <section
+        id="esg"
+        className="relative overflow-hidden py-28 px-6 md:px-12 text-white rounded-[3rem] border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)]"
+        style={{
+          backgroundImage: "url('/images/esg-bg.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Layered Gradient & Light Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-black/70 to-danger/90 mix-blend-overlay backdrop-blur-[3px] -z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_70%)] pointer-events-none -z-10" />
+
+        <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+          {/* Left: Floating ESG Image */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            viewport={{ once: true }}
+            className="w-full lg:w-1/2 flex justify-center relative"
+          >
+            <motion.div
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 100 }}
+              className="relative group rounded-[2rem] overflow-hidden border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+            >
+              <Image
+                src="/images/esg-illustration.jpg"
+                alt="Birdview ESG Commitment"
+                width={650}
+                height={450}
+                className="rounded-[2rem] object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              {/* Glow bloom behind */}
+              <div className="absolute -inset-8 bg-primary/30 blur-3xl opacity-30 group-hover:opacity-60 transition-all duration-700" />
+            </motion.div>
+          </motion.div>
+
+          {/* Right: Text + Content */}
+          <motion.div
+            initial={{ opacity: 0, x: 60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+            viewport={{ once: true }}
+            className="w-full lg:w-1/2 space-y-10"
+          >
+            <div className="space-y-5">
+              <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
+                Building a{" "}
+                <span className="bg-gradient-to-r from-primary to-danger bg-clip-text text-transparent">
+                  Responsible Future
+                </span>
+              </h2>
+              <p className="text-lg md:text-xl text-gray-200 leading-relaxed max-w-xl">
+                Birdview Insurance’s ESG vision goes beyond sustainability —
+                it’s about redefining growth with purpose. We empower people,
+                protect the planet, and uphold governance that inspires trust.
+              </p>
+            </div>
+
+            {/* ESG Pillars */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: "🌿",
+                  title: "Environmental",
+                  text: "Green operations, digital-first solutions, and a net-zero path.",
+                  color: "from-primary/40 to-primary/10",
+                },
+                {
+                  icon: "🤝",
+                  title: "Social",
+                  text: "Championing inclusion, fairness, and financial accessibility.",
+                  color: "from-danger/40 to-danger/10",
+                },
+                {
+                  icon: "🏛️",
+                  title: "Governance",
+                  text: "Transparent leadership that strengthens accountability and trust.",
+                  color: "from-white/30 to-white/10",
+                },
+              ].map((pillar, i) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ y: -5, scale: 1.03 }}
+                  transition={{ duration: 0.3 }}
+                  className={`relative bg-gradient-to-br ${pillar.color} backdrop-blur-lg p-6 rounded-2xl border border-white/20 shadow-[0_0_25px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-all`}
+                >
+                  <div className="text-3xl mb-3">{pillar.icon}</div>
+                  <h4 className="font-bold text-lg mb-2">{pillar.title}</h4>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {pillar.text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Animated ESG Metrics */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="flex flex-wrap gap-10 mt-12"
+            >
+              {[
+                { value: "98%", label: "Paperless Operations", color: "text-primary" },
+                { value: "12,000+", label: "Families Empowered", color: "text-danger" },
+                { value: "35+", label: "Community Initiatives", color: "text-white" },
+              ].map((stat, i) => (
+                <div key={i} className="text-center md:text-left">
+                  <h3 className={`text-5xl font-extrabold ${stat.color}`}>
+                    {stat.value}
+                  </h3>
+                  <p className="text-sm text-gray-300">{stat.label}</p>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* CTA Button */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              viewport={{ once: true }}
+              className="mt-10"
+            >
+              <Link
+                href="/esg"
+                className="px-10 py-4 rounded-full bg-gradient-to-r from-primary to-danger hover:from-danger hover:to-primary font-semibold shadow-lg text-white transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
+              >
+                Discover Our ESG Journey
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* FAQ */}
       <Card

@@ -153,13 +153,13 @@ const GroupForm: React.FC = () => {
       });
 
       if (res.status === 200) {
-        toast.success(res.data.message || "Form submitted successfully!");
+        (toast as any).success((res.data as any).message || "Form submitted successfully!");
         handleReset();
       } else {
-        toast.error(res.data.error || "Something went wrong!");
+        (toast as any).error((res.data as any).error || "Something went wrong!");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.error || error.message);
+      (toast as any).error(error.response?.data?.error || error.message);
     } finally {
       setLoaderIcon(false);
     }

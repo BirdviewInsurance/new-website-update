@@ -1,5 +1,5 @@
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
   return (
-    <section className="w-full px-6 md:px-12 lg:px-24">{children}</section>
+    <section className="w-screen max-w-none overflow-hidden">{children}</section>
   );
 }

@@ -6,11 +6,13 @@ import {
     Card,
     CardBody,
     Input,
+    Textarea,
     Modal,
+    ModalContent,
     ModalHeader,
     ModalBody,
     ModalFooter,
-    Toast,
+    toast,
     Badge,
 } from "@heroui/react";
 import {
@@ -60,7 +62,6 @@ export default function AquacultureInsurance() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [openModal, setOpenModal] = useState(false);
-    const [toast, setToast] = useState({ open: false, message: "", type: "success" });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -69,21 +70,21 @@ export default function AquacultureInsurance() {
     const handleSubmit = async () => {
         const { name, email, phone, request } = form;
         if (!name || !email || !phone || !request) {
-            return setToast({ open: true, message: "Please fill all fields.", type: "error" });
+            return (toast as any).error("Please fill all fields.");
         }
 
         setLoading(true);
         try {
             await axios.post("/api/sendAquacultureRequest", form);
             setSuccess(true);
-            setToast({ open: true, message: "Request submitted successfully!", type: "success" });
+            (toast as any).success("Request submitted successfully!");
             setTimeout(() => {
                 setOpenModal(false);
                 setForm({ name: "", email: "", phone: "", request: "" });
                 setSuccess(false);
             }, 3000);
-        } catch (err) {
-            setToast({ open: true, message: "Something went wrong.", type: "error" });
+        } catch (err: any) {
+            (toast as any).error(err?.message || "Something went wrong.");
         } finally {
             setLoading(false);
         }
@@ -245,51 +246,38 @@ export default function AquacultureInsurance() {
             </div>
 
             {/* Modal Form */}
-            <Modal open={openModal} onClose={() => setOpenModal(false)} size="md">
-                <ModalHeader className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-400 text-white font-bold text-center">
-                    Aquaculture Insurance Request
-                </ModalHeader>
-                <ModalBody className="space-y-4">
-                    <Input label="Full Name" name="name" value={form.name} onChange={handleChange} fullWidth />
-                    <Input label="Email Address" name="email" value={form.email} onChange={handleChange} fullWidth />
-                    <Input label="Phone Number" name="phone" value={form.phone} onChange={handleChange} fullWidth />
-                    <Input
-                        label="Your Request / Inquiry"
-                        name="request"
-                        value={form.request}
-                        onChange={handleChange}
-                        multiline
-                        rows={4}
-                        fullWidth
-                    />
-                </ModalBody>
-                <ModalFooter className="flex justify-between">
-                    <Button color="secondary" onClick={() => setForm({ name: "", email: "", phone: "", request: "" })}>
-                        Reset
-                    </Button>
-                    <Button
-                        color={success ? "success" : "primary"}
-                        onClick={handleSubmit}
-                        disabled={loading || success}
-                    >
-                        {loading ? "Submitting..." : success ? "Submitted!" : "Submit"}
-                    </Button>
-                </ModalFooter>
+            <Modal isOpen={openModal} onOpenChange={setOpenModal} size="md">
+                <ModalContent>
+                    <ModalHeader className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-400 text-white font-bold text-center">
+                        Aquaculture Insurance Request
+                    </ModalHeader>
+                    <ModalBody className="space-y-4">
+                        <Input label="Full Name" name="name" value={form.name} onChange={handleChange} fullWidth />
+                        <Input label="Email Address" name="email" value={form.email} onChange={handleChange} fullWidth />
+                        <Input label="Phone Number" name="phone" value={form.phone} onChange={handleChange} fullWidth />
+                        <Textarea
+                            label="Your Request / Inquiry"
+                            name="request"
+                            value={form.request}
+                            onChange={handleChange}
+                            rows={4}
+                            fullWidth
+                        />
+                    </ModalBody>
+                    <ModalFooter className="flex justify-between">
+                        <Button color="secondary" onClick={() => setForm({ name: "", email: "", phone: "", request: "" })}>
+                            Reset
+                        </Button>
+                        <Button
+                            color={success ? "success" : "primary"}
+                            onClick={handleSubmit}
+                            disabled={loading || success}
+                        >
+                            {loading ? "Submitting..." : success ? "Submitted!" : "Submit"}
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
             </Modal>
-
-            {/* Toast */}
-            {toast.open && (
-                <Toast
-                    open={toast.open}
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast({ ...toast, open: false })}
-                    className={`${toast.type === "success"
-                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white"
-                            : "bg-gradient-to-r from-red-500 to-red-600 text-white"
-                        } shadow-lg rounded-xl`}
-                />
-            )}
         </div>
     );
 }
