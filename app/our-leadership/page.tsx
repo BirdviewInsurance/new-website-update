@@ -50,14 +50,19 @@ export default function OurLeadership() {
       img: "/assets/managementPhotos/Mary-Mundia.png",
     },
     {
-      name: "Kevin Osiga",
-      title: "Underwriting Manager",
-      img: "/assets/managementPhotos/Kevin-Osiga.png",
+      name: "Obed Menjeri",
+      title: "Business Development Manager",
+      img: "/assets/managementPhotos/Obed-Menjeri.png",
     },
     {
       name: "Esdor Yahuma",
-      title: "Business Development Manager",
+      title: "Assistant Business Development Manager",
       img: "/assets/managementPhotos/Esdor-Yahuma.png",
+    },
+    {
+      name: "Kevin Osiga",
+      title: "Underwriting Manager",
+      img: "/assets/managementPhotos/Kevin-Osiga.png",
     },
     {
       name: "Ann Kinyanjui",
