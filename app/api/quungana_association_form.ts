@@ -1,8 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
-import * as fs from 'fs/promises';
-import * as XLSX from 'xlsx';
-import path from 'path';
+import type { NextApiRequest, NextApiResponse } from "next";
+
+import * as fs from "fs/promises";
+import path from "path";
+
+import nodemailer from "nodemailer";
+import * as XLSX from "xlsx";
 
 // --- Types ---
 type SheetMatrix = (string | number | null)[][];
@@ -53,29 +55,54 @@ export interface QuunganaAssociationFormForm {
   title: string;
 }
 
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
   try {
-    const { 
-      memberidno, groupname, groupnumber, relationship, title, firstname, lastname,
-      middlename, idtype, idno, dateofbirth, gender, country, city, address, mobileno, eimail,
+    const {
+      memberidno,
+      groupname,
+      groupnumber,
+      relationship,
+      title,
+      firstname,
+      lastname,
+      middlename,
+      idtype,
+      idno,
+      dateofbirth,
+      gender,
+      country,
+      city,
+      address,
+      mobileno,
+      eimail,
       dependantsData = [],
-      beneficiariesData = []
+      beneficiariesData = [],
     } = req.body;
 
     console.log("✅ Received Form Data:", JSON.stringify(req.body, null, 2));
-    console.log("✅ Received Dependants Data:", JSON.stringify(dependantsData, null, 2));
-    console.log("✅ Received Beneficiaries Data:", JSON.stringify(beneficiariesData, null, 2));
+    console.log(
+      "✅ Received Dependants Data:",
+      JSON.stringify(dependantsData, null, 2),
+    );
+    console.log(
+      "✅ Received Beneficiaries Data:",
+      JSON.stringify(beneficiariesData, null, 2),
+    );
 
-    const publicDir = path.join(process.cwd(), 'public');
+    const publicDir = path.join(process.cwd(), "public");
+
     await fs.mkdir(publicDir, { recursive: true });
 
-    const filePath = path.join(publicDir, 'quungana_association_details.xlsx');
+    const filePath = path.join(publicDir, "quungana_association_details.xlsx");
     let workbook: XLSX.WorkBook;
     let ws1: XLSX.WorkSheet;
     let ws2: XLSX.WorkSheet;
@@ -84,92 +111,223 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let fileBuffer = await fs.readFile(filePath).catch(() => null);
 
     if (fileBuffer) {
-      workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+      workbook = XLSX.read(fileBuffer, { type: "buffer" });
 
-      ws1 = workbook.Sheets['Member Details'] || XLSX.utils.aoa_to_sheet([
-        ['Member Id Number','Group Name','Group Number','Relationship','Title',
-        'First Name','Last Name','Middle Name','ID Type','ID Number',
-        'Date Of Birth','Gender','Country','City','Address','Mobile Number','Email']
-      ]);
+      ws1 =
+        workbook.Sheets["Member Details"] ||
+        XLSX.utils.aoa_to_sheet([
+          [
+            "Member Id Number",
+            "Group Name",
+            "Group Number",
+            "Relationship",
+            "Title",
+            "First Name",
+            "Last Name",
+            "Middle Name",
+            "ID Type",
+            "ID Number",
+            "Date Of Birth",
+            "Gender",
+            "Country",
+            "City",
+            "Address",
+            "Mobile Number",
+            "Email",
+          ],
+        ]);
 
-      ws2 = workbook.Sheets['Dependants Details'] || XLSX.utils.aoa_to_sheet([
-        ['Member Id No','Dependant ID','Relationship','Title','First Name','Middle Name','Last Name',
-        'ID Type','ID Number','Date Of Birth','Gender','Country','City']
-      ]);
+      ws2 =
+        workbook.Sheets["Dependants Details"] ||
+        XLSX.utils.aoa_to_sheet([
+          [
+            "Member Id No",
+            "Dependant ID",
+            "Relationship",
+            "Title",
+            "First Name",
+            "Middle Name",
+            "Last Name",
+            "ID Type",
+            "ID Number",
+            "Date Of Birth",
+            "Gender",
+            "Country",
+            "City",
+          ],
+        ]);
 
-      ws3 = workbook.Sheets['Beneficiaries Info'] || XLSX.utils.aoa_to_sheet([
-        ['Member Id No','Beneficiary ID','Relationship','Title','Full Name',
-        'Date Of Birth','Phone Number','Address','Email']
-      ]);
-
+      ws3 =
+        workbook.Sheets["Beneficiaries Info"] ||
+        XLSX.utils.aoa_to_sheet([
+          [
+            "Member Id No",
+            "Beneficiary ID",
+            "Relationship",
+            "Title",
+            "Full Name",
+            "Date Of Birth",
+            "Phone Number",
+            "Address",
+            "Email",
+          ],
+        ]);
     } else {
       workbook = XLSX.utils.book_new();
 
       ws1 = XLSX.utils.aoa_to_sheet([
-        ['Member Id Number','Group Name','Group Number','Relationship','Title',
-        'First Name','Last Name','Middle Name','ID Type','ID Number',
-        'Date Of Birth','Gender','Country','City','Address','Mobile Number','Email']
+        [
+          "Member Id Number",
+          "Group Name",
+          "Group Number",
+          "Relationship",
+          "Title",
+          "First Name",
+          "Last Name",
+          "Middle Name",
+          "ID Type",
+          "ID Number",
+          "Date Of Birth",
+          "Gender",
+          "Country",
+          "City",
+          "Address",
+          "Mobile Number",
+          "Email",
+        ],
       ]);
-      XLSX.utils.book_append_sheet(workbook, ws1, 'Member Details');
+      XLSX.utils.book_append_sheet(workbook, ws1, "Member Details");
 
       ws2 = XLSX.utils.aoa_to_sheet([
-        ['Member Id No','Dependant ID','Relationship','Title','First Name','Middle Name','Last Name',
-        'ID Type','ID Number','Date Of Birth','Gender','Country','City']
+        [
+          "Member Id No",
+          "Dependant ID",
+          "Relationship",
+          "Title",
+          "First Name",
+          "Middle Name",
+          "Last Name",
+          "ID Type",
+          "ID Number",
+          "Date Of Birth",
+          "Gender",
+          "Country",
+          "City",
+        ],
       ]);
-      XLSX.utils.book_append_sheet(workbook, ws2, 'Dependants Details');
+      XLSX.utils.book_append_sheet(workbook, ws2, "Dependants Details");
 
       ws3 = XLSX.utils.aoa_to_sheet([
-        ['Member Id No','Beneficiary ID','Relationship','Title','Full Name',
-        'Date Of Birth','Phone Number','Address','Email']
+        [
+          "Member Id No",
+          "Beneficiary ID",
+          "Relationship",
+          "Title",
+          "Full Name",
+          "Date Of Birth",
+          "Phone Number",
+          "Address",
+          "Email",
+        ],
       ]);
-      XLSX.utils.book_append_sheet(workbook, ws3, 'Beneficiaries Info');
+      XLSX.utils.book_append_sheet(workbook, ws3, "Beneficiaries Info");
     }
 
     // --- Append Member Row ---
-    const existingMemberData: SheetMatrix = XLSX.utils.sheet_to_json(ws1, { header: 1 }) as SheetMatrix;
+    const existingMemberData: SheetMatrix = XLSX.utils.sheet_to_json(ws1, {
+      header: 1,
+    }) as SheetMatrix;
+
     existingMemberData.push([
-      memberidno, groupname, groupnumber, relationship, title, firstname, lastname,
-      middlename, idtype, idno, dateofbirth, gender, country, city, address, mobileno, eimail
+      memberidno,
+      groupname,
+      groupnumber,
+      relationship,
+      title,
+      firstname,
+      lastname,
+      middlename,
+      idtype,
+      idno,
+      dateofbirth,
+      gender,
+      country,
+      city,
+      address,
+      mobileno,
+      eimail,
     ]);
-    workbook.Sheets['Member Details'] = XLSX.utils.aoa_to_sheet(existingMemberData);
+    workbook.Sheets["Member Details"] =
+      XLSX.utils.aoa_to_sheet(existingMemberData);
 
     // --- Append Dependants ---
-    const existingDependantsData: SheetMatrix = XLSX.utils.sheet_to_json(ws2, { header: 1 }) as SheetMatrix;
+    const existingDependantsData: SheetMatrix = XLSX.utils.sheet_to_json(ws2, {
+      header: 1,
+    }) as SheetMatrix;
+
     if (dependantsData.length > 0) {
       dependantsData.forEach((dep: Dependant, index: number) => {
         if (!dep || !dep.relationship || !dep.firstName) return;
         existingDependantsData.push([
-          memberidno, index + 1, dep.relationship, dep.title || "",
-          dep.firstName, dep.middleName || "", dep.surname || "",
-          dep.idtypes || "", dep.idnos || "", dep.dob || "", dep.gendere || "", dep.countrye || "", dep.cities || ""
+          memberidno,
+          index + 1,
+          dep.relationship,
+          dep.title || "",
+          dep.firstName,
+          dep.middleName || "",
+          dep.surname || "",
+          dep.idtypes || "",
+          dep.idnos || "",
+          dep.dob || "",
+          dep.gendere || "",
+          dep.countrye || "",
+          dep.cities || "",
         ]);
       });
     }
-    workbook.Sheets['Dependants Details'] = XLSX.utils.aoa_to_sheet(existingDependantsData);
+    workbook.Sheets["Dependants Details"] = XLSX.utils.aoa_to_sheet(
+      existingDependantsData,
+    );
 
     // --- Append Beneficiaries ---
-    const existingBeneficiariesData: SheetMatrix = XLSX.utils.sheet_to_json(ws3, { header: 1 }) as SheetMatrix;
+    const existingBeneficiariesData: SheetMatrix = XLSX.utils.sheet_to_json(
+      ws3,
+      { header: 1 },
+    ) as SheetMatrix;
+
     if (beneficiariesData.length > 0) {
       beneficiariesData.forEach((ben: Beneficiary, index: number) => {
         if (!ben || !ben.relationship || !ben.beneficiary_fullname) return;
         existingBeneficiariesData.push([
-          memberidno, index + 1, ben.relationship, ben.title || "",
-          ben.beneficiary_fullname, ben.dob || "", ben.phone_number || "",
-          ben.beneficiary_address || "", ben.beneficiary_email || ""
+          memberidno,
+          index + 1,
+          ben.relationship,
+          ben.title || "",
+          ben.beneficiary_fullname,
+          ben.dob || "",
+          ben.phone_number || "",
+          ben.beneficiary_address || "",
+          ben.beneficiary_email || "",
         ]);
       });
     }
-    workbook.Sheets['Beneficiaries Info'] = XLSX.utils.aoa_to_sheet(existingBeneficiariesData);
+    workbook.Sheets["Beneficiaries Info"] = XLSX.utils.aoa_to_sheet(
+      existingBeneficiariesData,
+    );
 
     // --- Save Workbook ---
-    const updatedBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    const updatedBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "buffer",
+    });
+
     await fs.writeFile(filePath, updatedBuffer);
 
     const fileUrl = `https://www.birdviewmicroinsurance.com/quungana_association_details.xlsx`;
 
     // --- Send Email to Admins ---
     const transporter = nodemailer.createTransport({
-      host: 'mail5016.site4now.net',
+      host: "mail5016.site4now.net",
       port: 465,
       secure: true,
       auth: {
@@ -180,16 +338,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const mailOptions = {
       from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
-      to: ['DGikuma@birdviewinsurance.com','Gkangwana@birdviewinsurance.com','Kosiga@birdviewinsurance.com'],
+      to: [
+        "DGikuma@birdviewinsurance.com",
+        "Gkangwana@birdviewinsurance.com",
+        "Kosiga@birdviewinsurance.com",
+      ],
       subject: `Updated Quungana Welfare Association Member Details from ${memberidno} - ${firstname}`,
       text: `Please find the updated Excel sheet with the latest Group, Dependants and Beneficiaries Details.\n\nDownload:\n${fileUrl}`,
-      attachments: [{ filename: 'quungana_association_details.xlsx', content: updatedBuffer }]
+      attachments: [
+        {
+          filename: "quungana_association_details.xlsx",
+          content: updatedBuffer,
+        },
+      ],
     };
 
     await transporter.sendMail(mailOptions);
 
     // --- Confirmation Email to Member ---
-    const fullName = `${firstname} ${middlename || ''} ${lastname}`.trim();
+    const fullName = `${firstname} ${middlename || ""} ${lastname}`.trim();
     const memberEmailBody = `
 Dear ${fullName},
 
@@ -202,7 +369,7 @@ Thank you for submitting your membership details. Below is what we received:
 - Relationship: ${relationship}
 - Title: ${title}
 - First Name: ${firstname}
-- Middle Name: ${middlename || '-'}
+- Middle Name: ${middlename || "-"}
 - Last Name: ${lastname}
 - ID Type: ${idtype}
 - ID Number: ${idno}
@@ -215,32 +382,48 @@ Thank you for submitting your membership details. Below is what we received:
 - Email: ${eimail}
 
 📌 DEPENDANTS
-${dependantsData.length > 0 ? dependantsData.map((d: Dependant, i: number) => `
+${
+  dependantsData.length > 0
+    ? dependantsData
+        .map(
+          (d: Dependant, i: number) => `
 Dependant ${i + 1}:
 - Relationship: ${d.relationship}
-- Title: ${d.title || '-'}
+- Title: ${d.title || "-"}
 - First Name: ${d.firstName}
-- Middle Name: ${d.middleName || '-'}
-- Last Name: ${d.surname || '-'}
-- ID Type: ${d.idtypes || ''}
-- ID Number: ${d.idnos || ''}
-- Date of Birth: ${d.dob || ''}
-- Gender: ${d.gendere || ''}
-- Country: ${d.countrye || ''}
-- City: ${d.cities || ''}
-`).join('\n') : 'No dependants added.'}
+- Middle Name: ${d.middleName || "-"}
+- Last Name: ${d.surname || "-"}
+- ID Type: ${d.idtypes || ""}
+- ID Number: ${d.idnos || ""}
+- Date of Birth: ${d.dob || ""}
+- Gender: ${d.gendere || ""}
+- Country: ${d.countrye || ""}
+- City: ${d.cities || ""}
+`,
+        )
+        .join("\n")
+    : "No dependants added."
+}
 
 📌 BENEFICIARIES
-${beneficiariesData.length > 0 ? beneficiariesData.map((b: Beneficiary, i: number) => `
+${
+  beneficiariesData.length > 0
+    ? beneficiariesData
+        .map(
+          (b: Beneficiary, i: number) => `
 Beneficiary ${i + 1}:
 - Relationship: ${b.relationship}
-- Title: ${b.title || '-'}
+- Title: ${b.title || "-"}
 - Full Name: ${b.beneficiary_fullname}
-- Date of Birth: ${b.dob || '-'}
-- Phone: ${b.phone_number || '-'}
-- Address: ${b.beneficiary_address || '-'}
-- Email: ${b.beneficiary_email || '-'}
-`).join('\n') : 'No beneficiaries added.'}
+- Date of Birth: ${b.dob || "-"}
+- Phone: ${b.phone_number || "-"}
+- Address: ${b.beneficiary_address || "-"}
+- Email: ${b.beneficiary_email || "-"}
+`,
+        )
+        .join("\n")
+    : "No beneficiaries added."
+}
 
 Warm regards,  
 Birdview Insurance
@@ -253,9 +436,12 @@ Birdview Insurance
       text: memberEmailBody,
     });
 
-    return res.status(200).json({ message: 'Form sent successfully', fileUrl });
+    return res.status(200).json({ message: "Form sent successfully", fileUrl });
   } catch (error: any) {
     console.error("❌ Full Error Details:", error);
-    return res.status(500).json({ error: error?.message || 'Unknown error occurred' });
+
+    return res
+      .status(500)
+      .json({ error: error?.message || "Unknown error occurred" });
   }
 }

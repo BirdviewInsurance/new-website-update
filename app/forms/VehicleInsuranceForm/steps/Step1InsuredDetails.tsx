@@ -19,14 +19,14 @@ type Step1Props = {
 
 const Step1InsuredDetails: React.FC<Step1Props> = ({
   formData = {},
-  updateFormData = () => { },
+  updateFormData = () => {},
 }) => {
   return (
     <motion.div
       key="step1"
-      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -30 }}
+      initial={{ opacity: 0, y: 30 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Card className="rounded-2xl shadow-2xl border border-gray-100 bg-white/80 backdrop-blur-sm hover:shadow-blue-100 transition-all duration-300">
@@ -44,14 +44,12 @@ const Step1InsuredDetails: React.FC<Step1Props> = ({
                 Products
               </label>
               <Select
-                selectedKeys={[formData.products || ""]}
-                onChange={(e) =>
-                  updateFormData({ products: e.target.value })
-                }
-                placeholder="Select product"
-                variant="flat"
-                className="rounded-lg border-gray-300 bg-gray-50 text-gray-900"
                 required
+                className="rounded-lg border-gray-300 bg-gray-50 text-gray-900"
+                placeholder="Select product"
+                selectedKeys={[formData.products || ""]}
+                variant="flat"
+                onChange={(e) => updateFormData({ products: e.target.value })}
               >
                 <SelectItem key="001-Tricycle">001 - Tricycle</SelectItem>
                 <SelectItem key="002-Motorbike">002 - Motorbike</SelectItem>
@@ -79,38 +77,38 @@ const Step1InsuredDetails: React.FC<Step1Props> = ({
 
             {/* Pin Number */}
             <Input
-              type="text"
+              required
+              className="bg-gray-50 text-gray-900"
               label="PIN Number"
               placeholder="Enter PIN Number"
+              type="text"
               value={formData.pinNumber || ""}
-              onChange={(e) => updateFormData({ pinNumber: e.target.value })}
               variant="flat"
-              className="bg-gray-50 text-gray-900"
-              required
+              onChange={(e) => updateFormData({ pinNumber: e.target.value })}
             />
 
             {/* Policy Holder */}
             <Input
-              type="text"
+              required
+              className="bg-gray-50 text-gray-900"
               label="Policy Holder"
               placeholder="Enter Policy Holder Name"
+              type="text"
               value={formData.policyHolder || ""}
-              onChange={(e) => updateFormData({ policyHolder: e.target.value })}
               variant="flat"
-              className="bg-gray-50 text-gray-900"
-              required
+              onChange={(e) => updateFormData({ policyHolder: e.target.value })}
             />
 
             {/* Email Address */}
             <Input
-              type="email"
+              required
+              className="bg-gray-50 text-gray-900"
               label="Email Address"
               placeholder="Enter Email Address"
+              type="email"
               value={formData.eimail || ""}
-              onChange={(e) => updateFormData({ eimail: e.target.value })}
               variant="flat"
-              className="bg-gray-50 text-gray-900"
-              required
+              onChange={(e) => updateFormData({ eimail: e.target.value })}
             />
           </div>
         </CardBody>

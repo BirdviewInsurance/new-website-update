@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Input,
   Select,
@@ -83,15 +83,22 @@ const GroupForm: React.FC = () => {
     parent: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleCheckboxChange = (name: string, value: string, checked: boolean) => {
+  const handleCheckboxChange = (
+    name: string,
+    value: string,
+    checked: boolean,
+  ) => {
     setFormData((prevState) => ({
       ...prevState,
       [name]: checked ? value : "",
@@ -153,10 +160,14 @@ const GroupForm: React.FC = () => {
       });
 
       if (res.status === 200) {
-        (toast as any).success((res.data as any).message || "Form submitted successfully!");
+        (toast as any).success(
+          (res.data as any).message || "Form submitted successfully!",
+        );
         handleReset();
       } else {
-        (toast as any).error((res.data as any).error || "Something went wrong!");
+        (toast as any).error(
+          (res.data as any).error || "Something went wrong!",
+        );
       }
     } catch (error: any) {
       (toast as any).error(error.response?.data?.error || error.message);
@@ -171,11 +182,11 @@ const GroupForm: React.FC = () => {
         <CardHeader className="text-center border-b">
           <div className="flex flex-col items-center justify-center">
             <Image
-              src="/images/logo.jpeg"
-              width={180}
-              height={60}
               alt="Logo"
               className="rounded-md"
+              height={60}
+              src="/images/logo.jpeg"
+              width={180}
             />
             <h2 className="text-2xl font-semibold text-gray-800 mt-2">
               Group Registration Form
@@ -190,26 +201,26 @@ const GroupForm: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form className="space-y-8" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
+                isRequired
                 label="Group Name"
                 name="groupname"
-                isRequired
                 value={formData.groupname}
                 onChange={handleChange}
               />
               <Input
+                isRequired
                 label="Group Location"
                 name="grouplocation"
-                isRequired
                 value={formData.grouplocation}
                 onChange={handleChange}
               />
               <Input
+                isRequired
                 label="Contact Person"
                 name="contactperson"
-                isRequired
                 value={formData.contactperson}
                 onChange={handleChange}
               />
@@ -218,25 +229,25 @@ const GroupForm: React.FC = () => {
                   Mobile Number
                 </label>
                 <PhoneInput
+                  containerClass="!w-full"
                   country={"ke"}
+                  inputStyle={{ width: "100%", height: "50px" }}
                   value={formData.mobileno}
                   onChange={handlePhoneChange}
-                  inputStyle={{ width: "100%", height: "50px" }}
-                  containerClass="!w-full"
                 />
               </div>
               <Input
+                isRequired
                 label="Email"
                 name="email"
                 type="email"
-                isRequired
                 value={formData.email}
                 onChange={handleChange}
               />
               <Input
+                isRequired
                 label="Number of Members"
                 name="noofmembers"
-                isRequired
                 value={formData.noofmembers}
                 onChange={handleChange}
               />
@@ -282,37 +293,53 @@ const GroupForm: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-8">
                 <div className="flex items-center space-x-4">
                   <Checkbox
-                    isSelected={formData.methodOfContributionMonthly === "monthly"}
+                    isSelected={
+                      formData.methodOfContributionMonthly === "monthly"
+                    }
                     onValueChange={(checked) =>
-                      handleCheckboxChange("methodOfContributionMonthly", "monthly", checked)
+                      handleCheckboxChange(
+                        "methodOfContributionMonthly",
+                        "monthly",
+                        checked,
+                      )
                     }
                   >
                     Per Month
                   </Checkbox>
                   <Input
+                    isDisabled={
+                      formData.methodOfContributionMonthly !== "monthly"
+                    }
                     label="Monthly Contribution Amount"
                     name="contributionMonthlyAmount"
                     value={formData.contributionMonthlyAmount}
                     onChange={handleChange}
-                    isDisabled={formData.methodOfContributionMonthly !== "monthly"}
                   />
                 </div>
 
                 <div className="flex items-center space-x-4">
                   <Checkbox
-                    isSelected={formData.methodOfContributionPerclaim === "perclaim"}
+                    isSelected={
+                      formData.methodOfContributionPerclaim === "perclaim"
+                    }
                     onValueChange={(checked) =>
-                      handleCheckboxChange("methodOfContributionPerclaim", "perclaim", checked)
+                      handleCheckboxChange(
+                        "methodOfContributionPerclaim",
+                        "perclaim",
+                        checked,
+                      )
                     }
                   >
                     Per Claim
                   </Checkbox>
                   <Input
+                    isDisabled={
+                      formData.methodOfContributionPerclaim !== "perclaim"
+                    }
                     label="Per Claim Contribution Amount"
                     name="contributionPerClaimAmount"
                     value={formData.contributionPerClaimAmount}
                     onChange={handleChange}
-                    isDisabled={formData.methodOfContributionPerclaim !== "perclaim"}
                   />
                 </div>
               </div>
@@ -323,38 +350,43 @@ const GroupForm: React.FC = () => {
                 Payout Amount per Member
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {["member", "spouse", "child", "sibling", "parent"].map((role) => (
-                  <Input
-                    key={role}
-                    label={`${role.charAt(0).toUpperCase() + role.slice(1)} Amount`}
-                    value={formData.payoutAmountPer[role]}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        payoutAmountPer: { ...prev.payoutAmountPer, [role]: e.target.value },
-                      }))
-                    }
-                  />
-                ))}
+                {["member", "spouse", "child", "sibling", "parent"].map(
+                  (role) => (
+                    <Input
+                      key={role}
+                      label={`${role.charAt(0).toUpperCase() + role.slice(1)} Amount`}
+                      value={formData.payoutAmountPer[role]}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          payoutAmountPer: {
+                            ...prev.payoutAmountPer,
+                            [role]: e.target.value,
+                          },
+                        }))
+                      }
+                    />
+                  ),
+                )}
               </div>
             </div>
 
             <div className="flex justify-center space-x-6 pt-8">
               <Button
-                type="submit"
-                color="primary"
-                variant="solid"
                 className="px-8 py-4 font-bold text-lg rounded-xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 transition-all duration-300"
+                color="primary"
+                type="submit"
+                variant="solid"
               >
                 Submit
               </Button>
 
               <Button
-                type="reset"
-                onPress={handleReset}
-                color="danger"
-                variant="solid"
                 className="px-8 py-4 font-bold text-lg rounded-xl shadow-lg text-white bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 transition-all duration-300"
+                color="danger"
+                type="reset"
+                variant="solid"
+                onPress={handleReset}
               >
                 Reset
               </Button>

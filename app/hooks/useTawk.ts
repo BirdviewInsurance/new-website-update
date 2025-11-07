@@ -8,23 +8,25 @@ import { useEffect } from "react";
  * @param widgetId - Your Tawk widget ID
  */
 export function useTawk(propertyId: string, widgetId: string) {
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        if (document.getElementById("tawk-script")) return; // prevent duplicates
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (document.getElementById("tawk-script")) return; // prevent duplicates
 
-        const script = document.createElement("script");
-        script.id = "tawk-script";
-        script.async = true;
-        script.src = `https://embed.tawk.to/${propertyId}/${widgetId}`;
-        script.charset = "UTF-8";
-        script.setAttribute("crossorigin", "*");
-        document.body.appendChild(script);
+    const script = document.createElement("script");
 
-        return () => {
-            const existing = document.getElementById("tawk-script");
-            if (existing) existing.remove();
-            // @ts-ignore
-            if (window.Tawk_API) delete window.Tawk_API;
-        };
-    }, [propertyId, widgetId]);
+    script.id = "tawk-script";
+    script.async = true;
+    script.src = `https://embed.tawk.to/${propertyId}/${widgetId}`;
+    script.charset = "UTF-8";
+    script.setAttribute("crossorigin", "*");
+    document.body.appendChild(script);
+
+    return () => {
+      const existing = document.getElementById("tawk-script");
+
+      if (existing) existing.remove();
+      // @ts-ignore
+      if (window.Tawk_API) delete window.Tawk_API;
+    };
+  }, [propertyId, widgetId]);
 }

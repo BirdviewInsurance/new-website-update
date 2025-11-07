@@ -1,9 +1,11 @@
 export const metadata = {
   title: "Evacuation And Repatriation | Birdview Microinsurance",
-  description: "Evacuation And Repatriation — Learn more about Evacuation And Repatriation at Birdview Microinsurance. Get details, benefits, and how to apply.",
+  description:
+    "Evacuation And Repatriation — Learn more about Evacuation And Repatriation at Birdview Microinsurance. Get details, benefits, and how to apply.",
   openGraph: {
     title: "Evacuation And Repatriation | Birdview Microinsurance",
-    description: "Evacuation And Repatriation — Learn more about Evacuation And Repatriation at Birdview Microinsurance. Get details, benefits, and how to apply.",
+    description:
+      "Evacuation And Repatriation — Learn more about Evacuation And Repatriation at Birdview Microinsurance. Get details, benefits, and how to apply.",
     url: "https://example.com/products/evacuation_and_repatriation",
     siteName: "Birdview Microinsurance",
     images: ["/og-image.png"],

@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
+import type { NextApiRequest, NextApiResponse } from "next";
 
+import nodemailer from "nodemailer";
 
 export interface SendEmailForm {
   details: string;
@@ -11,14 +11,17 @@ export interface SendEmailForm {
   phone: string;
 }
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const { firstName, lastName, email, phone, enquiryType, details } = req.body;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method === "POST") {
+    const { firstName, lastName, email, phone, enquiryType, details } =
+      req.body;
 
     // Create a transporter object using your email service configuration
     const transporter = nodemailer.createTransport({
-      host: 'mail5016.site4now.net', // Replace with your email provider's SMTP server
+      host: "mail5016.site4now.net", // Replace with your email provider's SMTP server
       port: 465, // Replace with your email provider's SMTP port
       secure: true, // Set to true for 465, false for other ports
       auth: {
@@ -33,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Define email options with HTML formatting
     const mailOptions = {
       from: '"Birdview Insurance" <Customerservice@birdviewinsurance.com>',
-      to: 'Customerservice@birdviewinsurance.com', // The recipient's email address
+      to: "Customerservice@birdviewinsurance.com", // The recipient's email address
       subject, // Dynamic subject line
       html: `
         <p><strong>First Name:</strong> ${firstName}</p>
@@ -51,14 +54,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       // Send the email
       await transporter.sendMail(mailOptions);
-      res.status(200).json({ message: 'Form sent successfully' });
+      res.status(200).json({ message: "Form sent successfully" });
     } catch (error: any) {
       console.error(error);
-      res.status(500).json({ error: 'Error sending Form' });
+      res.status(500).json({ error: "Error sending Form" });
     }
   } else {
     // Handle any other HTTP method
-    res.setHeader('Allow', ['POST']);
+    res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

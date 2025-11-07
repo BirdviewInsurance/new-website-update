@@ -1,9 +1,17 @@
 // pages/api/submit-member.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { IncomingForm, type Fields, type Files, type File as FormidableFile, type Options as FormidableOptions } from "formidable";
+
 import * as fs from "fs/promises";
-import * as XLSX from "xlsx";
 import path from "path";
+
+import {
+  IncomingForm,
+  type Fields,
+  type Files,
+  type File as FormidableFile,
+  type Options as FormidableOptions,
+} from "formidable";
+import * as XLSX from "xlsx";
 import nodemailer from "nodemailer";
 
 export const config = {
@@ -42,7 +50,7 @@ interface FlatFields {
 
 async function parseForm(
   req: NextApiRequest,
-  options?: Partial<FormidableOptions>
+  options?: Partial<FormidableOptions>,
 ): Promise<{ fields: FlatFields; files: Files }> {
   return new Promise((resolve, reject) => {
     const form = new IncomingForm({
@@ -75,17 +83,21 @@ async function parseForm(
 
 const getField = (fields: Fields, key: string): string => {
   const value = fields[key];
+
   if (value === undefined || value === null) return "";
   if (Array.isArray(value)) {
     const v = value[0];
+
     return typeof v === "string" ? v : "";
   }
+
   return typeof value === "string" ? value : "";
 };
 
 const safeJSONParse = <T>(text: string): T[] => {
   try {
     if (!text) return [];
+
     return JSON.parse(text) as T[];
   } catch {
     return [];
@@ -93,15 +105,22 @@ const safeJSONParse = <T>(text: string): T[] => {
 };
 
 // --- Handler ---
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
+
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 
   const publicDir = path.join(process.cwd(), "public");
   const uploadDir = path.join(publicDir, "uploads");
-  const filePath = path.join(publicDir, "kenyans_in_south_wales_member_details.xlsx");
+  const filePath = path.join(
+    publicDir,
+    "kenyans_in_south_wales_member_details.xlsx",
+  );
 
   try {
     await fs.mkdir(uploadDir, { recursive: true });
@@ -129,31 +148,70 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const option = fields.option || "";
 
     // Parse JSON arrays safely
-    const dependantsData = safeJSONParse<Dependant>(fields.dependantsData || "");
-    const beneficiariesData = safeJSONParse<Beneficiary>(fields.beneficiariesData || "");
+    const dependantsData = safeJSONParse<Dependant>(
+      fields.dependantsData || "",
+    );
+    const beneficiariesData = safeJSONParse<Beneficiary>(
+      fields.beneficiariesData || "",
+    );
 
     // Load or create workbook
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
-    const workbook = fileBuffer ? XLSX.read(fileBuffer, { type: "buffer" }) : XLSX.utils.book_new();
+    const workbook = fileBuffer
+      ? XLSX.read(fileBuffer, { type: "buffer" })
+      : XLSX.utils.book_new();
 
     // MEMBER sheet
     const memberHeaders = [
-      "Member Id Number", "Group Name", "Group Number", "Title", "First Name",
-      "Last Name", "Middle Name", "ID Type", "ID Number", "Date Of Birth", "Gender",
-      "Country", "City", "Address", "Mobile Number", "Email", "Family Option", "Option"
+      "Member Id Number",
+      "Group Name",
+      "Group Number",
+      "Title",
+      "First Name",
+      "Last Name",
+      "Middle Name",
+      "ID Type",
+      "ID Number",
+      "Date Of Birth",
+      "Gender",
+      "Country",
+      "City",
+      "Address",
+      "Mobile Number",
+      "Email",
+      "Family Option",
+      "Option",
     ];
 
     const memberSheetData: SheetMatrix = workbook.Sheets["Member Details"]
-      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Member Details"], { header: 1 }) as SheetMatrix)
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Member Details"], {
+          header: 1,
+        }) as SheetMatrix)
       : [memberHeaders];
 
     memberSheetData.push([
-      memberidno, groupname, groupnumber, title, firstname, lastname, middlename,
-      idtype, idno, dateofbirth, gender, country, city, address,
-      mobileno, eimail, family_option, option
+      memberidno,
+      groupname,
+      groupnumber,
+      title,
+      firstname,
+      lastname,
+      middlename,
+      idtype,
+      idno,
+      dateofbirth,
+      gender,
+      country,
+      city,
+      address,
+      mobileno,
+      eimail,
+      family_option,
+      option,
     ]);
 
     const memberSheet = XLSX.utils.aoa_to_sheet(memberSheetData);
+
     workbook.Sheets["Member Details"] = memberSheet;
     if (!workbook.SheetNames.includes("Member Details")) {
       XLSX.utils.book_append_sheet(workbook, memberSheet, "Member Details");
@@ -161,12 +219,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // DEPENDANTS sheet
     const depHeaders = [
-      "Member Id No", "ID", "Relationship", "Title", "First Name", "Middle Name",
-      "Last Name", "ID Type", "ID Number", "Date Of Birth", "Gender", "Country", "City"
+      "Member Id No",
+      "ID",
+      "Relationship",
+      "Title",
+      "First Name",
+      "Middle Name",
+      "Last Name",
+      "ID Type",
+      "ID Number",
+      "Date Of Birth",
+      "Gender",
+      "Country",
+      "City",
     ];
 
     const depSheetData: SheetMatrix = workbook.Sheets["Dependants Details"]
-      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Dependants Details"], { header: 1 }) as SheetMatrix)
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Dependants Details"], {
+          header: 1,
+        }) as SheetMatrix)
       : [depHeaders];
 
     dependantsData.forEach((dep) => {
@@ -189,6 +260,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const depSheet = XLSX.utils.aoa_to_sheet(depSheetData);
+
     workbook.Sheets["Dependants Details"] = depSheet;
     if (!workbook.SheetNames.includes("Dependants Details")) {
       XLSX.utils.book_append_sheet(workbook, depSheet, "Dependants Details");
@@ -196,12 +268,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // BENEFICIARIES sheet
     const benHeaders = [
-      "Member Id No", "ID", "Relationship", "Title", "Full Name",
-      "Date Of Birth", "Phone Number", "Address", "Email"
+      "Member Id No",
+      "ID",
+      "Relationship",
+      "Title",
+      "Full Name",
+      "Date Of Birth",
+      "Phone Number",
+      "Address",
+      "Email",
     ];
 
     const benSheetData: SheetMatrix = workbook.Sheets["Beneficiaries Info"]
-      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Beneficiaries Info"], { header: 1 }) as SheetMatrix)
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Beneficiaries Info"], {
+          header: 1,
+        }) as SheetMatrix)
       : [benHeaders];
 
     beneficiariesData.forEach((ben) => {
@@ -220,14 +301,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const benSheet = XLSX.utils.aoa_to_sheet(benSheetData);
+
     workbook.Sheets["Beneficiaries Info"] = benSheet;
     if (!workbook.SheetNames.includes("Beneficiaries Info")) {
       XLSX.utils.book_append_sheet(workbook, benSheet, "Beneficiaries Info");
     }
 
     // Write workbook to buffer and save
-    const updatedBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" }) as ArrayBuffer;
+    const updatedBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "buffer",
+    }) as ArrayBuffer;
     const uint8Array = new Uint8Array(updatedBuffer);
+
     await fs.writeFile(filePath, uint8Array);
     console.log("✅ Excel file updated successfully");
 
@@ -251,10 +337,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ];
 
     // Handle uploaded supporting documents field if present
-    const uploadField = files.supportingDocuments as FormidableFile | FormidableFile[] | undefined;
+    const uploadField = files.supportingDocuments as
+      | FormidableFile
+      | FormidableFile[]
+      | undefined;
+
     if (uploadField) {
-      const uploadArray = Array.isArray(uploadField) ? uploadField : [uploadField];
-      uploadArray.forEach(file => {
+      const uploadArray = Array.isArray(uploadField)
+        ? uploadField
+        : [uploadField];
+
+      uploadArray.forEach((file) => {
         attachments.push({
           filename: file.originalFilename ?? "upload",
           path: (file as any).filepath ?? (file as any).filePath ?? undefined, // defensive
@@ -268,7 +361,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       await transporter.sendMail({
         from: `"Birdview Insurance" <${process.env.SMTP_USER ?? "customerservice@birdviewinsurance.com"}>`,
-        to: ["Gkangwana@birdviewinsurance.com", "pkihuria@birdviewinsurance.com", "customerservice@birdviewinsurance.com", "akinyanjui@birdviewinsurance.com"],
+        to: [
+          "Gkangwana@birdviewinsurance.com",
+          "pkihuria@birdviewinsurance.com",
+          "customerservice@birdviewinsurance.com",
+          "akinyanjui@birdviewinsurance.com",
+        ],
         subject: `Updated Member Details from ${memberidno} - ${firstname}`,
         text: `Please find the updated Excel sheet.\nDownload link:\n${fileUrl}`,
         attachments,
@@ -278,7 +376,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Send member confirmation
-    const fullName = `${title ? title + " " : ""}${firstname} ${middlename ? middlename + " " : ""}${lastname}`.trim();
+    const fullName =
+      `${title ? title + " " : ""}${firstname} ${middlename ? middlename + " " : ""}${lastname}`.trim();
     const memberSubject = `${memberidno} - ${fullName} | Confirmation of Submission`;
 
     const memberEmailBody = `
@@ -289,7 +388,7 @@ Thank you for your submission.
 📌 MEMBER DETAILS
 - Member ID: ${memberidno}
 - Group: ${groupname} (${groupnumber})
-- Name: ${title} ${firstname} ${middlename || ''} ${lastname}
+- Name: ${title} ${firstname} ${middlename || ""} ${lastname}
 - ID: ${idtype} ${idno}
 - DOB: ${dateofbirth}
 - Gender: ${gender}
@@ -299,15 +398,31 @@ Thank you for your submission.
 - Option : ${option}
 
 📌 DEPENDANTS
-${dependantsData.length > 0 ? dependantsData.map((d, i) => `
+${
+  dependantsData.length > 0
+    ? dependantsData
+        .map(
+          (d, i) => `
 Dependant ${i + 1}:
-- ${d.relationship} - ${d.title || ''} ${d.firstName} ${d.middleName || ''} ${d.surname || ''}`).join('\n') : 'None'}
+- ${d.relationship} - ${d.title || ""} ${d.firstName} ${d.middleName || ""} ${d.surname || ""}`,
+        )
+        .join("\n")
+    : "None"
+}
 
 📌 BENEFICIARIES
-${beneficiariesData.length > 0 ? beneficiariesData.map((b, i) => `
+${
+  beneficiariesData.length > 0
+    ? beneficiariesData
+        .map(
+          (b, i) => `
 Beneficiary ${i + 1}:
-- ${b.relationship} - ${b.title || ''} ${b.beneficiary_fullname}
-- Phone: ${b.phone_number || ''} | Email: ${b.beneficiary_email || ''}`).join('\n') : 'None'}
+- ${b.relationship} - ${b.title || ""} ${b.beneficiary_fullname}
+- Phone: ${b.phone_number || ""} | Email: ${b.beneficiary_email || ""}`,
+        )
+        .join("\n")
+    : "None"
+}
 
 📌 PAYMENT INSTRUCTIONS
 
@@ -333,15 +448,22 @@ Birdview Insurance`.trim();
           text: memberEmailBody,
         });
       } else {
-        console.warn("⚠️ Member email not provided, skipping member confirmation email.");
+        console.warn(
+          "⚠️ Member email not provided, skipping member confirmation email.",
+        );
       }
     } catch (memberEmailErr) {
       console.error("⚠️ Member email failed:", memberEmailErr);
     }
 
-    return res.status(200).json({ message: "Form sent successfully", fileUrl, reset: true });
+    return res
+      .status(200)
+      .json({ message: "Form sent successfully", fileUrl, reset: true });
   } catch (err: any) {
     console.error("❌ Error in handler:", err);
-    return res.status(500).json({ error: err?.message || "Unknown server error" });
+
+    return res
+      .status(500)
+      .json({ error: err?.message || "Unknown server error" });
   }
 }

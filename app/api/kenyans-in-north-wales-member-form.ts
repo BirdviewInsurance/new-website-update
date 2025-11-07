@@ -1,9 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { IncomingForm, type Fields, type Files, type Options } from "formidable";
-import nodemailer from "nodemailer";
+
 import * as fs from "fs/promises";
-import * as XLSX from "xlsx";
 import path from "path";
+
+import {
+  IncomingForm,
+  type Fields,
+  type Files,
+  type Options,
+} from "formidable";
+import nodemailer from "nodemailer";
+import * as XLSX from "xlsx";
 
 // Required for formidable with Next.js
 export const config = {
@@ -17,7 +24,7 @@ export const config = {
 // ----------------------------
 function parseForm(
   req: NextApiRequest,
-  options: Partial<Options> = {}
+  options: Partial<Options> = {},
 ): Promise<{ fields: Fields; files: Files }> {
   return new Promise((resolve, reject) => {
     const form = new IncomingForm({
@@ -38,10 +45,11 @@ function parseForm(
 // ----------------------------
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
+
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
@@ -50,7 +58,7 @@ export default async function handler(
     const uploadDir = path.join(publicDir, "uploads");
     const filePath = path.join(
       publicDir,
-      "kenyans_in_north_wales_member_details.xlsx"
+      "kenyans_in_north_wales_member_details.xlsx",
     );
 
     await fs.mkdir(uploadDir, { recursive: true });
@@ -70,12 +78,12 @@ export default async function handler(
 
       if (Array.isArray(value)) {
         const v = value[0];
+
         return typeof v === "string" ? v : "";
       }
 
       return typeof value === "string" ? value : "";
     };
-
 
     const memberidno = getField("memberidno");
     const firstname = getField("firstname");
@@ -103,8 +111,12 @@ export default async function handler(
     // ----------------------------
     // ✅ Parse Dependants & Beneficiaries JSON
     // ----------------------------
-    const dependantsData = JSON.parse(getField("dependantsData") || "[]") as any[];
-    const beneficiariesData = JSON.parse(getField("beneficiariesData") || "[]") as any[];
+    const dependantsData = JSON.parse(
+      getField("dependantsData") || "[]",
+    ) as any[];
+    const beneficiariesData = JSON.parse(
+      getField("beneficiariesData") || "[]",
+    ) as any[];
 
     // ----------------------------
     // ✅ Load or Create Excel Workbook
@@ -120,80 +132,168 @@ export default async function handler(
     // ✅ MEMBER SHEET
     // ----------------------------
     const memberHeaders = [
-      "Member Id Number", "Group Name", "Group Number", "Title", "First Name",
-      "Last Name", "Middle Name", "ID Type", "ID Number", "Date Of Birth", "Gender",
-      "Country", "City", "Address", "Mobile Number", "Email", "Family Option", "Option"
+      "Member Id Number",
+      "Group Name",
+      "Group Number",
+      "Title",
+      "First Name",
+      "Last Name",
+      "Middle Name",
+      "ID Type",
+      "ID Number",
+      "Date Of Birth",
+      "Gender",
+      "Country",
+      "City",
+      "Address",
+      "Mobile Number",
+      "Email",
+      "Family Option",
+      "Option",
     ];
 
     let memberSheetData: any[][] = workbook.Sheets["Member Details"]
-      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Member Details"], { header: 1 }) as any[][])
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Member Details"], {
+          header: 1,
+        }) as any[][])
       : [memberHeaders];
 
     memberSheetData.push([
-      memberidno, groupname, groupnumber, title, firstname, lastname, middlename,
-      idtype, idno, dateofbirth, gender, country, city, address,
-      mobileno, eimail, family_option, option,
+      memberidno,
+      groupname,
+      groupnumber,
+      title,
+      firstname,
+      lastname,
+      middlename,
+      idtype,
+      idno,
+      dateofbirth,
+      gender,
+      country,
+      city,
+      address,
+      mobileno,
+      eimail,
+      family_option,
+      option,
     ]);
 
-    workbook.Sheets["Member Details"] = XLSX.utils.aoa_to_sheet(memberSheetData);
+    workbook.Sheets["Member Details"] =
+      XLSX.utils.aoa_to_sheet(memberSheetData);
     if (!workbook.SheetNames.includes("Member Details"))
-      XLSX.utils.book_append_sheet(workbook, workbook.Sheets["Member Details"], "Member Details");
+      XLSX.utils.book_append_sheet(
+        workbook,
+        workbook.Sheets["Member Details"],
+        "Member Details",
+      );
 
     // ----------------------------
     // ✅ DEPENDANTS SHEET
     // ----------------------------
     const depHeaders = [
-      "Member Id No", "ID", "Relationship", "Title", "First Name",
-      "Middle Name", "Last Name", "ID Type", "ID Number", "Date Of Birth",
-      "Gender", "Country", "City"
+      "Member Id No",
+      "ID",
+      "Relationship",
+      "Title",
+      "First Name",
+      "Middle Name",
+      "Last Name",
+      "ID Type",
+      "ID Number",
+      "Date Of Birth",
+      "Gender",
+      "Country",
+      "City",
     ];
 
     let depSheetData: any[][] = workbook.Sheets["Dependants Details"]
-      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Dependants Details"], { header: 1 }) as any[][])
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Dependants Details"], {
+          header: 1,
+        }) as any[][])
       : [depHeaders];
 
     dependantsData.forEach((d, i) => {
       if (!d.relationship || !d.firstName || !d.idnos) return;
 
       depSheetData.push([
-        memberidno, depSheetData.length, d.relationship, d.title || "",
-        d.firstName, d.middleName || "", d.surname || "",
-        d.idtypes, d.idnos, d.dob, d.gendere, d.countrye, d.cities,
+        memberidno,
+        depSheetData.length,
+        d.relationship,
+        d.title || "",
+        d.firstName,
+        d.middleName || "",
+        d.surname || "",
+        d.idtypes,
+        d.idnos,
+        d.dob,
+        d.gendere,
+        d.countrye,
+        d.cities,
       ]);
     });
 
-    workbook.Sheets["Dependants Details"] = XLSX.utils.aoa_to_sheet(depSheetData);
+    workbook.Sheets["Dependants Details"] =
+      XLSX.utils.aoa_to_sheet(depSheetData);
     if (!workbook.SheetNames.includes("Dependants Details"))
-      XLSX.utils.book_append_sheet(workbook, workbook.Sheets["Dependants Details"], "Dependants Details");
+      XLSX.utils.book_append_sheet(
+        workbook,
+        workbook.Sheets["Dependants Details"],
+        "Dependants Details",
+      );
 
     // ----------------------------
     // ✅ BENEFICIARIES SHEET
     // ----------------------------
     const benHeaders = [
-      "Member Id No", "ID", "Relationship", "Title", "Full Name",
-      "Date Of Birth", "Phone Number", "Address", "Email",
+      "Member Id No",
+      "ID",
+      "Relationship",
+      "Title",
+      "Full Name",
+      "Date Of Birth",
+      "Phone Number",
+      "Address",
+      "Email",
     ];
 
     let benSheetData: any[][] = workbook.Sheets["Beneficiaries Info"]
-      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Beneficiaries Info"], { header: 1 }) as any[][])
+      ? (XLSX.utils.sheet_to_json(workbook.Sheets["Beneficiaries Info"], {
+          header: 1,
+        }) as any[][])
       : [benHeaders];
 
     beneficiariesData.forEach((b, i) => {
       if (!b.relationship || !b.beneficiary_fullname) return;
 
       benSheetData.push([
-        memberidno, benSheetData.length, b.relationship, b.title || "",
-        b.beneficiary_fullname, b.dob,
-        b.phone_number || "", b.beneficiary_address || "", b.beneficiary_email || "",
+        memberidno,
+        benSheetData.length,
+        b.relationship,
+        b.title || "",
+        b.beneficiary_fullname,
+        b.dob,
+        b.phone_number || "",
+        b.beneficiary_address || "",
+        b.beneficiary_email || "",
       ]);
     });
 
-    workbook.Sheets["Beneficiaries Info"] = XLSX.utils.aoa_to_sheet(benSheetData);
+    workbook.Sheets["Beneficiaries Info"] =
+      XLSX.utils.aoa_to_sheet(benSheetData);
     if (!workbook.SheetNames.includes("Beneficiaries Info"))
-      XLSX.utils.book_append_sheet(workbook, workbook.Sheets["Beneficiaries Info"], "Beneficiaries Info");
+      XLSX.utils.book_append_sheet(
+        workbook,
+        workbook.Sheets["Beneficiaries Info"],
+        "Beneficiaries Info",
+      );
 
     // ✅ Save updated Excel file
-    const updatedBuffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+    const updatedBuffer = XLSX.write(workbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
     await fs.writeFile(filePath, updatedBuffer);
 
     // ----------------------------
@@ -204,7 +304,8 @@ export default async function handler(
       port: 465,
       secure: true,
       auth: {
-        user: process.env.BIRDVIEW_EMAIL ?? "customerservice@birdviewinsurance.com",
+        user:
+          process.env.BIRDVIEW_EMAIL ?? "customerservice@birdviewinsurance.com",
         pass: process.env.BIRDVIEW_PASS ?? "B!rdv!ew@2024",
       },
     });
@@ -218,8 +319,10 @@ export default async function handler(
     ];
 
     const uploads = files.supportingDocuments;
+
     if (uploads) {
       const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
+
       uploadArray.forEach((file: any) => {
         attachments.push({
           filename: file.originalFilename,
@@ -262,6 +365,7 @@ export default async function handler(
     });
   } catch (err: any) {
     console.error("❌ Server Error:", err);
+
     return res.status(500).json({ error: err.message || "Server error" });
   }
 }

@@ -6,23 +6,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
 } from "@heroui/navbar";
-import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import NextLink from "next/link";
 import clsx from "clsx";
-
-import { ThemeSwitch } from "@/components/theme-switch";
-import { GithubIcon, SearchIcon, Logo } from "@/components/icons";
-
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
+
+import { SearchIcon } from "@/components/icons";
 
 // Animation variants for dropdowns
 const submenuVariants = {
@@ -40,14 +34,20 @@ const MobileMegaMenu = ({
 }) => {
   const [openTop, setOpenTop] = useState<string | null>(null);
   const router = useRouter();
-  const [openColumns, setOpenColumns] = useState<{ [key: string]: number | null }>({});
+  const [openColumns, setOpenColumns] = useState<{
+    [key: string]: number | null;
+  }>({});
 
   const topLevelItems = [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services", megaItems: megaMenus.Services },
     { label: "Products", href: "/products", megaItems: megaMenus.Products },
     { label: "Claims", href: "/claims", megaItems: megaMenus.Claims },
-    { label: "Leadership", href: "/our-leadership", megaItems: megaMenus.Leadership },
+    {
+      label: "Leadership",
+      href: "/our-leadership",
+      megaItems: megaMenus.Leadership,
+    },
     { label: "About Us", href: "/about-us", megaItems: megaMenus.AboutUs },
   ];
 
@@ -61,6 +61,10 @@ const MobileMegaMenu = ({
           <motion.div key={item.label} layout>
             {/* Top-level link */}
             <button
+              className={clsx(
+                "w-full flex justify-between items-center py-3 text-left font-semibold text-white text-base tracking-wide transition-all duration-300 border-b border-white/10",
+                "hover:text-white hover:border-white",
+              )}
               onClick={() => {
                 if (!mega) {
                   router.push(item.href);
@@ -69,23 +73,16 @@ const MobileMegaMenu = ({
                   setOpenTop(isOpen ? null : item.label);
                 }
               }}
-              className={clsx(
-                "w-full flex justify-between items-center py-3 text-left font-semibold text-white text-base tracking-wide transition-all duration-300 border-b border-white/10",
-                "hover:text-white hover:border-white"
-              )}
             >
-              <span className="flex items-center gap-2">
-                {item.label}
-              </span>
+              <span className="flex items-center gap-2">{item.label}</span>
               {mega && (
                 <motion.span
                   animate={{ rotate: isOpen ? 90 : 0 }}
-                  transition={{ duration: 0.3 }}
                   className="text-white"
+                  transition={{ duration: 0.3 }}
                 >
                   <ChevronRightIcon className="w-5 h-5 text-white font-bold drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]" />
                 </motion.span>
-
               )}
             </button>
 
@@ -93,51 +90,51 @@ const MobileMegaMenu = ({
             <AnimatePresence>
               {mega && isOpen && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.35 }}
                   className="pl-4 border-l-2 border-white/20 mt-2 mb-3"
+                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35 }}
                 >
                   {item.megaItems.map((col: any, colIdx: number) => {
                     const colOpen = openColumns[item.label] === colIdx;
+
                     return (
                       <motion.div key={colIdx} layout className="mb-2">
                         <button
+                          className="flex justify-between items-center w-full text-sm font-medium text-white/80 py-2 hover:text-white transition-all"
                           onClick={() =>
                             setOpenColumns((prev) => ({
                               ...prev,
                               [item.label]: colOpen ? null : colIdx,
                             }))
                           }
-                          className="flex justify-between items-center w-full text-sm font-medium text-white/80 py-2 hover:text-white transition-all"
                         >
                           {col.title}
                           <motion.span
                             animate={{ rotate: colOpen ? 90 : 0 }}
-                            transition={{ duration: 0.3 }}
                             className="text-white"
+                            transition={{ duration: 0.3 }}
                           >
                             <ChevronRightIcon className="w-4 h-4 text-white font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.3)]" />
                           </motion.span>
-
                         </button>
 
                         <AnimatePresence>
                           {colOpen && (
                             <motion.div
-                              initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.3 }}
                               className="pl-3 border-l border-white/10 flex flex-col gap-1 mt-1"
+                              exit={{ height: 0, opacity: 0 }}
+                              initial={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
                             >
                               {col.links.map((link: any) => (
                                 <Link
                                   key={link.href}
+                                  className="py-1 text-sm text-white/70 hover:text-white hover:font-semibold transition-all duration-200 relative group"
                                   href={link.href}
                                   onClick={closeDrawer}
-                                  className="py-1 text-sm text-white/70 hover:text-white hover:font-semibold transition-all duration-200 relative group"
                                 >
                                   <span>{link.label}</span>
                                   <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-white group-hover:w-full transition-all duration-300" />
@@ -158,7 +155,8 @@ const MobileMegaMenu = ({
 
       {/* Footer */}
       <div className="mt-10 text-center text-sm text-white/70">
-        © {new Date().getFullYear()} <span className="font-semibold text-white">Birdview Insurance</span>
+        © {new Date().getFullYear()}{" "}
+        <span className="font-semibold text-white">Birdview Insurance</span>
         <p className="text-white/60 mt-1">Trusted Protection. Global Reach.</p>
       </div>
     </div>
@@ -190,8 +188,10 @@ export const Navbar = () => {
         setIsDrawerOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEsc);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEsc);
@@ -213,22 +213,22 @@ export const Navbar = () => {
   const searchInput = (
     <Input
       aria-label="Search"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      onKeyDown={handleSearchSubmit}
       classNames={{
-        inputWrapper: "bg-default-100 rounded-lg border border-primary/20 shadow-sm",
+        inputWrapper:
+          "bg-default-100 rounded-lg border border-primary/20 shadow-sm",
         input: "text-sm placeholder:text-primary font-semibold",
       }}
-      size="sm"
       placeholder="Search..."
+      size="sm"
       startContent={
         <SearchIcon className="text-base text-primary font-semibold pointer-events-none flex-shrink-0" />
       }
       type="search"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      onKeyDown={handleSearchSubmit}
     />
   );
-
 
   // const retrieveInput = (
   //   <Input
@@ -242,79 +242,153 @@ export const Navbar = () => {
   //   />
   // );
 
-
   const megaMenus = {
     Services: [
       {
         title: "Evacuation & Repatriation",
         links: [
-          { label: "Emergency Medical Evacuation", href: "/services/evacuation_and_repatriation/emergency" },
-          { label: "Repatriation of Remains", href: "/services/evacuation_and_repatriation/repatriation" },
-          { label: "Air Ambulance Support", href: "/services/evacuation_and_repatriation/air-ambulance" },
+          {
+            label: "Emergency Medical Evacuation",
+            href: "/services/evacuation_and_repatriation/emergency",
+          },
+          {
+            label: "Repatriation of Remains",
+            href: "/services/evacuation_and_repatriation/repatriation",
+          },
+          {
+            label: "Air Ambulance Support",
+            href: "/services/evacuation_and_repatriation/air-ambulance",
+          },
         ],
       },
       {
         title: "Last Expense",
         links: [
-          { label: "Funeral Expense Cover", href: "/services/last_expense/funeral" },
-          { label: "Family Support Cover", href: "/services/last_expense/family-support" },
-          { label: "Corporate Group Last Expense", href: "/services/last_expense/group" },
+          {
+            label: "Funeral Expense Cover",
+            href: "/services/last_expense/funeral",
+          },
+          {
+            label: "Family Support Cover",
+            href: "/services/last_expense/family-support",
+          },
+          {
+            label: "Corporate Group Last Expense",
+            href: "/services/last_expense/group",
+          },
         ],
       },
       {
         title: "Medical Insurance",
         links: [
-          { label: "Individual Medical Plans", href: "/services/medical/individual" },
+          {
+            label: "Individual Medical Plans",
+            href: "/services/medical/individual",
+          },
           { label: "Family Medical Cover", href: "/services/medical/family" },
-          { label: "Corporate & SME Plans", href: "/services/medical/corporate" },
+          {
+            label: "Corporate & SME Plans",
+            href: "/services/medical/corporate",
+          },
         ],
       },
       {
         title: "Hospital Cash",
         links: [
-          { label: "Daily Hospital Benefit", href: "/services/hospital_cash/daily" },
-          { label: "Extended Stay Benefit", href: "/services/hospital_cash/extended" },
-          { label: "Accident Hospitalization", href: "/services/hospital_cash/accident" },
+          {
+            label: "Daily Hospital Benefit",
+            href: "/services/hospital_cash/daily",
+          },
+          {
+            label: "Extended Stay Benefit",
+            href: "/services/hospital_cash/extended",
+          },
+          {
+            label: "Accident Hospitalization",
+            href: "/services/hospital_cash/accident",
+          },
         ],
       },
       {
         title: "Personal Accident",
         links: [
-          { label: "Individual Accident Cover", href: "/services/personal_accident/individual" },
-          { label: "Family Accident Cover", href: "/services/personal_accident/family" },
-          { label: "Corporate Accident Cover", href: "/services/personal_accident/corporate" },
+          {
+            label: "Individual Accident Cover",
+            href: "/services/personal_accident/individual",
+          },
+          {
+            label: "Family Accident Cover",
+            href: "/services/personal_accident/family",
+          },
+          {
+            label: "Corporate Accident Cover",
+            href: "/services/personal_accident/corporate",
+          },
         ],
       },
       {
         title: "BodaBoda Welfare Cover",
         links: [
-          { label: "Rider Medical Cover", href: "/services/bodaboda_welfare/medical" },
-          { label: "Accident & Injury Cover", href: "/services/bodaboda_welfare/accident" },
-          { label: "Funeral & Repatriation", href: "/services/bodaboda_welfare/funeral" },
+          {
+            label: "Rider Medical Cover",
+            href: "/services/bodaboda_welfare/medical",
+          },
+          {
+            label: "Accident & Injury Cover",
+            href: "/services/bodaboda_welfare/accident",
+          },
+          {
+            label: "Funeral & Repatriation",
+            href: "/services/bodaboda_welfare/funeral",
+          },
         ],
       },
       {
         title: "TukTuk Welfare Cover",
         links: [
-          { label: "Driver & Passenger Cover", href: "/services/tuktuk_welfare/driver-passenger" },
-          { label: "Accident & Property Damage", href: "/services/tuktuk_welfare/accident" },
-          { label: "Medical & Last Expense", href: "/services/tuktuk_welfare/medical" },
+          {
+            label: "Driver & Passenger Cover",
+            href: "/services/tuktuk_welfare/driver-passenger",
+          },
+          {
+            label: "Accident & Property Damage",
+            href: "/services/tuktuk_welfare/accident",
+          },
+          {
+            label: "Medical & Last Expense",
+            href: "/services/tuktuk_welfare/medical",
+          },
         ],
       },
       {
         title: "Probation Guard",
         links: [
-          { label: "Job Risk Protection", href: "/services/probation/job-protection" },
-          { label: "Medical & Injury Cover", href: "/services/probation/medical" },
-          { label: "Life & Accident Benefits", href: "/services/probation/life-benefits" },
+          {
+            label: "Job Risk Protection",
+            href: "/services/probation/job-protection",
+          },
+          {
+            label: "Medical & Injury Cover",
+            href: "/services/probation/medical",
+          },
+          {
+            label: "Life & Accident Benefits",
+            href: "/services/probation/life-benefits",
+          },
         ],
       },
       {
         title: "AQUABIMA Insurance",
         links: [
-          { label: "Fishermen Welfare Cover", href: "/services/aquabima/fishermen" },
+          {
+            label: "Fishermen Welfare Cover",
+            href: "/services/aquabima/fishermen",
+          },
           { label: "Marine Accident Cover", href: "/services/aquabima/marine" },
-          { label: "Fishing Equipment Protection", href: "/services/aquabima/equipment" },
+          {
+            label: "Fishing Equipment Protection",
+            href: "/services/aquabima/equipment",
+          },
         ],
       },
     ],
@@ -323,10 +397,22 @@ export const Navbar = () => {
         title: "Evacuation & Repatriation",
         links: [
           { label: "Overview", href: "/product/evacuation-repatriation" },
-          { label: "Benefits & Coverage", href: "/products/evacuation_and_repatriation" },
-          { label: "Eligibility & Requirements", href: "/product/evacuation-repatriation/eligibility" },
-          { label: "How It Works", href: "/product/evacuation-repatriation/how-it-works" },
-          { label: "Get a Quote", href: "/product/evacuation-repatriation/quote" },
+          {
+            label: "Benefits & Coverage",
+            href: "/products/evacuation_and_repatriation",
+          },
+          {
+            label: "Eligibility & Requirements",
+            href: "/product/evacuation-repatriation/eligibility",
+          },
+          {
+            label: "How It Works",
+            href: "/product/evacuation-repatriation/how-it-works",
+          },
+          {
+            label: "Get a Quote",
+            href: "/product/evacuation-repatriation/quote",
+          },
           { label: "FAQs", href: "/product/evacuation-repatriation/faqs" },
         ],
       },
@@ -335,7 +421,10 @@ export const Navbar = () => {
         links: [
           { label: "Overview", href: "/product/last-expense" },
           { label: "Benefits & Premiums", href: "/products/last_expense" },
-          { label: "Family Cover Options", href: "/product/last-expense/family-options" },
+          {
+            label: "Family Cover Options",
+            href: "/product/last-expense/family-options",
+          },
           { label: "Claim Process", href: "/product/last-expense/claims" },
           { label: "Policy Terms", href: "/product/last-expense/policy-terms" },
           { label: "Enroll Now", href: "/product/last-expense/enroll" },
@@ -344,21 +433,42 @@ export const Navbar = () => {
       {
         title: "Medical Insurance",
         links: [
-          { label: "Individual Plans", href: "/product/medical-insurance/individual" },
+          {
+            label: "Individual Plans",
+            href: "/product/medical-insurance/individual",
+          },
           { label: "Benefits & Premiums", href: "/products/medical" },
           { label: "Family Plans", href: "/product/medical-insurance/family" },
-          { label: "Corporate Packages", href: "/product/medical-insurance/corporate" },
-          { label: "Hospitals Network", href: "/product/medical-insurance/hospitals" },
-          { label: "Claims & Reimbursements", href: "/product/medical-insurance/claims" },
-          { label: "Request a Quote", href: "/product/medical-insurance/quote" },
+          {
+            label: "Corporate Packages",
+            href: "/product/medical-insurance/corporate",
+          },
+          {
+            label: "Hospitals Network",
+            href: "/product/medical-insurance/hospitals",
+          },
+          {
+            label: "Claims & Reimbursements",
+            href: "/product/medical-insurance/claims",
+          },
+          {
+            label: "Request a Quote",
+            href: "/product/medical-insurance/quote",
+          },
         ],
       },
       {
         title: "Hospital Cash",
         links: [
-          { label: "How It Works", href: "/product/hospital-cash/how-it-works" },
+          {
+            label: "How It Works",
+            href: "/product/hospital-cash/how-it-works",
+          },
           { label: "Benefits & Premiums", href: "/products/hospital_cash" },
-          { label: "Daily Benefit Details", href: "/product/hospital-cash/details" },
+          {
+            label: "Daily Benefit Details",
+            href: "/product/hospital-cash/details",
+          },
           { label: "Eligibility", href: "/product/hospital-cash/eligibility" },
           { label: "Claim Procedure", href: "/product/hospital-cash/claims" },
           { label: "Pricing Plans", href: "/product/hospital-cash/pricing" },
@@ -368,9 +478,18 @@ export const Navbar = () => {
       {
         title: "Personal Accident",
         links: [
-          { label: "Coverage Summary", href: "/product/personal-accident/coverage" },
-          { label: "Benefits & Compensation", href: "/products/personal_accident" },
-          { label: "Exclusions", href: "/product/personal-accident/exclusions" },
+          {
+            label: "Coverage Summary",
+            href: "/product/personal-accident/coverage",
+          },
+          {
+            label: "Benefits & Compensation",
+            href: "/products/personal_accident",
+          },
+          {
+            label: "Exclusions",
+            href: "/product/personal-accident/exclusions",
+          },
           { label: "Claim Steps", href: "/product/personal-accident/claims" },
           { label: "Get Covered", href: "/product/personal-accident/enroll" },
           { label: "FAQs", href: "/product/personal-accident/faqs" },
@@ -379,10 +498,22 @@ export const Navbar = () => {
       {
         title: "BodaBoda Welfare Cover",
         links: [
-          { label: "What’s Covered", href: "/product/bodaboda-welfare/coverage" },
-          { label: "Accident & Hospitalization Benefits", href: "/products/bodaboda_welfare" },
-          { label: "Member Requirements", href: "/product/bodaboda-welfare/requirements" },
-          { label: "Premiums & Payments", href: "/product/bodaboda-welfare/premiums" },
+          {
+            label: "What’s Covered",
+            href: "/product/bodaboda-welfare/coverage",
+          },
+          {
+            label: "Accident & Hospitalization Benefits",
+            href: "/products/bodaboda_welfare",
+          },
+          {
+            label: "Member Requirements",
+            href: "/product/bodaboda-welfare/requirements",
+          },
+          {
+            label: "Premiums & Payments",
+            href: "/product/bodaboda-welfare/premiums",
+          },
           { label: "Join Now", href: "/product/bodaboda-welfare/enroll" },
           { label: "FAQs", href: "/product/bodaboda-welfare/faqs" },
         ],
@@ -391,9 +522,15 @@ export const Navbar = () => {
         title: "TukTuk Welfare Cover",
         links: [
           { label: "Cover Overview", href: "/product/tuktuk-welfare" },
-          { label: "Driver & Passenger Benefits", href: "/products/tuktuk_welfare" },
+          {
+            label: "Driver & Passenger Benefits",
+            href: "/products/tuktuk_welfare",
+          },
           { label: "Claim Guide", href: "/product/tuktuk-welfare/claims" },
-          { label: "Membership Options", href: "/product/tuktuk-welfare/membership" },
+          {
+            label: "Membership Options",
+            href: "/product/tuktuk-welfare/membership",
+          },
           { label: "Apply Today", href: "/product/tuktuk-welfare/apply" },
           { label: "FAQs", href: "/product/tuktuk-welfare/faqs" },
         ],
@@ -401,12 +538,27 @@ export const Navbar = () => {
       {
         title: "Probation Guard",
         links: [
-          { label: "What is Probation Guard?", href: "/product/probation-guard" },
+          {
+            label: "What is Probation Guard?",
+            href: "/product/probation-guard",
+          },
           { label: "Benefits & Premiums", href: "/products/probation_guard" },
-          { label: "Coverage Details", href: "/product/probation-guard/coverage" },
-          { label: "Eligibility", href: "/product/probation-guard/eligibility" },
-          { label: "Claims & Support", href: "/product/probation-guard/claims" },
-          { label: "Policy Terms", href: "/product/probation-guard/policy-terms" },
+          {
+            label: "Coverage Details",
+            href: "/product/probation-guard/coverage",
+          },
+          {
+            label: "Eligibility",
+            href: "/product/probation-guard/eligibility",
+          },
+          {
+            label: "Claims & Support",
+            href: "/product/probation-guard/claims",
+          },
+          {
+            label: "Policy Terms",
+            href: "/product/probation-guard/policy-terms",
+          },
           { label: "Get a Quote", href: "/product/probation-guard/quote" },
         ],
       },
@@ -415,8 +567,14 @@ export const Navbar = () => {
         links: [
           { label: "About AQUABIMA", href: "/product/aquabima" },
           { label: "Benefits & Premiums", href: "/products/aquaculture" },
-          { label: "Fishermen Cover Details", href: "/product/aquabima/details" },
-          { label: "Accident & Death Benefits", href: "/product/aquabima/benefits" },
+          {
+            label: "Fishermen Cover Details",
+            href: "/product/aquabima/details",
+          },
+          {
+            label: "Accident & Death Benefits",
+            href: "/product/aquabima/benefits",
+          },
           { label: "Premium Plans", href: "/product/aquabima/premiums" },
           { label: "Claim Process", href: "/product/aquabima/claims" },
           { label: "Enroll Now", href: "/product/aquabima/enroll" },
@@ -427,11 +585,23 @@ export const Navbar = () => {
       {
         title: "File a Claim",
         links: [
-          { label: "Evacuation & Repartriation Claims", href: "/Claims/EvacuationRepatriationClaimForm" },
-          { label: "Hospital Cash Claims", href: "/Claims/HospitalCashClaimForm" },
-          { label: "Personal Accident Claims", href: "/Claims/PersonalAccidentClaimForm" },
+          {
+            label: "Evacuation & Repartriation Claims",
+            href: "/Claims/EvacuationRepatriationClaimForm",
+          },
+          {
+            label: "Hospital Cash Claims",
+            href: "/Claims/HospitalCashClaimForm",
+          },
+          {
+            label: "Personal Accident Claims",
+            href: "/Claims/PersonalAccidentClaimForm",
+          },
           { label: "Medical Claims", href: "/Claims/MedicalClaimForm" },
-          { label: "Last Expense Claims", href: "/Claims/LastExpenseClaimForm" },
+          {
+            label: "Last Expense Claims",
+            href: "/Claims/LastExpenseClaimForm",
+          },
         ],
       },
       {
@@ -479,38 +649,49 @@ export const Navbar = () => {
     ],
     AboutUs: [
       {
-        title: "Company", links: [
+        title: "Company",
+        links: [
           { label: "Our Story", href: "/about#story" },
           { label: "Mission & Vision", href: "/about#mission-vision" },
           { label: "Careers", href: "/careers" },
         ],
       },
       {
-        title: "Legal", links: [
+        title: "Legal",
+        links: [
           { label: "Privacy Policy", href: "/privacy-policy" },
           { label: "Terms of Service", href: "/terms-of-service" },
           { label: "Regulatory Info", href: "/regulatory-info" },
         ],
       },
       {
-        title: "Get in Touch", links: [
+        title: "Get in Touch",
+        links: [
           { label: "Contact Form", href: "/contact-us#form" },
           { label: "Customer Support", href: "/contact-us#support" },
           { label: "Office Locations", href: "/contact-us#locations" },
         ],
       },
       {
-        title: "Follow Us", links: [
+        title: "Follow Us",
+        links: [
           { label: "Facebook", href: "https://facebook.com/birdviewinsurance" },
           { label: "Twitter", href: "https://twitter.com/birdviewinsure" },
-          { label: "LinkedIn", href: "https://linkedin.com/company/birdviewinsurance" },
-          { label: "Instagram", href: "https://instagram.com/birdviewinsurance" },
+          {
+            label: "LinkedIn",
+            href: "https://linkedin.com/company/birdviewinsurance",
+          },
+          {
+            label: "Instagram",
+            href: "https://instagram.com/birdviewinsurance",
+          },
           { label: "YouTube", href: "https://youtube.com/birdviewinsurance" },
           { label: "Tiktok", href: "https://tiktok.com/@birdviewinsurance" },
         ],
       },
       {
-        title: "Resources", links: [
+        title: "Resources",
+        links: [
           { label: "Blog", href: "/blog" },
           { label: "Newsroom", href: "/newsroom" },
           { label: "FAQs", href: "/faqs" },
@@ -525,13 +706,13 @@ export const Navbar = () => {
       <div className="w-full bg-primary text-white text-sm px-4 py-5 flex items-center justify-between flex-wrap md:flex-nowrap relative z-50">
         {/* Left: Full-height white logo section */}
         <div className="hidden md:flex items-center gap-2 flex-shrink-0 bg-white h-full absolute left-0 top-0 px-4">
-          <Link href="/" className="flex items-center gap-2 h-full">
+          <Link className="flex items-center gap-2 h-full" href="/">
             <img
-              src="/images/logo1.png"
               alt="Birdview Logo"
               className="h-16 md:h-22 w-auto md:w-38 object-contain"
+              src="/images/logo1.png"
             />
-            <span className="font-semibold text-primary"></span>
+            <span className="font-semibold text-primary" />
           </Link>
         </div>
 
@@ -546,23 +727,25 @@ export const Navbar = () => {
     mx-auto
   "
         >
-          {["Newsroom", "Careers", "Blog", "Complaints", "Contact Us"].map((item) => (
-            <Link
-              key={item}
-              href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
-              className="hover:underline text-white font-medium tracking-wide transition-colors duration-300"
-            >
-              {item}
-            </Link>
-          ))}
+          {["Newsroom", "Careers", "Blog", "Complaints", "Contact Us"].map(
+            (item) => (
+              <Link
+                key={item}
+                className="hover:underline text-white font-medium tracking-wide transition-colors duration-300"
+                href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                {item}
+              </Link>
+            ),
+          )}
         </div>
       </div>
 
       {/* HeroUI Navbar */}
       <HeroUINavbar
+        className="bg-danger text-white shadow-md z-50"
         maxWidth="xl"
         position="sticky"
-        className="bg-danger text-white shadow-md z-50"
       >
         {/* Left side (brand + nav items) */}
         <NavbarContent className="basis-1/5 md:basis-full" justify="start">
@@ -572,9 +755,9 @@ export const Navbar = () => {
               href="/"
             >
               <img
-                src="/images/logo1.png"
                 alt="Birdview Logo"
                 className="h-8 w-auto"
+                src="/images/logo1.png"
               />
             </NextLink>
           </NavbarBrand>
@@ -583,35 +766,63 @@ export const Navbar = () => {
           <ul className="hidden md:flex gap-4 justify-start ml-4 relative">
             {[
               { label: "Home", href: "/" },
-              { label: "Services", href: "/services", mega: true, megaItems: megaMenus.Services },
-              { label: "Products", href: "/products", mega: true, megaItems: megaMenus.Products },
-              { label: "Claims", href: "/claims", mega: true, megaItems: megaMenus.Claims },
-              { label: "Leadership", href: "/our-leadership", mega: true, megaItems: megaMenus.Leadership },
-              { label: "About Us", href: "/about", mega: true, megaItems: megaMenus.AboutUs },
+              {
+                label: "Services",
+                href: "/services",
+                mega: true,
+                megaItems: megaMenus.Services,
+              },
+              {
+                label: "Products",
+                href: "/products",
+                mega: true,
+                megaItems: megaMenus.Products,
+              },
+              {
+                label: "Claims",
+                href: "/claims",
+                mega: true,
+                megaItems: megaMenus.Claims,
+              },
+              {
+                label: "Leadership",
+                href: "/our-leadership",
+                mega: true,
+                megaItems: megaMenus.Leadership,
+              },
+              {
+                label: "About Us",
+                href: "/about",
+                mega: true,
+                megaItems: megaMenus.AboutUs,
+              },
             ].map((item) => {
               const isActive = pathname?.startsWith(item.href);
+
               return (
                 <NavbarItem key={item.href} className="relative group">
                   <button
+                    className={clsx(
+                      "flex items-center gap-1 text-white relative transition-colors duration-300",
+                      isActive ? "font-semibold" : "font-medium",
+                    )}
                     onClick={() => {
                       if (item.label === "Home") {
                         router.push("/"); // ✅ navigate to homepage
                         setOpenMenu(null);
                       } else if (item.mega) {
-                        setOpenMenu(openMenu === item.label ? null : item.label);
+                        setOpenMenu(
+                          openMenu === item.label ? null : item.label,
+                        );
                       }
                     }}
-                    className={clsx(
-                      "flex items-center gap-1 text-white relative transition-colors duration-300",
-                      isActive ? "font-semibold" : "font-medium"
-                    )}
                   >
                     {item.label}
                     {item.mega && (
                       <span
                         className={clsx(
                           "inline-block transition-transform duration-300",
-                          openMenu === item.label ? "rotate-180" : "rotate-0"
+                          openMenu === item.label ? "rotate-180" : "rotate-0",
                         )}
                       >
                         ▼
@@ -620,7 +831,7 @@ export const Navbar = () => {
                     <span
                       className={clsx(
                         "absolute left-0 -bottom-1 h-1 bg-white transition-all duration-300",
-                        isActive ? "w-full" : "group-hover:w-full"
+                        isActive ? "w-full" : "group-hover:w-full",
                       )}
                     />
                     {isActive && (
@@ -633,27 +844,29 @@ export const Navbar = () => {
                     {item.mega && openMenu === item.label && (
                       <>
                         <motion.div
-                          initial={{ opacity: 0 }}
                           animate={{ opacity: 0.4 }}
-                          exit={{ opacity: 0 }}
                           className="fixed inset-0 bg-black z-10"
+                          exit={{ opacity: 0 }}
+                          initial={{ opacity: 0 }}
                           onClick={() => setOpenMenu(null)}
                         />
                         <motion.div
-                          initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.25 }}
                           className="fixed left-0 top-full mt-2 w-screen bg-white text-gray-900 shadow-lg p-8 grid grid-cols-3 gap-8 z-20"
+                          exit={{ opacity: 0, y: -10 }}
+                          initial={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.25 }}
                         >
                           {item.megaItems.map((col, idx) => (
                             <div key={idx} className="flex flex-col gap-2">
-                              <h4 className="font-extrabold text-danger">{col.title}</h4>
+                              <h4 className="font-extrabold text-danger">
+                                {col.title}
+                              </h4>
                               {col.links.map((link) => (
                                 <Link
                                   key={link.href}
-                                  href={link.href}
                                   className="hover:text-primary transition"
+                                  href={link.href}
                                   onClick={() => setOpenMenu(null)}
                                 >
                                   {link.label}
@@ -672,7 +885,10 @@ export const Navbar = () => {
         </NavbarContent>
 
         {/* Right side (search + retrieve + theme) visible md+ */}
-        <NavbarContent className="hidden md:flex basis-1/5 md:basis-full" justify="end">
+        <NavbarContent
+          className="hidden md:flex basis-1/5 md:basis-full"
+          justify="end"
+        >
           <NavbarItem className="w-[220px] lg:w-[320px] font-semibold text-primary">
             {searchInput}
           </NavbarItem>
@@ -683,18 +899,20 @@ export const Navbar = () => {
 
           <NavbarItem className="hidden md:flex gap-2">
             <div
-              className="flex items-center justify-center md:justify-end gap-2 relative flex-shrink-0 ml-auto"
               ref={menuRef}
+              className="flex items-center justify-center md:justify-end gap-2 relative flex-shrink-0 ml-auto"
             >
               <Button
-                onPress={() => setOpenMenu(openMenu === 'portals' ? null : 'portals')}
                 className="bg-primary text-white font-semibold px-3 py-1.5 rounded-md transition-all duration-300 text-sm"
+                onPress={() =>
+                  setOpenMenu(openMenu === "portals" ? null : "portals")
+                }
               >
                 Portals
                 <span
                   className={clsx(
-                    'inline-block ml-1 transition-transform duration-300',
-                    openMenu === 'portals' ? 'rotate-180' : 'rotate-0'
+                    "inline-block ml-1 transition-transform duration-300",
+                    openMenu === "portals" ? "rotate-180" : "rotate-0",
                   )}
                 >
                   ▼
@@ -702,21 +920,30 @@ export const Navbar = () => {
               </Button>
 
               <AnimatePresence>
-                {openMenu === 'portals' && (
+                {openMenu === "portals" && (
                   <motion.div
-                    initial="hidden"
                     animate="visible"
-                    exit="hidden"
-                    variants={submenuVariants}
                     className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                    exit="hidden"
+                    initial="hidden"
+                    variants={submenuVariants}
                   >
                     {[
-                      { name: 'Agent Portal', path: '/agent-portal' },
-                      { name: 'Broker Portal', path: '/broker-portal' },
-                      { name: 'Provider Portal', path: '/provider-portal' },
-                      { name: 'Intermediary Registration', path: '/intermediary-registration' },
-                      { name: 'Agent Registration', path: '/agent-registration' },
-                      { name: 'Group Registration', path: '/group-registration' },
+                      { name: "Agent Portal", path: "/agent-portal" },
+                      { name: "Broker Portal", path: "/broker-portal" },
+                      { name: "Provider Portal", path: "/provider-portal" },
+                      {
+                        name: "Intermediary Registration",
+                        path: "/intermediary-registration",
+                      },
+                      {
+                        name: "Agent Registration",
+                        path: "/agent-registration",
+                      },
+                      {
+                        name: "Group Registration",
+                        path: "/group-registration",
+                      },
                     ].map((item) => (
                       <div
                         key={item.name}
@@ -739,18 +966,20 @@ export const Navbar = () => {
         {/* Mobile icons + Hamburger (visible on small screens only) */}
         <NavbarContent className="md:hidden basis-1 pl-4" justify="end">
           <div
-            className="flex items-center justify-center md:justify-end gap-2 relative flex-shrink-0 ml-auto"
             ref={menuRef}
+            className="flex items-center justify-center md:justify-end gap-2 relative flex-shrink-0 ml-auto"
           >
             <Button
-              onPress={() => setOpenMenu(openMenu === 'portals' ? null : 'portals')}
               className="bg-primary text-white font-semibold px-3 py-1.5 rounded-md transition-all duration-300 text-sm"
+              onPress={() =>
+                setOpenMenu(openMenu === "portals" ? null : "portals")
+              }
             >
               Portals
               <span
                 className={clsx(
-                  'inline-block ml-1 transition-transform duration-300',
-                  openMenu === 'portals' ? 'rotate-180' : 'rotate-0'
+                  "inline-block ml-1 transition-transform duration-300",
+                  openMenu === "portals" ? "rotate-180" : "rotate-0",
                 )}
               >
                 ▼
@@ -758,21 +987,24 @@ export const Navbar = () => {
             </Button>
 
             <AnimatePresence>
-              {openMenu === 'portals' && (
+              {openMenu === "portals" && (
                 <motion.div
-                  initial="hidden"
                   animate="visible"
-                  exit="hidden"
-                  variants={submenuVariants}
                   className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                  exit="hidden"
+                  initial="hidden"
+                  variants={submenuVariants}
                 >
                   {[
-                    { name: 'Agent Portal', path: '/agent-portal' },
-                    { name: 'Broker Portal', path: '/broker-portal' },
-                    { name: 'Provider Portal', path: '/provider-portal' },
-                    { name: 'Intermediary Registration', path: '/intermediary-registration' },
-                    { name: 'Agent Registration', path: '/agent-registration' },
-                    { name: 'Group Registration', path: '/group-registration' },
+                    { name: "Agent Portal", path: "/agent-portal" },
+                    { name: "Broker Portal", path: "/broker-portal" },
+                    { name: "Provider Portal", path: "/provider-portal" },
+                    {
+                      name: "Intermediary Registration",
+                      path: "/intermediary-registration",
+                    },
+                    { name: "Agent Registration", path: "/agent-registration" },
+                    { name: "Group Registration", path: "/group-registration" },
                   ].map((item) => (
                     <div
                       key={item.name}
@@ -792,8 +1024,8 @@ export const Navbar = () => {
           {/* Mobile menu toggle */}
           <button
             aria-label={isDrawerOpen ? "Close menu" : "Open menu"}
-            onClick={() => setIsDrawerOpen((s) => !s)}
             className="ml-2 p-2 rounded-md hover:bg-white/10 transition text-white"
+            onClick={() => setIsDrawerOpen((s) => !s)}
           >
             {/* simple hamburger / close icon — keep your own icon if you prefer */}
             {isDrawerOpen ? "✕" : "☰"}
@@ -807,27 +1039,26 @@ export const Navbar = () => {
           <>
             {/* Dim background */}
             <motion.div
-              initial={{ opacity: 0 }}
               animate={{ opacity: 0.6 }}
-              exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black z-30 backdrop-blur-sm"
+              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
               onClick={closeDrawer}
             />
 
             {/* Drawer content */}
             <motion.div
-              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 180, damping: 25 }}
               className="fixed top-[120px] left-0 right-0 bottom-0 z-40 rounded-tr-3xl overflow-hidden flex flex-col"
+              exit={{ x: "-100%" }}
+              initial={{ x: "-100%" }}
+              transition={{ type: "spring", stiffness: 180, damping: 25 }}
             >
-              <MobileMegaMenu megaMenus={megaMenus} closeDrawer={closeDrawer} />
+              <MobileMegaMenu closeDrawer={closeDrawer} megaMenus={megaMenus} />
             </motion.div>
           </>
         )}
       </AnimatePresence>
-
     </>
   );
 };

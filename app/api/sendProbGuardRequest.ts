@@ -1,5 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
+import type { NextApiRequest, NextApiResponse } from "next";
+
+import nodemailer from "nodemailer";
 
 export interface SendProbGuardRequestForm {
   name: string;
@@ -8,17 +9,20 @@ export interface SendProbGuardRequestForm {
   request: string;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  if (req.method === "POST") {
     const { name, email, phone, request }: SendProbGuardRequestForm = req.body;
 
     const transporter = nodemailer.createTransport({
-      host: 'mail5016.site4now.net',
+      host: "mail5016.site4now.net",
       port: 465,
       secure: true,
       auth: {
-        user: 'Customerservice@birdviewinsurance.com',
-        pass: 'B!rdv!ew@2024',
+        user: "Customerservice@birdviewinsurance.com",
+        pass: "B!rdv!ew@2024",
       },
     });
 
@@ -26,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const mailOptions = {
       from: '"Birdview Insurance" <Customerservice@birdviewinsurance.com>',
-      to: 'Underwriting@birdviewinsurance.com',
+      to: "Underwriting@birdviewinsurance.com",
       subject,
       html: `
         <h2>Probation Guard Request</h2>
@@ -42,13 +46,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       await transporter.sendMail(mailOptions);
-      return res.status(200).json({ message: 'Probation Guard request sent successfully.' });
+
+      return res
+        .status(200)
+        .json({ message: "Probation Guard request sent successfully." });
     } catch (error) {
-      console.error('Nodemailer Error:', error);
-      return res.status(500).json({ error: 'Failed to send probation guard request.' });
+      console.error("Nodemailer Error:", error);
+
+      return res
+        .status(500)
+        .json({ error: "Failed to send probation guard request." });
     }
   }
 
-  res.setHeader('Allow', ['POST']);
+  res.setHeader("Allow", ["POST"]);
+
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }

@@ -14,7 +14,10 @@ export interface ThemeSwitchProps {
   classNames?: SwitchProps["classNames"];
 }
 
-export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => {
+export const ThemeSwitch: FC<ThemeSwitchProps> = ({
+  className,
+  classNames,
+}) => {
   const { theme, setTheme } = useTheme();
   const isSSR = useIsSSR();
 
@@ -41,7 +44,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => 
         className: clsx(
           "px-0.5 py-0.5 cursor-pointer transition-all duration-500 ease-in-out",
           className,
-          classNames?.base
+          classNames?.base,
         ),
       })}
     >
@@ -60,7 +63,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => 
             "hover:from-yellow-400 hover:via-fuchsia-500 hover:to-cyan-400",
             "transition-all duration-500 ease-in-out shadow-[0_0_10px_rgba(255,255,255,0.4)]",
             "backdrop-blur-md",
-            classNames?.wrapper
+            classNames?.wrapper,
           ),
         })}
       >
@@ -70,19 +73,19 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => 
             "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white/90 shadow-lg flex items-center justify-center",
             "transition-all duration-500 ease-in-out transform",
             "border border-white/40",
-            isSelected ? "translate-x-6" : "translate-x-0"
+            isSelected ? "translate-x-6" : "translate-x-0",
           )}
         >
           {/* Icon */}
           {isSelected ? (
             <MoonFilledIcon
-              size={14}
               className="text-indigo-600 drop-shadow-[0_0_4px_rgba(99,102,241,0.8)] animate-pulse"
+              size={14}
             />
           ) : (
             <SunFilledIcon
-              size={14}
               className="text-yellow-500 drop-shadow-[0_0_4px_rgba(253,224,71,0.8)] animate-pulse"
+              size={14}
             />
           )}
         </div>

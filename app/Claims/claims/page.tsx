@@ -26,6 +26,7 @@ const ClaimForm: React.FC = () => {
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -41,6 +42,7 @@ const ClaimForm: React.FC = () => {
 
     if (oversizedFiles.length > 0) {
       setFileError("One or more files exceed the 5MB size limit.");
+
       return;
     }
 
@@ -69,6 +71,7 @@ const ClaimForm: React.FC = () => {
 
     try {
       const data = new FormData();
+
       data.append("policy_no", formData.policy_no);
       data.append("national_id", formData.national_id);
       data.append("contactperson", formData.contactperson);
@@ -82,14 +85,18 @@ const ClaimForm: React.FC = () => {
       });
 
       if (res.status === 200) {
-        (toast as any).success((res.data as any).message || "Your claim has been received.");
+        (toast as any).success(
+          (res.data as any).message || "Your claim has been received.",
+        );
         handleReset();
       } else {
-        (toast as any).error((res.data as any).error || "Something went wrong.");
+        (toast as any).error(
+          (res.data as any).error || "Something went wrong.",
+        );
       }
     } catch (error: any) {
       (toast as any).error(
-        error.response?.data?.error || error.message || "Submission error"
+        error.response?.data?.error || error.message || "Submission error",
       );
     } finally {
       setLoaderIcon(false);
@@ -105,18 +112,18 @@ const ClaimForm: React.FC = () => {
         <CardBody className="p-10">
           {loaderIcon && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600" />
             </div>
           )}
 
           {/* Logo + Heading */}
           <div className="text-center mb-10">
             <Image
-              src="/images/logo.jpeg"
               alt="Company Logo"
-              width={200}
-              height={60}
               className="mx-auto mb-4"
+              height={60}
+              src="/images/logo.jpeg"
+              width={200}
             />
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               Insurance Claim Form
@@ -127,61 +134,61 @@ const ClaimForm: React.FC = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <Input
               isRequired
-              name="policy_no"
               label="Policy Number"
+              name="policy_no"
               placeholder="Enter your policy number"
+              radius="lg"
               value={formData.policy_no}
-              onChange={handleChange}
               variant="bordered"
-              radius="lg"
+              onChange={handleChange}
             />
 
             <Input
               isRequired
-              name="national_id"
               label="National ID Number"
+              name="national_id"
               placeholder="Enter your national ID"
-              value={formData.national_id}
-              onChange={handleChange}
-              variant="bordered"
               radius="lg"
+              value={formData.national_id}
+              variant="bordered"
+              onChange={handleChange}
             />
 
             <Input
               isRequired
-              name="contactperson"
               label="Contact Person"
+              name="contactperson"
               placeholder="Enter contact person name"
-              value={formData.contactperson}
-              onChange={handleChange}
-              variant="bordered"
               radius="lg"
+              value={formData.contactperson}
+              variant="bordered"
+              onChange={handleChange}
             />
 
             {/* File Upload */}
             <div>
               <label
-                htmlFor="upload-files"
                 className="block text-gray-700 font-medium mb-2"
+                htmlFor="upload-files"
               >
                 Upload Supporting Documents
               </label>
               <input
-                type="file"
-                id="upload-files"
                 multiple
-                onChange={handleFileChange}
                 className="hidden"
+                id="upload-files"
+                type="file"
+                onChange={handleFileChange}
               />
               <label htmlFor="upload-files">
                 <Button
                   as="span"
+                  className="font-semibold text-white"
                   color="success"
                   variant="shadow"
-                  className="font-semibold text-white"
                 >
                   Choose Files
                 </Button>
@@ -203,20 +210,20 @@ const ClaimForm: React.FC = () => {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row justify-center gap-6 pt-4">
               <Button
-                type="submit"
-                color="primary"
-                size="lg"
-                radius="lg"
                 className="px-10 text-white font-semibold"
+                color="primary"
+                radius="lg"
+                size="lg"
+                type="submit"
               >
                 Submit
               </Button>
               <Button
-                type="reset"
-                color="danger"
-                size="lg"
-                radius="lg"
                 className="px-10 text-white font-semibold"
+                color="danger"
+                radius="lg"
+                size="lg"
+                type="reset"
                 onClick={handleReset}
               >
                 Reset

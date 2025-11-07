@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Input,
-  Button,
-  Card,
-  CardBody,
-  toast,
-} from "@heroui/react";
+import { Input, Button, Card, CardBody, toast } from "@heroui/react";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -69,6 +63,7 @@ const JobApplicationForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -87,6 +82,7 @@ const JobApplicationForm: React.FC = () => {
     setLoaderIcon(true);
 
     const data = new FormData();
+
     Object.entries(formData).forEach(([key, val]) => {
       if (val !== null) data.append(key, val as any);
     });
@@ -98,13 +94,18 @@ const JobApplicationForm: React.FC = () => {
       });
 
       if (res.status === 200) {
-        (toast as any).success(res.data.message || "✅ Application Submitted: Your application has been received.");
+        (toast as any).success(
+          res.data.message ||
+            "✅ Application Submitted: Your application has been received.",
+        );
         setTimeout(() => router.push("/"), 3000);
       } else {
         throw new Error(res.data.error || "Unknown error");
       }
     } catch (error: any) {
-      (toast as any).error(error.response?.data?.error || error.message || "❌ Submission Failed");
+      (toast as any).error(
+        error.response?.data?.error || error.message || "❌ Submission Failed",
+      );
     } finally {
       setLoaderIcon(false);
     }
@@ -118,91 +119,91 @@ const JobApplicationForm: React.FC = () => {
       <Card className="w-full max-w-2xl shadow-xl border border-gray-200 rounded-2xl bg-white">
         <CardBody>
           <form
-            onSubmit={handleSubmit}
             className="max-w-3xl w-full mx-auto p-8 bg-white shadow-xl rounded-3xl border border-gray-200"
+            onSubmit={handleSubmit}
           >
             <div className="text-center">
               <div className="mb-4">
                 <Image
-                  src="/images/logo.jpeg"
-                  width={180}
-                  height={50}
                   alt="Logo"
                   className="mx-auto"
+                  height={50}
+                  src="/images/logo.jpeg"
+                  width={180}
                 />
               </div>
               <h2 className="text-3xl font-bold text-gray-800">
                 Job Application Form
               </h2>
-              <div className="w-16 h-1 bg-blue-600 mt-3 mx-auto rounded-full"></div>
+              <div className="w-16 h-1 bg-blue-600 mt-3 mx-auto rounded-full" />
             </div>
 
             {/* Name & Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
               <Input
+                required
                 name="firstName"
                 placeholder="First Name*"
                 value={formData.firstName}
                 onChange={handleChange}
-                required
               />
               <Input
+                required
                 name="lastName"
                 placeholder="Last Name*"
                 value={formData.lastName}
                 onChange={handleChange}
-                required
               />
               <Input
+                required
                 name="email"
-                type="email"
                 placeholder="Email*"
+                type="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
               />
               <div>
                 <label className="block text-sm font-medium mb-1">Phone*</label>
                 <PhoneInput
                   country={"ke"}
+                  inputStyle={{ width: "100%" }}
                   value={formData.phone}
                   onChange={handlePhoneChange}
-                  inputStyle={{ width: "100%" }}
                 />
               </div>
             </div>
 
             {/* Address */}
             <Input
+              required
               className="mt-4"
               name="address"
               placeholder="Address*"
               value={formData.address}
               onChange={handleChange}
-              required
             />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <Input
+                required
                 name="city"
                 placeholder="City*"
                 value={formData.city}
                 onChange={handleChange}
-                required
               />
               <Input
+                required
                 name="province"
                 placeholder="Province/County*"
                 value={formData.province}
                 onChange={handleChange}
-                required
               />
               <Input
+                required
                 name="postalCode"
                 placeholder="Postal Code*"
                 value={formData.postalCode}
                 onChange={handleChange}
-                required
               />
             </div>
 
@@ -210,12 +211,12 @@ const JobApplicationForm: React.FC = () => {
             <div className="mt-4">
               <label className="block text-sm font-medium mb-1">Country*</label>
               <select
+                className="w-full border rounded-md p-2"
                 name="country"
                 value={formData.country}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, country: e.target.value }))
                 }
-                className="w-full border rounded-md p-2"
               >
                 {countries.map((c) => (
                   <option key={c} value={c}>
@@ -229,10 +230,10 @@ const JobApplicationForm: React.FC = () => {
             <div className="mt-4">
               <label className="block text-sm font-medium mb-1">Resume*</label>
               <input
+                required
+                accept=".pdf,.doc,.docx"
                 type="file"
                 onChange={handleFileChange}
-                accept=".pdf,.doc,.docx"
-                required
               />
             </div>
 
@@ -267,36 +268,36 @@ const JobApplicationForm: React.FC = () => {
               onChange={handleChange}
             />
             <Input
+              required
               className="mt-4"
               name="employer"
               placeholder="Current Employer*"
               value={formData.employer}
               onChange={handleChange}
-              required
             />
             <Input
+              required
               className="mt-4"
               name="position"
               placeholder="Current Position Title*"
               value={formData.position}
               onChange={handleChange}
-              required
             />
             <Input
+              required
               className="mt-4"
               name="experience"
               placeholder="Years of Banking Experience*"
               value={formData.experience}
               onChange={handleChange}
-              required
             />
 
             <div className="text-center mt-6">
               <Button
-                type="submit"
+                className="w-full md:w-auto px-8 py-3 rounded-full shadow-md text-white font-semibold"
                 color="primary"
                 isLoading={loaderIcon}
-                className="w-full md:w-auto px-8 py-3 rounded-full shadow-md text-white font-semibold"
+                type="submit"
               >
                 Submit Application
               </Button>

@@ -18,20 +18,24 @@ import {
 } from "@heroui/react";
 
 // ✅ Optional small motion wrappers
-const AnimationDownToUp: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const AnimationDownToUp: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
   <motion.div
-    initial={{ opacity: 0, y: 30 }}
     animate={{ opacity: 1, y: 0 }}
+    initial={{ opacity: 0, y: 30 }}
     transition={{ duration: 0.5 }}
   >
     {children}
   </motion.div>
 );
 
-const AnimationRightToLeft: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const AnimationRightToLeft: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
   <motion.div
-    initial={{ opacity: 0, x: 30 }}
     animate={{ opacity: 1, x: 0 }}
+    initial={{ opacity: 0, x: 30 }}
     transition={{ duration: 0.5 }}
   >
     {children}
@@ -56,18 +60,19 @@ const RegForm: React.FC = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   // ✅ HeroUI Toast helpers
-  const showSuccess = (message: string) =>
-    (toast as any).success(message);
+  const showSuccess = (message: string) => (toast as any).success(message);
 
-  const showError = (message: string) =>
-    (toast as any).error(message);
+  const showError = (message: string) => (toast as any).error(message);
 
   const handlePhoneChange = (value: string) => {
     setFormData((prev) => ({ ...prev, mobileno: value }));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -86,13 +91,17 @@ const RegForm: React.FC = () => {
 
       if (res.status === 200) {
         const data = res.data as any;
+
         showSuccess(data?.message || "Form submitted successfully!");
       } else {
         const data = res.data as any;
+
         showError(data?.error || "Something went wrong");
       }
     } catch (error: any) {
-      showError(error?.response?.data?.error || error.message || "Submission failed");
+      showError(
+        error?.response?.data?.error || error.message || "Submission failed",
+      );
     } finally {
       setLoaderIcon(false);
     }
@@ -105,9 +114,13 @@ const RegForm: React.FC = () => {
         <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-400 text-white p-6 flex justify-between items-center rounded-t-2xl">
           <div>
             <h2 className="text-2xl font-semibold">Attendee Registration</h2>
-            <p className="text-blue-100 text-sm">High-end corporate registration form</p>
+            <p className="text-blue-100 text-sm">
+              High-end corporate registration form
+            </p>
           </div>
-          <Badge color="primary" variant="flat" className="uppercase">Premium</Badge>
+          <Badge className="uppercase" color="primary" variant="flat">
+            Premium
+          </Badge>
         </CardHeader>
 
         {/* ✅ Card Body */}
@@ -124,19 +137,20 @@ const RegForm: React.FC = () => {
           )}
 
           <motion.div
-            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
             className="w-full"
+            initial={{ opacity: 0, y: 25 }}
+            transition={{ duration: 0.6 }}
           >
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form className="space-y-8" onSubmit={handleSubmit}>
               {/* Top Info */}
               <div className="text-center mb-4">
                 <h3 className="text-2xl font-bold text-slate-800 uppercase tracking-wide">
                   Event Attendance Form
                 </h3>
                 <p className="text-slate-500">
-                  Please fill in your details accurately to complete registration.
+                  Please fill in your details accurately to complete
+                  registration.
                 </p>
               </div>
 
@@ -144,15 +158,15 @@ const RegForm: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <AnimationRightToLeft>
                   <Input
-                    name="fullnames"
-                    label="Full Name"
-                    variant="bordered"
-                    value={formData.fullnames}
-                    onChange={handleChange}
-                    radius="lg"
-                    disabled={submitted}
-                    className="bg-slate-50"
                     required
+                    className="bg-slate-50"
+                    disabled={submitted}
+                    label="Full Name"
+                    name="fullnames"
+                    radius="lg"
+                    value={formData.fullnames}
+                    variant="bordered"
+                    onChange={handleChange}
                   />
                 </AnimationRightToLeft>
 
@@ -162,9 +176,9 @@ const RegForm: React.FC = () => {
                       Phone Number
                     </label>
                     <PhoneInput
+                      containerClass="w-full"
                       country="ke"
-                      value={formData.mobileno}
-                      onChange={handlePhoneChange}
+                      disabled={submitted}
                       inputStyle={{
                         width: "100%",
                         height: "52px",
@@ -172,8 +186,8 @@ const RegForm: React.FC = () => {
                         borderColor: "#ddd",
                         fontSize: "15px",
                       }}
-                      containerClass="w-full"
-                      disabled={submitted}
+                      value={formData.mobileno}
+                      onChange={handlePhoneChange}
                     />
                   </div>
                 </AnimationDownToUp>
@@ -182,15 +196,15 @@ const RegForm: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <AnimationDownToUp>
                   <Input
-                    name="email"
-                    label="Email Address"
-                    type="email"
-                    variant="bordered"
-                    value={formData.email}
-                    onChange={handleChange}
-                    radius="lg"
-                    disabled={submitted}
                     required
+                    disabled={submitted}
+                    label="Email Address"
+                    name="email"
+                    radius="lg"
+                    type="email"
+                    value={formData.email}
+                    variant="bordered"
+                    onChange={handleChange}
                   />
                 </AnimationDownToUp>
 
@@ -200,13 +214,13 @@ const RegForm: React.FC = () => {
                       Agency Representation
                     </label>
                     <textarea
+                      required
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      disabled={submitted}
                       name="agencies"
+                      rows={4}
                       value={formData.agencies}
                       onChange={handleChange}
-                      required
-                      disabled={submitted}
-                      rows={4}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                   </div>
                 </AnimationRightToLeft>
@@ -214,15 +228,16 @@ const RegForm: React.FC = () => {
 
               {/* Submit Button */}
               <motion.div
+                className="flex justify-center mt-6"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex justify-center mt-6"
               >
                 <Button
-                  type="submit"
+                  className={`relative px-10 py-5 text-lg font-semibold rounded-xl text-white shadow-lg bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 hover:shadow-blue-400/40 transition-all duration-300 ease-in-out ${
+                    submitted ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
                   disabled={submitted}
-                  className={`relative px-10 py-5 text-lg font-semibold rounded-xl text-white shadow-lg bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 hover:shadow-blue-400/40 transition-all duration-300 ease-in-out ${submitted ? "opacity-60 cursor-not-allowed" : ""
-                    }`}
+                  type="submit"
                 >
                   {submitted ? "Submitted" : "Submit"}
                 </Button>

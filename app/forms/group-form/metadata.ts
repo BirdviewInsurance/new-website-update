@@ -1,9 +1,11 @@
 export const metadata = {
   title: "Group Form | Birdview Microinsurance",
-  description: "Group Form — Learn more about Group Form at Birdview Microinsurance. Get details, benefits, and how to apply.",
+  description:
+    "Group Form — Learn more about Group Form at Birdview Microinsurance. Get details, benefits, and how to apply.",
   openGraph: {
     title: "Group Form | Birdview Microinsurance",
-    description: "Group Form — Learn more about Group Form at Birdview Microinsurance. Get details, benefits, and how to apply.",
+    description:
+      "Group Form — Learn more about Group Form at Birdview Microinsurance. Get details, benefits, and how to apply.",
     url: "https://example.com/forms/group-form",
     siteName: "Birdview Microinsurance",
     images: ["/og-image.png"],

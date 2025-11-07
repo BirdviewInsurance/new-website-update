@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+
 import ContactDetailsCard from "./ContactDetailsCard";
 import InquiryFormCard from "./InquiryFormCard";
 import MapSection from "./MapSection";
@@ -32,20 +33,20 @@ export default function ContactUs() {
 
       {/* Main Section */}
       <div
-        id="form"
         className="py-12 px-4 sm:px-8 lg:px-20 grid lg:grid-cols-2 gap-10"
+        id="form"
       >
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
           transition={{ duration: 0.6 }}
         >
           <ContactDetailsCard />
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <InquiryFormCard />
@@ -53,7 +54,7 @@ export default function ContactUs() {
       </div>
 
       {/* Locations Section */}
-      <div id="locations" className="w-full flex justify-center mt-16">
+      <div className="w-full flex justify-center mt-16" id="locations">
         <MapSection />
       </div>
     </div>

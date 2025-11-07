@@ -3,7 +3,7 @@ export default function sitemap() {
     {
       url: "https://birdviewmicroinsurance.com",
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 1.0,
     },
   ];

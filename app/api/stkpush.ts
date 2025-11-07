@@ -1,15 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from "next";
+
 import axios from "axios";
 
-
 // Environment variable guards added automatically
-if (!process.env.MPESA_CALLBACK_URL) { throw new Error('Missing required environment variable: MPESA_CALLBACK_URL'); }
-if (!process.env.MPESA_CONSUMER_KEY) { throw new Error('Missing required environment variable: MPESA_CONSUMER_KEY'); }
-if (!process.env.MPESA_CONSUMER_SECRET) { throw new Error('Missing required environment variable: MPESA_CONSUMER_SECRET'); }
-if (!process.env.MPESA_PASSKEY) { throw new Error('Missing required environment variable: MPESA_PASSKEY'); }
-if (!process.env.MPESA_SHORTCODE) { throw new Error('Missing required environment variable: MPESA_SHORTCODE'); }
-
-
+if (!process.env.MPESA_CALLBACK_URL) {
+  throw new Error("Missing required environment variable: MPESA_CALLBACK_URL");
+}
+if (!process.env.MPESA_CONSUMER_KEY) {
+  throw new Error("Missing required environment variable: MPESA_CONSUMER_KEY");
+}
+if (!process.env.MPESA_CONSUMER_SECRET) {
+  throw new Error(
+    "Missing required environment variable: MPESA_CONSUMER_SECRET",
+  );
+}
+if (!process.env.MPESA_PASSKEY) {
+  throw new Error("Missing required environment variable: MPESA_PASSKEY");
+}
+if (!process.env.MPESA_SHORTCODE) {
+  throw new Error("Missing required environment variable: MPESA_SHORTCODE");
+}
 
 export interface StkpushForm {
   amount: number;
@@ -17,10 +27,14 @@ export interface StkpushForm {
   idno: string;
 }
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, error: "Method not allowed" });
   }
 
   try {
@@ -43,18 +57,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       "https://sandbox.safaricom.co.ke/mpesa/callback";
 
     // 1. Generate access token
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString(
+      "base64",
+    );
     const tokenRes = await axios.get(
       "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
       {
         headers: { Authorization: `Basic ${auth}` },
-      }
+      },
     );
-    const accessToken = (tokenRes.data as { access_token: string }).access_token;
+    const accessToken = (tokenRes.data as { access_token: string })
+      .access_token;
 
     // 2. Create password
-    const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14); // YYYYMMDDHHMMSS
-    const password = Buffer.from(shortcode + passkey + timestamp).toString("base64");
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[-T:.Z]/g, "")
+      .slice(0, 14); // YYYYMMDDHHMMSS
+    const password = Buffer.from(shortcode + passkey + timestamp).toString(
+      "base64",
+    );
 
     // 🔹 Debug logs
     console.log("DEBUG phone:", phone);
@@ -87,10 +109,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     const stkData = stkRes.data as { CheckoutRequestID: string };
+
     return res.status(200).json({
       success: true,
       checkoutRequestID: stkData.CheckoutRequestID,
@@ -100,8 +123,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error: any) {
     console.error(
       "STK Push Error Raw:",
-      JSON.stringify(error?.response?.data || error?.message, null, 2)
+      JSON.stringify(error?.response?.data || error?.message, null, 2),
     );
+
     return res.status(500).json({
       success: false,
       error: error?.response?.data || error?.message,

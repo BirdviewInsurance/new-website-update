@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import formidable, { Files, Fields } from "formidable";
-import * as XLSX from "xlsx";
+
 import fs from "fs";
 import path from "path";
+
+import formidable, { Files, Fields } from "formidable";
+import * as XLSX from "xlsx";
 import nodemailer from "nodemailer";
 
 // ---- Required by Next.js for formidable ----
@@ -16,7 +18,10 @@ if (!process.env.SMTP_USER) throw new Error("Missing SMTP_USER");
 if (!process.env.SMTP_PASS) throw new Error("Missing SMTP_PASS");
 if (!process.env.SMTP_PORT) throw new Error("Missing SMTP_PORT");
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -30,12 +35,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   form.parse(req, async (err: any, fields: Fields, files: Files) => {
     if (err) {
       console.error("❌ Formidable parse error:", err);
+
       return res.status(500).json({ error: "Form parsing failed" });
     }
 
     try {
       // ✅ Flatten fields properly
       const body: Record<string, any> = {};
+
       for (const key in fields) {
         body[key] = Array.isArray(fields[key]) ? fields[key][0] : fields[key];
       }
@@ -124,6 +131,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     } catch (error: any) {
       console.error("❌ API Error:", error);
+
       return res.status(500).json({ error: error.message });
     }
   });

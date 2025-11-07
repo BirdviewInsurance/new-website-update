@@ -11,7 +11,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  Button,
 } from "@heroui/react";
 
 interface Step2PolicyDetailsProps {
@@ -19,11 +18,16 @@ interface Step2PolicyDetailsProps {
   updateFormData?: (data: Record<string, any>) => void;
 }
 
-const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, updateFormData = () => { } }) => {
+const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({
+  formData = {},
+  updateFormData = () => {},
+}) => {
   // 🔹 Helper: safely add months
   const addMonths = (date: string, months: number) => {
     const d = new Date(date);
+
     d.setMonth(d.getMonth() + months);
+
     return d.toISOString().split("T")[0];
   };
 
@@ -31,6 +35,7 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
   useEffect(() => {
     if (formData.certificateStartDate && formData.period) {
       let newEndDate = "";
+
       switch (formData.period) {
         case "One Month":
           newEndDate = addMonths(formData.certificateStartDate, 1);
@@ -51,22 +56,26 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
   const handleFilesChange = (field: string, e: any) => {
     const selectedFiles = Array.from(e.target.files).map((file: any) => ({
       file,
-      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
+      preview: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
     }));
     const existing = Array.isArray(formData[field]) ? formData[field] : [];
+
     updateFormData({ [field]: [...existing, ...selectedFiles] });
   };
 
   const removeFile = (field: string, index: number) => {
     const newFiles = formData[field].filter((_: any, i: number) => i !== index);
+
     updateFormData({ [field]: newFiles });
   };
 
   return (
     <motion.div
       key="step2"
-      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <Card className="rounded-2xl shadow-2xl border border-gray-100 bg-white/80 backdrop-blur-sm hover:shadow-blue-100 transition-all duration-300">
@@ -80,31 +89,33 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Registration Number */}
             <Input
-              type="text"
               label="Registration Number"
               placeholder="Enter registration number"
+              type="text"
               value={formData.registrationNumber || ""}
-              onChange={(e) => updateFormData({ registrationNumber: e.target.value })}
               variant="flat"
+              onChange={(e) =>
+                updateFormData({ registrationNumber: e.target.value })
+              }
             />
 
             {/* Chasis Number */}
             <Input
-              type="text"
               label="Chasis Number"
               placeholder="Enter chasis number"
+              type="text"
               value={formData.chasisNo || ""}
-              onChange={(e) => updateFormData({ chasisNo: e.target.value })}
               variant="flat"
+              onChange={(e) => updateFormData({ chasisNo: e.target.value })}
             />
 
             {/* Cover Type */}
             <RadioGroup
+              className="mt-2"
               label="Cover Type"
+              orientation="horizontal"
               value={formData.coverType || ""}
               onValueChange={(val) => updateFormData({ coverType: val })}
-              orientation="horizontal"
-              className="mt-2"
             >
               <Radio value="Comprehensive">Comprehensive</Radio>
               <Radio value="Third Party">Third Party</Radio>
@@ -112,44 +123,44 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
 
             {/* Certificate Start Date */}
             <Input
-              type="date"
+              description="Select the start date for the certificate"
               label="Certificate Start Date"
+              type="date"
               value={formData.certificateStartDate || ""}
+              variant="flat"
               onChange={(e) =>
                 updateFormData({
                   certificateStartDate: e.target.value,
                   autoCalculated: true,
                 })
               }
-              description="Select the start date for the certificate"
-              variant="flat"
             />
 
             {/* Period */}
             <RadioGroup
               label="Period"
+              orientation="horizontal"
               value={formData.period || ""}
               onValueChange={(val) =>
                 updateFormData({ period: val, autoCalculated: true })
               }
-              orientation="horizontal"
             >
               <Radio value="Full Year">Full Year</Radio>
             </RadioGroup>
 
             {/* Certificate To Date */}
             <Input
-              type="date"
+              description="Select the expiry date for the certificate"
               label="Certificate To Date"
+              type="date"
               value={formData.certificateToDate || ""}
+              variant="flat"
               onChange={(e) =>
                 updateFormData({
                   certificateToDate: e.target.value,
                   autoCalculated: false,
                 })
               }
-              description="Select the expiry date for the certificate"
-              variant="flat"
             />
           </div>
 
@@ -178,11 +189,24 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
           {/* Upload Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             {[
-              { key: "idCopy", label: "ID Copy", color: "from-blue-500 to-indigo-600" },
-              { key: "pinCopy", label: "PIN Copy", color: "from-green-500 to-emerald-600" },
-              { key: "logBookOrKraPin", label: "Log Book / KRA PIN", color: "from-pink-500 to-rose-600" },
+              {
+                key: "idCopy",
+                label: "ID Copy",
+                color: "from-blue-500 to-indigo-600",
+              },
+              {
+                key: "pinCopy",
+                label: "PIN Copy",
+                color: "from-green-500 to-emerald-600",
+              },
+              {
+                key: "logBookOrKraPin",
+                label: "Log Book / KRA PIN",
+                color: "from-pink-500 to-rose-600",
+              },
             ].map(({ key, label, color }) => {
               const files = formData[key] || [];
+
               return (
                 <div key={key}>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -194,11 +218,11 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
                   >
                     <span>Upload {label}</span>
                     <input
-                      type="file"
                       multiple
                       accept="image/*,application/pdf"
-                      onChange={(e) => handleFilesChange(key, e)}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      type="file"
+                      onChange={(e) => handleFilesChange(key, e)}
                     />
                   </label>
 
@@ -208,9 +232,9 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
                         <div key={i} className="relative inline-block">
                           {item.preview ? (
                             <img
-                              src={item.preview}
                               alt={`${label} ${i + 1}`}
                               className="w-[100px] h-[100px] object-cover rounded-md border"
+                              src={item.preview}
                             />
                           ) : (
                             <p className="text-sm text-gray-700 max-w-[120px] truncate border px-2 py-1 rounded-md bg-gray-100">
@@ -219,10 +243,10 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
                           )}
 
                           <button
-                            type="button"
-                            onClick={() => removeFile(key, i)}
                             className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md hover:bg-red-600 transition"
                             title="Remove file"
+                            type="button"
+                            onClick={() => removeFile(key, i)}
                           >
                             ×
                           </button>
@@ -242,18 +266,23 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Input
-                type="text"
                 label="Make"
                 placeholder="Enter Vehicle Make"
+                type="text"
                 value={formData.vehicleMake || ""}
-                onChange={(e) => updateFormData({ vehicleMake: e.target.value })}
+                onChange={(e) =>
+                  updateFormData({ vehicleMake: e.target.value })
+                }
               />
 
               <Select
                 label="Year Of Manufacture"
-                selectedKeys={formData.yearOfMake ? [String(formData.yearOfMake)] : []}
+                selectedKeys={
+                  formData.yearOfMake ? [String(formData.yearOfMake)] : []
+                }
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
+
                   updateFormData({ yearOfMake: selected });
                 }}
               >
@@ -261,20 +290,21 @@ const Step2PolicyDetails: React.FC<Step2PolicyDetailsProps> = ({ formData = {}, 
                   <SelectItem key="select-year">Select Year</SelectItem>,
                   ...Array.from(
                     { length: new Date().getFullYear() - 1976 + 1 },
-                    (_, i) => 1976 + i
+                    (_, i) => 1976 + i,
                   )
                     .reverse()
                     .map((year) => {
                       const yearStr = String(year);
+
                       return <SelectItem key={yearStr}>{yearStr}</SelectItem>;
-                    })
+                    }),
                 ]}
               </Select>
 
               <Input
-                type="text"
                 label="License To Carry"
                 placeholder="License to carry"
+                type="text"
                 value={formData.licenseToCarry || ""}
                 onChange={(e) =>
                   updateFormData({ licenseToCarry: e.target.value })

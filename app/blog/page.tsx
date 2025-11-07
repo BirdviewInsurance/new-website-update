@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import CategoryBar from "./CategoryBar";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { motion, AnimatePresence } from "framer-motion";
+
+import CategoryBar from "./CategoryBar";
 
 const posts = [
   {
@@ -26,7 +27,8 @@ const posts = [
     category: "Insurance",
   },
   {
-    title: "Group Medical Insurance for SMEs in Kenya: Costs, Benefits & How It Works",
+    title:
+      "Group Medical Insurance for SMEs in Kenya: Costs, Benefits & How It Works",
     excerpt:
       "SMEs power Kenya’s economy. Group medical insurance helps attract and retain talent while keeping costs manageable.",
     date: "Sep 5, 2025",
@@ -64,7 +66,8 @@ const posts = [
     category: "Events",
   },
   {
-    title: "Celebrating Culture and Connection: Birdview at Kenya-UK Utamaduni Day",
+    title:
+      "Celebrating Culture and Connection: Birdview at Kenya-UK Utamaduni Day",
     excerpt:
       "Birdview proudly sponsored Utamaduni Day, uniting the Kenyan diaspora in the UK with culture, pride, and heritage.",
     date: "Sep 14, 2025",
@@ -122,7 +125,8 @@ const posts = [
     category: "Insurance",
   },
   {
-    title: "Why Birdview Exists: A Story of Purpose, Protection, and Kenyan Resilience",
+    title:
+      "Why Birdview Exists: A Story of Purpose, Protection, and Kenyan Resilience",
     excerpt:
       "Birdview was founded to make protection simple, affordable, and accessible—especially when it matters most.",
     date: "Sep 24, 2025",
@@ -167,6 +171,7 @@ export default function BlogPage() {
 
   const filteredPosts = useMemo(() => {
     if (activeCategory === "All") return posts;
+
     return posts.filter((post) => post.category === activeCategory);
   }, [activeCategory]);
 
@@ -174,8 +179,8 @@ export default function BlogPage() {
     <section className="relative w-screen max-w-none bg-background overflow-hidden">
       {/* Hero Section */}
       <div className="relative h-[40vh] flex flex-col items-center justify-center text-center text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-700 to-red-600"></div>
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-700 to-red-600" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
             Our Insights & Updates
@@ -187,7 +192,10 @@ export default function BlogPage() {
       </div>
 
       {/* Floating Category Bar */}
-      <CategoryBar activeCategory={activeCategory} onSelect={setActiveCategory} />
+      <CategoryBar
+        activeCategory={activeCategory}
+        onSelect={setActiveCategory}
+      />
 
       {/* Posts Grid */}
       <div className="max-w-7xl mx-auto py-12 px-4 md:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -195,9 +203,9 @@ export default function BlogPage() {
           {filteredPosts.map((post) => (
             <motion.div
               key={post.slug}
-              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.4 }}
             >
               <Link href={`/blog/${post.slug}`}>
@@ -207,9 +215,9 @@ export default function BlogPage() {
                 >
                   <CardHeader className="p-0">
                     <img
-                      src={post.image}
                       alt={post.title}
                       className="w-full h-52 object-cover rounded-t-xl"
+                      src={post.image}
                     />
                   </CardHeader>
                   <CardBody className="p-5">

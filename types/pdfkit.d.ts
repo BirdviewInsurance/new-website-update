@@ -1,12 +1,12 @@
-declare module 'pdfkit' {
-  import { Readable } from 'stream';
-  
+declare module "pdfkit" {
+  import { Readable } from "stream";
+
   interface PDFDocumentOptions {
     margin?: number;
     size?: string | [number, number];
     [key: string]: any;
   }
-  
+
   class PDFDocument extends Readable {
     constructor(options?: PDFDocumentOptions);
     fontSize(size: number): PDFDocument;
@@ -22,7 +22,6 @@ declare module 'pdfkit' {
     end(): void;
     [key: string]: any;
   }
-  
+
   export = PDFDocument;
 }
-

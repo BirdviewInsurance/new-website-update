@@ -1,9 +1,11 @@
 export const metadata = {
   title: "[slug] | Birdview Microinsurance",
-  description: "[slug] — Learn more about [slug] at Birdview Microinsurance. Get details, benefits, and how to apply.",
+  description:
+    "[slug] — Learn more about [slug] at Birdview Microinsurance. Get details, benefits, and how to apply.",
   openGraph: {
     title: "[slug] | Birdview Microinsurance",
-    description: "[slug] — Learn more about [slug] at Birdview Microinsurance. Get details, benefits, and how to apply.",
+    description:
+      "[slug] — Learn more about [slug] at Birdview Microinsurance. Get details, benefits, and how to apply.",
     url: "https://example.com/our-leadership/[slug]",
     siteName: "Birdview Microinsurance",
     images: ["/og-image.png"],

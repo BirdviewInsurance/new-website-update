@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import formidable, { Fields, Files, File } from "formidable";
+
 import * as fs from "fs/promises";
 import * as fssync from "fs";
 import * as path from "path";
+
+import formidable, { Fields, Files, File } from "formidable";
 import * as XLSX from "xlsx";
 import nodemailer from "nodemailer";
 import archiver from "archiver";
@@ -16,10 +18,11 @@ export const config = {
 
 // Helper to parse multipart form data
 async function parseForm(
-  req: NextApiRequest
+  req: NextApiRequest,
 ): Promise<{ fields: Fields; files: Files }> {
   return new Promise((resolve, reject) => {
     const form = formidable({ multiples: true, keepExtensions: true });
+
     form.parse(req, (err, fields, files) => {
       if (err) reject(err);
       else resolve({ fields, files });
@@ -31,7 +34,7 @@ async function parseForm(
 async function createZip(
   policyHolder: string,
   files: { filename: string; filepath: string }[],
-  excelPath: string
+  excelPath: string,
 ): Promise<string> {
   const zipName = `${policyHolder.replace(/\s+/g, "_")}_Documents.zip`;
   const zipPath = path.join(process.cwd(), "public", zipName);
@@ -40,21 +43,21 @@ async function createZip(
 
   archive.pipe(output);
   archive.file(excelPath, { name: path.basename(excelPath) });
-  files.forEach((file) =>
-    archive.file(file.filepath, { name: file.filename })
-  );
+  files.forEach((file) => archive.file(file.filepath, { name: file.filename }));
 
   await archive.finalize();
+
   return zipPath;
 }
 
 // Upload ZIP to Snownet server
 async function uploadZipToSnownet(
   zipPath: string,
-  policyHolder: string
+  policyHolder: string,
 ): Promise<{ fileUrl?: string; url?: string } | null> {
   try {
     const formData = new FormData();
+
     formData.append("file", fssync.createReadStream(zipPath));
     formData.append("name", policyHolder);
 
@@ -65,10 +68,11 @@ async function uploadZipToSnownet(
         headers: { ...formData.getHeaders() },
         timeout: 30000,
         validateStatus: () => true,
-      }
+      },
     );
 
     if (response.status >= 400 || !response.data) throw new Error();
+
     return response.data;
   } catch {
     return null; // Return null safely
@@ -77,10 +81,11 @@ async function uploadZipToSnownet(
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ): Promise<void> {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
+
     return;
   }
 
@@ -89,11 +94,17 @@ export default async function handler(
 
     // Convert fields to simple object
     const formData: Record<string, string> = {};
+
     Object.keys(fields).forEach((k) => {
       const value = fields[k];
+
       formData[k] = Array.isArray(value)
-        ? (value[0] !== undefined ? String(value[0]) : '')
-        : (value !== undefined ? String(value) : '');
+        ? value[0] !== undefined
+          ? String(value[0])
+          : ""
+        : value !== undefined
+          ? String(value)
+          : "";
     });
 
     // Extract uploaded files safely
@@ -103,8 +114,10 @@ export default async function handler(
       "logBookOrKraPin",
     ].flatMap((k) => {
       const f = files[k];
+
       if (!f) return [];
       const arr = Array.isArray(f) ? f : [f];
+
       return arr.map((file: File) => ({
         filename: file.originalFilename || "unknown",
         filepath: file.filepath,
@@ -113,6 +126,7 @@ export default async function handler(
 
     // Prepare Excel file
     const publicDir = path.join(process.cwd(), "public");
+
     await fs.mkdir(publicDir, { recursive: true });
     const excelPath = path.join(publicDir, "vehicle_insurance_proposals.xlsx");
 
@@ -151,6 +165,7 @@ export default async function handler(
     }
 
     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+
     rows.push([
       formData.products || "",
       formData.timeOnRisk || "",
@@ -175,12 +190,23 @@ export default async function handler(
     ]);
 
     workbook.Sheets["Vehicle Proposals"] = XLSX.utils.aoa_to_sheet(rows);
-    const updatedBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+    const updatedBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "buffer",
+    });
+
     await fs.writeFile(excelPath, updatedBuffer);
 
     // Zip and upload to Snownet
-    const zipPath = await createZip(formData.policyHolder, uploadedFiles, excelPath);
-    const snownetResponse = await uploadZipToSnownet(zipPath, formData.policyHolder);
+    const zipPath = await createZip(
+      formData.policyHolder,
+      uploadedFiles,
+      excelPath,
+    );
+    const snownetResponse = await uploadZipToSnownet(
+      zipPath,
+      formData.policyHolder,
+    );
     const snownetLink =
       snownetResponse?.fileUrl || snownetResponse?.url || "Upload Failed";
 
@@ -201,7 +227,10 @@ export default async function handler(
       subject: `New Insurance Proposal: ${formData.policyHolder}`,
       text: `A new proposal was submitted.\n\nZIP Storage Link: ${snownetLink}`,
       attachments: [
-        ...uploadedFiles.map((f) => ({ filename: f.filename, path: f.filepath })),
+        ...uploadedFiles.map((f) => ({
+          filename: f.filename,
+          path: f.filepath,
+        })),
         { filename: "vehicle_insurance_proposals.xlsx", path: excelPath },
       ],
     });

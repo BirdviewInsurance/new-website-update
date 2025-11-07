@@ -22,14 +22,13 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   });
 
   return (
-    <animated.span
-      className={`font-semibold text-black md:${colorClass}`}
-    >
-      {number.to((n) =>
-        `${prefix}${n.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`
+    <animated.span className={`font-semibold text-black md:${colorClass}`}>
+      {number.to(
+        (n) =>
+          `${prefix}${n.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
       )}
     </animated.span>
   );

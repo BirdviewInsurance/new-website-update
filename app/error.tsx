@@ -36,17 +36,17 @@ export default function Error({
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
           <button
-            onClick={() => reset()}
             className="px-6 py-3 rounded-full bg-danger hover:bg-white/40 border border-white/30 
                        transition-all duration-300 text-white font-semibold"
+            onClick={() => reset()}
           >
             🔄 Try Again
           </button>
 
           <a
-            href="/"
             className="px-6 py-3 rounded-full bg-primary hover:bg-primary/80 text-white 
                        font-semibold transition-all duration-300"
+            href="/"
           >
             Go Home
           </a>

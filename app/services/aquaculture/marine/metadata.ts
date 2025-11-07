@@ -1,9 +1,11 @@
 export const metadata = {
   title: "Marine | Birdview Microinsurance",
-  description: "Marine — Learn more about Marine at Birdview Microinsurance. Get details, benefits, and how to apply.",
+  description:
+    "Marine — Learn more about Marine at Birdview Microinsurance. Get details, benefits, and how to apply.",
   openGraph: {
     title: "Marine | Birdview Microinsurance",
-    description: "Marine — Learn more about Marine at Birdview Microinsurance. Get details, benefits, and how to apply.",
+    description:
+      "Marine — Learn more about Marine at Birdview Microinsurance. Get details, benefits, and how to apply.",
     url: "https://example.com/services/aquaculture/marine",
     siteName: "Birdview Microinsurance",
     images: ["/og-image.png"],

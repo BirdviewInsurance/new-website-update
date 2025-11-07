@@ -2,14 +2,16 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Link, Card, CardHeader, CardBody, Accordion, AccordionItem } from "@heroui/react";
+import {
+  Link,
+  Card,
+  CardHeader,
+  CardBody,
+  Accordion,
+  AccordionItem,
+} from "@heroui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAnimation } from "framer-motion";
 import { useRef } from "react";
-
-import QRCode from "react-qr-code";
-
-import { siteConfig } from "@/config/site";
 import {
   Users,
   FileText,
@@ -22,11 +24,12 @@ import {
   Activity,
 } from "lucide-react";
 
+import { useLiveChat } from "./hooks/useLiveChat";
+
+import { siteConfig } from "@/config/site";
 import LiquidRingLoader from "@/components/LiquidRingLoader";
 
 // import { useTawk } from "./hooks/useTawk";
-
-import { useLiveChat } from "./hooks/useLiveChat";
 
 // Animated counter component
 interface StatItem {
@@ -115,7 +118,7 @@ function StatCard({ label, value, suffix, icon }: StatItem) {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
 
     if (ref.current) observer.observe(ref.current);
@@ -128,16 +131,16 @@ function StatCard({ label, value, suffix, icon }: StatItem) {
   return (
     <motion.div
       ref={ref}
+      className="bg-white/10 backdrop-blur-lg shadow-xl rounded-2xl p-6 flex flex-col items-center text-center border border-white/20 hover:scale-105 transform transition"
       initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
-      className="bg-white/10 backdrop-blur-lg shadow-xl rounded-2xl p-6 flex flex-col items-center text-center border border-white/20 hover:scale-105 transform transition"
+      whileInView={{ opacity: 1, y: 0 }}
     >
       <div className="mb-4">{icon}</div>
       <motion.h3
-        className="text-4xl font-extrabold text-white"
         key={displayValue}
+        className="text-4xl font-extrabold text-white"
       >
         {displayValue}
         {suffix}
@@ -153,15 +156,60 @@ export default function Home() {
   useLiveChat(19361155);
 
   const allProducts = [
-    { title: "Evacuation and Repatriation", slug: "evacuation_and_repatriation", img: "/assets/productsPhotos/Evacuation-and-Repatriation.png", desc: "This cover is crafted to intervene and rescue situations of citizens being either stranded or deceased abroad." },
-    { title: "Last Expense", slug: "last_expense", img: "/assets/productsPhotos/last-expense.png", desc: "Our last expense/funeral expense cover pays a specified cash amount within 48 hours of notification of death." },
-    { title: "Medical", slug: "medical", img: "/assets/productsPhotos/medical.png", desc: "Our medical insurance products include inpatient (With In-built Maternity), Outpatient, Dental, and Optical." },
-    { title: "Hospital Cash", slug: "hospital_cash", img: "/assets/productsPhotos/hospital-cash.png", desc: "Daily payments for insureds admitted in hospital for up to a maximum of 10 payments per year or admission." },
-    { title: "Personal Accident", slug: "personal_accident", img: "/assets/productsPhotos/personal-accident.png", desc: "Plan provides fixed sum payout on death, permanent disablement, and medical expenses arising because of an accident." },
-    { title: "Motorbike/Bodaboda Insurance Welfare Cover", slug: "bodaboda_welfare", img: "/assets/productsPhotos/motorbike.jpg", desc: "Covers your motorbike against damage, theft, or loss, including third-party liability." },
-    { title: "TukTuk Insurance Welfare Cover", slug: "tuktuk_welfare", img: "/assets/productsPhotos/tuktuk.png", desc: "This insurance offers both Third Party and Comprehensive cover—protecting against damage or loss, third party liability." },
-    { title: "Probation Guard", slug: "probation_guard", img: "/assets/productsPhotos/prob_guard.png", desc: "This enhancement to our existing Evacuation and Repatriation Cover includes a new component." },
-    { title: "AQUABIMA Insurance", slug: "aquaculture", img: "/assets/productsPhotos/aqua_culture.jpeg", desc: "AQUABIMA is a tailored insurance solution for cage and pond farmers, ensuring guaranteed returns on investment." },
+    {
+      title: "Evacuation and Repatriation",
+      slug: "evacuation_and_repatriation",
+      img: "/assets/productsPhotos/Evacuation-and-Repatriation.png",
+      desc: "This cover is crafted to intervene and rescue situations of citizens being either stranded or deceased abroad.",
+    },
+    {
+      title: "Last Expense",
+      slug: "last_expense",
+      img: "/assets/productsPhotos/last-expense.png",
+      desc: "Our last expense/funeral expense cover pays a specified cash amount within 48 hours of notification of death.",
+    },
+    {
+      title: "Medical",
+      slug: "medical",
+      img: "/assets/productsPhotos/medical.png",
+      desc: "Our medical insurance products include inpatient (With In-built Maternity), Outpatient, Dental, and Optical.",
+    },
+    {
+      title: "Hospital Cash",
+      slug: "hospital_cash",
+      img: "/assets/productsPhotos/hospital-cash.png",
+      desc: "Daily payments for insureds admitted in hospital for up to a maximum of 10 payments per year or admission.",
+    },
+    {
+      title: "Personal Accident",
+      slug: "personal_accident",
+      img: "/assets/productsPhotos/personal-accident.png",
+      desc: "Plan provides fixed sum payout on death, permanent disablement, and medical expenses arising because of an accident.",
+    },
+    {
+      title: "Motorbike/Bodaboda Insurance Welfare Cover",
+      slug: "bodaboda_welfare",
+      img: "/assets/productsPhotos/motorbike.jpg",
+      desc: "Covers your motorbike against damage, theft, or loss, including third-party liability.",
+    },
+    {
+      title: "TukTuk Insurance Welfare Cover",
+      slug: "tuktuk_welfare",
+      img: "/assets/productsPhotos/tuktuk.png",
+      desc: "This insurance offers both Third Party and Comprehensive cover—protecting against damage or loss, third party liability.",
+    },
+    {
+      title: "Probation Guard",
+      slug: "probation_guard",
+      img: "/assets/productsPhotos/prob_guard.png",
+      desc: "This enhancement to our existing Evacuation and Repatriation Cover includes a new component.",
+    },
+    {
+      title: "AQUABIMA Insurance",
+      slug: "aquaculture",
+      img: "/assets/productsPhotos/aqua_culture.jpeg",
+      desc: "AQUABIMA is a tailored insurance solution for cage and pond farmers, ensuring guaranteed returns on investment.",
+    },
   ];
 
   interface Testimonial {
@@ -174,44 +222,55 @@ export default function Home() {
 
   const testimonials: Testimonial[] = [
     {
-      name: "Alice Mwangi", role: "Software Engineer", avatar: "/assets/managementPhotos/Ann-Kinyanjui.png", text: "Birdview Insurance made choosing the right plan incredibly easy. Highly recommend!"
+      name: "Alice Mwangi",
+      role: "Software Engineer",
+      avatar: "/assets/managementPhotos/Ann-Kinyanjui.png",
+      text: "Birdview Insurance made choosing the right plan incredibly easy. Highly recommend!",
     },
     {
-      name: "John Kamau", role: "Business Owner", avatar: "/assets/managementPhotos/Richard-Muiru.png", text: "Fast, reliable, and trustworthy. Their coverage saved us during an unexpected event."
+      name: "John Kamau",
+      role: "Business Owner",
+      avatar: "/assets/managementPhotos/Richard-Muiru.png",
+      text: "Fast, reliable, and trustworthy. Their coverage saved us during an unexpected event.",
     },
-    { name: "Grace Njeri", role: "Freelancer", avatar: "/assets/managementPhotos/Mary-Mundia.png", text: "Excellent customer service and flexible plans that fit my needs perfectly." },
+    {
+      name: "Grace Njeri",
+      role: "Freelancer",
+      avatar: "/assets/managementPhotos/Mary-Mundia.png",
+      text: "Excellent customer service and flexible plans that fit my needs perfectly.",
+    },
   ];
 
   const benefits = [
     {
       title: "Fast Claims",
       icon: "/icons/fast.svg",
-      desc: "Quick and hassle-free claim processing."
+      desc: "Quick and hassle-free claim processing.",
     },
     {
       title: "Trusted Partner",
       icon: "/icons/trusted.svg",
-      desc: "Over 20 years of experience and reliability."
+      desc: "Over 20 years of experience and reliability.",
     },
     {
       title: "24/7 Support",
       icon: "/icons/clock.svg",
-      desc: "We’re here for you anytime, anywhere."
+      desc: "We’re here for you anytime, anywhere.",
     },
     {
       title: "Tailored Plans",
       icon: "/icons/tailored.svg",
-      desc: "Custom insurance plans that fit your life."
+      desc: "Custom insurance plans that fit your life.",
     },
     {
       title: "Global Coverage",
       icon: "/icons/global.svg",
-      desc: "Insurance solutions that protect you worldwide."
+      desc: "Insurance solutions that protect you worldwide.",
     },
     {
       title: "Affordable Premiums",
       icon: "/icons/affordable.svg",
-      desc: "Comprehensive protection at competitive rates."
+      desc: "Comprehensive protection at competitive rates.",
     },
   ];
 
@@ -260,7 +319,11 @@ export default function Home() {
   // Animate products sequentially
   const productVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.15 } }),
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.15 },
+    }),
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -268,8 +331,9 @@ export default function Home() {
   // Cycle testimonials every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -289,6 +353,7 @@ export default function Home() {
 
     updateLength();
     window.addEventListener("resize", updateLength);
+
     return () => window.removeEventListener("resize", updateLength);
   }, []);
 
@@ -297,6 +362,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2500); // Loader visible for ~2.5 seconds
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -306,7 +372,6 @@ export default function Home() {
 
   return (
     <section className="flex flex-col gap-16 w-full overflow-visible">
-
       {/* Hero Section */}
       <div
         className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat"
@@ -321,49 +386,47 @@ export default function Home() {
         <div className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-6">
           {/* Heading */}
           <motion.h1
-            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
             className="text-4xl md:text-6xl font-extrabold leading-tight text-white max-w-5xl"
+            initial={{ opacity: 0, y: -20 }}
+            transition={{ duration: 1 }}
           >
             Exceeding <span className="text-red-400">Your Expectations</span>
           </motion.h1>
 
           {/* Subheading */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1 }}
             className="mt-6 text-gray-200 md:text-lg max-w-3xl"
+            initial={{ opacity: 0, y: 10 }}
+            transition={{ delay: 0.3, duration: 1 }}
           >
             Affordable and reliable micro insurance solutions, built to protect
-            individuals, families, and small businesses. Coverage that grows with
-            your needs — simple, transparent, and accessible.
+            individuals, families, and small businesses. Coverage that grows
+            with your needs — simple, transparent, and accessible.
           </motion.p>
 
           {/* Buttons + QR code */}
           <motion.div
-            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 1 }}
             className="flex items-center gap-4 mt-8 flex-wrap justify-center"
+            initial={{ opacity: 0 }}
+            transition={{ delay: 0.6, duration: 1 }}
           >
             {/* Get Covered Today button */}
             <Link
-              href={(siteConfig.links as any)?.getQuote || "#"}
               className="relative px-6 py-3 rounded-full text-white font-semibold bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-500 shadow-lg"
+              href={(siteConfig.links as any)?.getQuote || "#"}
             >
               Get Covered Today
             </Link>
 
             {/* Explore Plans button + QR code */}
-            <div
-              className="flex flex-col sm:flex-row items-center sm:gap-3 gap-5 sm:gap-3 mt-4 sm:mt-0"
-            >
+            <div className="flex flex-col sm:flex-row items-center sm:gap-3 gap-5 sm:gap-3 mt-4 sm:mt-0">
               {/* Explore Plans button */}
               <Link
-                href={(siteConfig.links as any)?.services || "#"}
                 className="relative px-6 py-3 rounded-full text-white font-semibold bg-red-600 hover:bg-red-700 hover:scale-105 transition-all duration-500 shadow-lg"
+                href={(siteConfig.links as any)?.services || "#"}
               >
                 Explore Plans
               </Link>
@@ -372,37 +435,41 @@ export default function Home() {
               <div className="flex flex-col items-center gap-3">
                 {/* Animated QR Code */}
                 <motion.div
-                  initial={{ scale: 1 }}
                   animate={{ scale: [1, 1.07, 1] }}
+                  className="relative flex items-center justify-center rounded-xl p-[3px]
+     bg-gradient-to-r from-blue-600 via-pink-500 to-red-600
+     shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+                  initial={{ scale: 1 }}
                   transition={{
                     duration: 2,
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="relative flex items-center justify-center rounded-xl p-[3px]
-     bg-gradient-to-r from-blue-600 via-pink-500 to-red-600
-     shadow-[0_0_15px_rgba(59,130,246,0.6)]"
                 >
                   <Link
-                    href="https://quote.birdviewinsurance.com/"
-                    target="_blank"
                     className="relative flex items-center justify-center bg-white/90 backdrop-blur-lg
          rounded-xl p-2 shadow-lg transition-transform duration-500"
+                    href="https://quote.birdviewinsurance.com/"
+                    target="_blank"
                   >
                     <Image
-                      src="/images/qr-quote.jpg"
-                      alt="Scan to Get a Quote"
-                      width={120}
-                      height={120}
-                      className="rounded-lg"
                       priority
+                      alt="Scan to Get a Quote"
+                      className="rounded-lg"
+                      height={120}
+                      src="/images/qr-quote.jpg"
+                      width={120}
                     />
 
                     {/* Soft glow animation overlay */}
                     <motion.div
-                      className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/30 to-red-500/30"
                       animate={{ opacity: [0.2, 0.5, 0.2] }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/30 to-red-500/30"
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
                     />
                   </Link>
                 </motion.div>
@@ -410,11 +477,11 @@ export default function Home() {
                 {/* Text below the QR */}
                 <p className="mt-2">
                   <motion.span
-                    className="text-xl text-white font-semibold"
                     animate={{
                       opacity: [1, 0.5, 1],
                       scale: [1, 1.05, 1],
                     }}
+                    className="text-xl text-white font-semibold"
                     transition={{
                       duration: 1.5,
                       repeat: Infinity,
@@ -432,11 +499,11 @@ export default function Home() {
 
       {/* Products Section */}
       <Card
-        shadow="lg"
-        radius="lg"
         className="w-full relative overflow-visible 
              bg-gradient-to-br from-primary/95 via-primary/80 to-danger/90 
              text-white rounded-3xl"
+        radius="lg"
+        shadow="lg"
       >
         {/* Premium Gradient + Image Overlay */}
         <div className="absolute inset-0 -z-10">
@@ -456,12 +523,12 @@ export default function Home() {
 
         {/* Decorative Background Wave */}
         <div className="absolute bottom-0 left-0 w-full h-32 md:h-40 -z-10 opacity-30">
-          <svg viewBox="0 0 1440 320" className="w-full h-full">
+          <svg className="w-full h-full" viewBox="0 0 1440 320">
             <path
+              d="M0,224L48,213.3C96,203,192,181,288,186.7C384,192,480,224,576,224C672,224,768,192,864,176C960,160,1056,160,1152,165.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
               fill="white"
               fillOpacity="0.3"
-              d="M0,224L48,213.3C96,203,192,181,288,186.7C384,192,480,224,576,224C672,224,768,192,864,176C960,160,1056,160,1152,165.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-            ></path>
+            />
           </svg>
         </div>
 
@@ -472,88 +539,99 @@ export default function Home() {
 
         {/* Product Cards with Frosted Glass & Glow */}
         <CardBody className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
-          {(showAllProducts ? allProducts : allProducts.slice(0, 4)).map((product, i) => (
-            <motion.div
-              key={i}
-              custom={i}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={productVariants}
-              whileHover={{ scale: 1.07 }}
-              className="cursor-pointer"
-            >
-              <Card
-                shadow="sm"
-                radius="lg"
-                className="relative overflow-hidden 
+          {(showAllProducts ? allProducts : allProducts.slice(0, 4)).map(
+            (product, i) => (
+              <motion.div
+                key={i}
+                className="cursor-pointer"
+                custom={i}
+                initial="hidden"
+                variants={productVariants}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.07 }}
+                whileInView="visible"
+              >
+                <Card
+                  className="relative overflow-hidden 
                      bg-white/10 backdrop-blur-xl 
                      border border-white/20 
                      hover:shadow-2xl transition-all duration-300"
-              >
-                {/* Glow Overlay */}
-                <div
-                  className="absolute inset-0 rounded-lg pointer-events-none opacity-50"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(var(--tw-primary-rgb),0.25), rgba(var(--tw-danger-rgb),0.25))",
-                  }}
-                />
+                  radius="lg"
+                  shadow="sm"
+                >
+                  {/* Glow Overlay */}
+                  <div
+                    className="absolute inset-0 rounded-lg pointer-events-none opacity-50"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(var(--tw-primary-rgb),0.25), rgba(var(--tw-danger-rgb),0.25))",
+                    }}
+                  />
 
-                <Image
-                  src={product.img}
-                  alt={product.title}
-                  width={600}
-                  height={400}
-                  className="rounded-t-lg object-cover h-48 w-full relative z-10"
-                />
-                <CardHeader className="text-xl font-semibold text-white px-4 pt-4 relative z-10 drop-shadow-md">
-                  {product.title}
-                </CardHeader>
-                <CardBody className="text-gray-200 px-4 pb-6 relative z-10">
-                  {product.desc}
-                </CardBody>
-                <Link
-                  href={`/products/${product.slug}`}
-                  className="group inline-flex items-center gap-2 mt-4 px-4 py-2 text-sm font-semibold rounded-full 
+                  <Image
+                    alt={product.title}
+                    className="rounded-t-lg object-cover h-48 w-full relative z-10"
+                    height={400}
+                    src={product.img}
+                    width={600}
+                  />
+                  <CardHeader className="text-xl font-semibold text-white px-4 pt-4 relative z-10 drop-shadow-md">
+                    {product.title}
+                  </CardHeader>
+                  <CardBody className="text-gray-200 px-4 pb-6 relative z-10">
+                    {product.desc}
+                  </CardBody>
+                  <Link
+                    className="group inline-flex items-center gap-2 mt-4 px-4 py-2 text-sm font-semibold rounded-full 
                   bg-white/20 hover:bg-white/40 text-white 
                   backdrop-blur-md border border-white/30 
                   transition-all duration-300"
-                >
-                  <span>Read More</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
+                    href={`/products/${product.slug}`}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
-
-              </Card>
-            </motion.div>
-          ))}
+                    <span>Read More</span>
+                    <svg
+                      className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Link>
+                </Card>
+              </motion.div>
+            ),
+          )}
         </CardBody>
 
         {/* Dropdown Arrow */}
         <div className="flex justify-center mt-6 relative z-10">
           <button
-            onClick={() => setShowAllProducts(!showAllProducts)}
             className="flex items-center gap-2 px-6 py-3 rounded-full border border-white text-white font-semibold hover:bg-white hover:text-primary shadow-lg backdrop-blur-md transition-all"
+            onClick={() => setShowAllProducts(!showAllProducts)}
           >
             {showAllProducts ? "Show Less" : "Show More"}
             <svg
-              className={`w-5 h-5 transform transition-transform duration-300 ${showAllProducts ? "rotate-180" : ""
-                }`}
+              className={`w-5 h-5 transform transition-transform duration-300 ${
+                showAllProducts ? "rotate-180" : ""
+              }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              <path
+                d="M19 9l-7 7-7-7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
             </svg>
           </button>
         </div>
@@ -561,17 +639,17 @@ export default function Home() {
 
       {/* Testimonial Carousel */}
       <Card
-        shadow="lg"
-        radius="lg"
         className="w-full relative overflow-hidden py-20"
+        radius="lg"
+        shadow="lg"
       >
         {/* Background Image + Brand Gradient Overlay */}
         <div className="absolute inset-0">
           <Image
-            src="/images/backdrop1.jpg"
-            alt="Corporate backdrop"
             fill
+            alt="Corporate backdrop"
             className="object-cover"
+            src="/images/backdrop1.jpg"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-black/60 to-danger/80 mix-blend-multiply" />
         </div>
@@ -589,11 +667,11 @@ export default function Home() {
                 i === currentTestimonial && (
                   <motion.div
                     key={t.name}
-                    initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
                     className="flex flex-col items-center gap-6 text-center px-8"
+                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
                   >
                     {/* Quote Icon */}
                     <div className="text-6xl text-white/40 font-serif">“</div>
@@ -606,13 +684,15 @@ export default function Home() {
                     {/* Client Identity */}
                     <div className="flex flex-col items-center gap-1">
                       <Image
-                        src={t.avatar}
                         alt={t.name}
-                        width={180}
-                        height={180}
                         className="rounded-full object-cover shadow-lg border-4 border-white/40"
+                        height={180}
+                        src={t.avatar}
+                        width={180}
                       />
-                      <p className="mt-4 font-semibold text-lg text-white">{t.name}</p>
+                      <p className="mt-4 font-semibold text-lg text-white">
+                        {t.name}
+                      </p>
                       <p className="text-sm text-white/70 tracking-wide uppercase">
                         {t.role}
                       </p>
@@ -621,15 +701,15 @@ export default function Home() {
                     {/* Optional: Client Company Logo */}
                     {t.companyLogo && (
                       <Image
-                        src={t.companyLogo}
                         alt={`${t.name} company`}
-                        width={140}
-                        height={50}
                         className="mt-4 object-contain opacity-80 invert"
+                        height={50}
+                        src={t.companyLogo}
+                        width={140}
                       />
                     )}
                   </motion.div>
-                )
+                ),
             )}
           </AnimatePresence>
         </CardBody>
@@ -637,17 +717,17 @@ export default function Home() {
 
       {/* Why Choose Us / Benefits */}
       <Card
-        shadow="lg"
-        radius="lg"
         className="relative w-full py-20 overflow-hidden border-0"
+        radius="lg"
+        shadow="lg"
       >
         {/* Background */}
         <div className="absolute inset-0">
           <Image
-            src="/images/partner.png"
-            alt="Global Background"
             fill
+            alt="Global Background"
             className="object-cover opacity-50"
+            src="/images/partner.png"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-black/80 to-danger/90 backdrop-blur-sm" />
         </div>
@@ -666,13 +746,15 @@ export default function Home() {
                   className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg transition hover:scale-105 h-full"
                 >
                   <Image
-                    src={item.icon}
                     alt={item.title}
-                    width={64}
-                    height={64}
                     className="drop-shadow-lg"
+                    height={64}
+                    src={item.icon}
+                    width={64}
                   />
-                  <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                  <h3 className="text-lg font-semibold text-white">
+                    {item.title}
+                  </h3>
                   <p className="text-white/80 text-sm">{item.desc}</p>
                 </div>
               ))}
@@ -683,9 +765,9 @@ export default function Home() {
 
       {/* Partners Section */}
       <Card
-        shadow="lg"
-        radius="lg"
         className="w-full relative overflow-hidden py-20 px-6 md:px-12 border border-white/20"
+        radius="lg"
+        shadow="lg"
         style={{
           backgroundImage: "url('/images/partner.png')",
           backgroundSize: "cover",
@@ -693,23 +775,29 @@ export default function Home() {
         }}
       >
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-black/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-black/70" />
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <CardHeader className="text-center mb-12">
             <motion.h2
+              className="text-3xl md:text-5xl font-extrabold text-white"
               initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-extrabold text-white"
+              whileInView={{ opacity: 1, y: 0 }}
             >
               Trusted by Global Industry Leaders
             </motion.h2>
             <p className="text-gray-300 mt-4 text-lg max-w-2xl mx-auto">
               We partner with the world’s most respected insurers to deliver
-              <span className="text-danger font-semibold"> secure, reliable,</span>{" "}
-              and <span className="text-danger font-semibold">customer-first</span>{" "}
+              <span className="text-danger font-semibold">
+                {" "}
+                secure, reliable,
+              </span>{" "}
+              and{" "}
+              <span className="text-danger font-semibold">
+                customer-first
+              </span>{" "}
               solutions across industries.
             </p>
           </CardHeader>
@@ -717,19 +805,19 @@ export default function Home() {
             {partners.map((partner, i) => (
               <motion.div
                 key={i}
+                className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20 shadow-lg hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] hover:bg-white/20 hover:border-white/40 hover:scale-105 transition-all duration-500 ease-out flex items-center justify-center w-full h-28"
                 initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20 shadow-lg hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] hover:bg-white/20 hover:border-white/40 hover:scale-105 transition-all duration-500 ease-out flex items-center justify-center w-full h-28"
+                whileInView={{ opacity: 1, scale: 1 }}
               >
                 <div className="w-full h-full flex items-center justify-center">
                   <Image
-                    src={partner.logo}
                     alt={partner.name}
-                    width={140}
-                    height={60}
                     className="object-contain w-full h-full grayscale hover:grayscale-0 transition duration-500 ease-out"
+                    height={60}
+                    src={partner.logo}
+                    width={140}
                   />
                 </div>
               </motion.div>
@@ -748,25 +836,28 @@ export default function Home() {
         </p>
         <div className="flex justify-center gap-6 flex-wrap">
           <Link
-            href={(siteConfig.links as any)?.getQuote || "https://quote.birdviewinsurance.com/"}
             className="px-8 py-4 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition"
+            href={
+              (siteConfig.links as any)?.getQuote ||
+              "https://quote.birdviewinsurance.com/"
+            }
           >
             Get a Quote
           </Link>
           <Link
-            href={(siteConfig.links as any)?.contact || "#"}
             className="px-8 py-4 rounded-full bg-danger text-white font-semibold shadow-lg hover:bg-danger/90 transition"
+            href={(siteConfig.links as any)?.contact || "#"}
           >
             Contact Us
           </Link>
         </div>
       </div>
 
-      { /* STATS */}
+      {/* STATS */}
       <Card
-        shadow="lg"
-        radius="lg"
         className="relative overflow-hidden w-full text-white py-20 px-6 md:px-12 border border-white/20"
+        radius="lg"
+        shadow="lg"
         style={{
           backgroundImage: "url('/images/stats.png')",
           backgroundSize: "cover",
@@ -774,15 +865,15 @@ export default function Home() {
         }}
       >
         {/* Blurred overlay */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <motion.h2
+            className="text-3xl md:text-5xl font-extrabold text-center mb-12"
             initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-extrabold text-center mb-12"
+            whileInView={{ opacity: 1, y: 0 }}
           >
             Our Growth in Numbers
           </motion.h2>
@@ -797,8 +888,8 @@ export default function Home() {
 
       {/* ESG SECTION - PREMIUM CORPORATE DESIGN */}
       <section
-        id="esg"
         className="relative overflow-hidden py-28 px-6 md:px-12 text-white rounded-[3rem] border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)]"
+        id="esg"
         style={{
           backgroundImage: "url('/images/esg-bg.jpg')",
           backgroundSize: "cover",
@@ -812,23 +903,23 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
           {/* Left: Floating ESG Image */}
           <motion.div
+            className="w-full lg:w-1/2 flex justify-center relative"
             initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
             viewport={{ once: true }}
-            className="w-full lg:w-1/2 flex justify-center relative"
+            whileInView={{ opacity: 1, y: 0 }}
           >
             <motion.div
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 100 }}
               className="relative group rounded-[2rem] overflow-hidden border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+              transition={{ type: "spring", stiffness: 100 }}
+              whileHover={{ scale: 1.03 }}
             >
               <Image
-                src="/images/esg-illustration.jpg"
                 alt="Birdview ESG Commitment"
-                width={650}
-                height={450}
                 className="rounded-[2rem] object-cover transition-transform duration-700 group-hover:scale-105"
+                height={450}
+                src="/images/esg-illustration.jpg"
+                width={650}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               {/* Glow bloom behind */}
@@ -838,11 +929,11 @@ export default function Home() {
 
           {/* Right: Text + Content */}
           <motion.div
+            className="w-full lg:w-1/2 space-y-10"
             initial={{ opacity: 0, x: 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
             viewport={{ once: true }}
-            className="w-full lg:w-1/2 space-y-10"
+            whileInView={{ opacity: 1, x: 0 }}
           >
             <div className="space-y-5">
               <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
@@ -882,9 +973,9 @@ export default function Home() {
               ].map((pillar, i) => (
                 <motion.div
                   key={i}
-                  whileHover={{ y: -5, scale: 1.03 }}
-                  transition={{ duration: 0.3 }}
                   className={`relative bg-gradient-to-br ${pillar.color} backdrop-blur-lg p-6 rounded-2xl border border-white/20 shadow-[0_0_25px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-all`}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{ y: -5, scale: 1.03 }}
                 >
                   <div className="text-3xl mb-3">{pillar.icon}</div>
                   <h4 className="font-bold text-lg mb-2">{pillar.title}</h4>
@@ -897,16 +988,28 @@ export default function Home() {
 
             {/* Animated ESG Metrics */}
             <motion.div
+              className="flex flex-wrap gap-10 mt-12"
               initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
               viewport={{ once: true }}
-              className="flex flex-wrap gap-10 mt-12"
+              whileInView={{ opacity: 1, y: 0 }}
             >
               {[
-                { value: "98%", label: "Paperless Operations", color: "text-primary" },
-                { value: "12,000+", label: "Families Empowered", color: "text-danger" },
-                { value: "35+", label: "Community Initiatives", color: "text-white" },
+                {
+                  value: "98%",
+                  label: "Paperless Operations",
+                  color: "text-primary",
+                },
+                {
+                  value: "12,000+",
+                  label: "Families Empowered",
+                  color: "text-danger",
+                },
+                {
+                  value: "35+",
+                  label: "Community Initiatives",
+                  color: "text-white",
+                },
               ].map((stat, i) => (
                 <div key={i} className="text-center md:text-left">
                   <h3 className={`text-5xl font-extrabold ${stat.color}`}>
@@ -919,15 +1022,15 @@ export default function Home() {
 
             {/* CTA Button */}
             <motion.div
+              className="mt-10"
               initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               viewport={{ once: true }}
-              className="mt-10"
+              whileInView={{ opacity: 1 }}
             >
               <Link
-                href="/esg"
                 className="px-10 py-4 rounded-full bg-gradient-to-r from-primary to-danger hover:from-danger hover:to-primary font-semibold shadow-lg text-white transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
+                href="/esg"
               >
                 Discover Our ESG Journey
               </Link>
@@ -938,8 +1041,6 @@ export default function Home() {
 
       {/* FAQ */}
       <Card
-        shadow="lg"
-        radius="lg"
         className="
     w-full relative overflow-hidden
     py-16 px-6 md:px-12
@@ -950,31 +1051,32 @@ export default function Home() {
     backdrop-blur-2xl
     shadow-[0_8px_30px_rgba(0,0,0,0.2)]
   "
+        radius="lg"
+        shadow="lg"
       >
         {/* 🌌 Background Image with Gradient Overlay */}
         <Image
-          src="/images/faq-bg.png"
-          alt="FAQ Background"
           fill
           priority
+          alt="FAQ Background"
           className="object-cover opacity-40 absolute inset-0 -z-10"
+          src="/images/faq-bg.png"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-danger/50 to-primary/70 -z-10" />
 
         {/* 🔹 Animated Header */}
         <motion.h2
-          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           className="text-3xl md:text-4xl font-extrabold text-center mb-12 drop-shadow-lg"
+          initial={{ opacity: 0, y: 40 }}
+          transition={{ duration: 0.6 }}
         >
           Frequently Asked Questions
         </motion.h2>
 
         <motion.div
+          className="max-w-3xl mx-auto"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
           variants={{
             hidden: { opacity: 0 },
             visible: {
@@ -982,21 +1084,30 @@ export default function Home() {
               transition: { staggerChildren: 0.15 },
             },
           }}
-          className="max-w-3xl mx-auto"
+          viewport={{ once: true }}
+          whileInView="visible"
         >
           <Accordion
-            variant="splitted"
             className="rounded-xl overflow-hidden"
             itemClasses={{
               base: "rounded-xl overflow-hidden group relative",
               trigger: "px-6 py-4 transition-colors",
               content: "px-6 pb-4 text-sm",
             }}
+            variant="splitted"
           >
             {faqs.map((faq, idx) => (
               <AccordionItem
                 key={idx}
                 aria-label={faq.q}
+                className={`
+            group relative
+            [&[data-open='true']]:bg-gradient-to-r from-danger to-primary
+            [&[data-open='false']]:bg-white/10
+            backdrop-blur-xl
+            transition-all duration-500
+            border border-white/10
+          `}
                 title={
                   <span
                     className="
@@ -1008,21 +1119,10 @@ export default function Home() {
                     {faq.q}
                   </span>
                 }
-                className={`
-            group relative
-            [&[data-open='true']]:bg-gradient-to-r from-danger to-primary
-            [&[data-open='false']]:bg-white/10
-            backdrop-blur-xl
-            transition-all duration-500
-            border border-white/10
-          `}
               >
                 {/* 🔹 Hover Tooltip Preview */}
                 <motion.div
-                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 0, y: 5 }}
-                  whileInView={{ opacity: 0, y: 5 }}
-                  transition={{ duration: 0.3 }}
                   className="
               absolute left-1/2 -translate-x-1/2 -top-12
               px-3 py-2 
@@ -1033,15 +1133,18 @@ export default function Home() {
               group-hover:opacity-100 group-hover:translate-y-0
               transition-all duration-300
             "
+                  initial={{ opacity: 0, y: 5 }}
+                  transition={{ duration: 0.3 }}
+                  whileInView={{ opacity: 0, y: 5 }}
                 >
                   {faq.a.length > 80 ? faq.a.substring(0, 80) + "..." : faq.a}
                 </motion.div>
 
                 <motion.p
-                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
                   className="text-white/90"
+                  initial={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
                 >
                   {faq.a}
                 </motion.p>
@@ -1050,7 +1153,6 @@ export default function Home() {
           </Accordion>
         </motion.div>
       </Card>
-
-    </section >
+    </section>
   );
 }

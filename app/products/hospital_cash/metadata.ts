@@ -1,9 +1,11 @@
 export const metadata = {
   title: "Hospital Cash | Birdview Microinsurance",
-  description: "Hospital Cash — Learn more about Hospital Cash at Birdview Microinsurance. Get details, benefits, and how to apply.",
+  description:
+    "Hospital Cash — Learn more about Hospital Cash at Birdview Microinsurance. Get details, benefits, and how to apply.",
   openGraph: {
     title: "Hospital Cash | Birdview Microinsurance",
-    description: "Hospital Cash — Learn more about Hospital Cash at Birdview Microinsurance. Get details, benefits, and how to apply.",
+    description:
+      "Hospital Cash — Learn more about Hospital Cash at Birdview Microinsurance. Get details, benefits, and how to apply.",
     url: "https://example.com/products/hospital_cash",
     siteName: "Birdview Microinsurance",
     images: ["/og-image.png"],

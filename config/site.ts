@@ -61,12 +61,13 @@ export const siteConfig = {
     },
   ],
   links: {
-    facebook: "https://www.facebook.com/profile.php?id=61572489643530&mibextid=ZbWKwL",
+    facebook:
+      "https://www.facebook.com/profile.php?id=61572489643530&mibextid=ZbWKwL",
     twitter: "https://x.com/BirdviewInsur?t=oTQd4bz-Tlhpb9OXuEgf2g&s=08",
-    instagram: "https://www.instagram.com/birdviewinsurance?igsh=bXN2bng0MjUwaGtp",
+    instagram:
+      "https://www.instagram.com/birdviewinsurance?igsh=bXN2bng0MjUwaGtp",
     tiktok: "https://www.tiktok.com/@birdview.insurance",
     Linkedin: "https://www.linkedin.com/in/birdview-insurance-71b32431a",
     youtube: "https://youtube.com/@birdviewinsurance?si=2pc3TACXTrqNWswA",
   },
 };
-

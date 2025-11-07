@@ -1,9 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
-import * as fs from 'fs/promises';
-import * as XLSX from 'xlsx';
-import path from 'path';
-import { IncomingForm } from 'formidable';
+import type { NextApiRequest, NextApiResponse } from "next";
+
+import * as fs from "fs/promises";
+import path from "path";
+
+import nodemailer from "nodemailer";
+import * as XLSX from "xlsx";
+import { IncomingForm } from "formidable";
 
 export const config = {
   api: {
@@ -11,47 +13,77 @@ export const config = {
   },
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const publicDir = path.join(process.cwd(), 'public');
-  const uploadDir = path.join(publicDir, 'uploads');
-  const filePath = path.join(publicDir, 'kenyan-nurses-midwives-association.xlsx');
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const publicDir = path.join(process.cwd(), "public");
+  const uploadDir = path.join(publicDir, "uploads");
+  const filePath = path.join(
+    publicDir,
+    "kenyan-nurses-midwives-association.xlsx",
+  );
 
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
   try {
     await fs.mkdir(uploadDir, { recursive: true });
 
-    const form = new IncomingForm({ multiples: true, uploadDir, keepExtensions: true });
-
-    const { fields, files } = await new Promise<{ fields: any; files: any }>((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve({ fields, files });
-      });
+    const form = new IncomingForm({
+      multiples: true,
+      uploadDir,
+      keepExtensions: true,
     });
+
+    const { fields, files } = await new Promise<{ fields: any; files: any }>(
+      (resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) reject(err);
+          else resolve({ fields, files });
+        });
+      },
+    );
 
     console.log("📝 Raw fields received:", fields);
 
     const {
-      memberidno, groupname, groupnumber, title, firstname, lastname,
-      middlename, idtype, idno, dateofbirth, gender, country, city, address,
-      mobileno, eimail, family_option, option,
+      memberidno,
+      groupname,
+      groupnumber,
+      title,
+      firstname,
+      lastname,
+      middlename,
+      idtype,
+      idno,
+      dateofbirth,
+      gender,
+      country,
+      city,
+      address,
+      mobileno,
+      eimail,
+      family_option,
+      option,
     } = fields;
 
     let dependantsData = [];
+
     try {
-      dependantsData = JSON.parse(fields.dependantsData || '[]');
+      dependantsData = JSON.parse(fields.dependantsData || "[]");
       console.log("👨‍👩‍👧 Dependants parsed:", dependantsData);
     } catch (err) {
       console.warn("⚠️ Invalid dependantsData JSON");
     }
 
     let beneficiariesData = [];
+
     try {
-      beneficiariesData = JSON.parse(fields.beneficiariesData || '[]');
+      beneficiariesData = JSON.parse(fields.beneficiariesData || "[]");
       console.log("🎯 Beneficiaries parsed:", beneficiariesData);
     } catch (err) {
       console.warn("⚠️ Invalid beneficiariesData JSON");
@@ -59,39 +91,86 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let workbook;
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
+
     if (fileBuffer) {
-      workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+      workbook = XLSX.read(fileBuffer, { type: "buffer" });
     } else {
       workbook = XLSX.utils.book_new();
     }
 
     const memberHeaders = [
-      'Member Id Number', 'Group Name', 'Group Number', 'Title', 'First Name',
-      'Last Name', 'Middle Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender',
-      'Country', 'City', 'Address', 'Mobile Number', 'Email', 'Family Option', 'Option'
+      "Member Id Number",
+      "Group Name",
+      "Group Number",
+      "Title",
+      "First Name",
+      "Last Name",
+      "Middle Name",
+      "ID Type",
+      "ID Number",
+      "Date Of Birth",
+      "Gender",
+      "Country",
+      "City",
+      "Address",
+      "Mobile Number",
+      "Email",
+      "Family Option",
+      "Option",
     ];
-    let memberSheetData = workbook.Sheets['Member Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Member Details'], { header: 1 })
+    let memberSheetData = workbook.Sheets["Member Details"]
+      ? XLSX.utils.sheet_to_json(workbook.Sheets["Member Details"], {
+          header: 1,
+        })
       : [memberHeaders];
 
     memberSheetData.push([
-      memberidno, groupname, groupnumber, title, firstname, lastname, middlename,
-      idtype, idno, dateofbirth, gender, country, city, address,
-      mobileno, eimail, family_option, option
+      memberidno,
+      groupname,
+      groupnumber,
+      title,
+      firstname,
+      lastname,
+      middlename,
+      idtype,
+      idno,
+      dateofbirth,
+      gender,
+      country,
+      city,
+      address,
+      mobileno,
+      eimail,
+      family_option,
+      option,
     ]);
 
     const memberSheet = XLSX.utils.aoa_to_sheet(memberSheetData as any[][]);
-    workbook.Sheets['Member Details'] = memberSheet;
-    if (!workbook.SheetNames.includes('Member Details')) {
-      XLSX.utils.book_append_sheet(workbook, memberSheet, 'Member Details');
+
+    workbook.Sheets["Member Details"] = memberSheet;
+    if (!workbook.SheetNames.includes("Member Details")) {
+      XLSX.utils.book_append_sheet(workbook, memberSheet, "Member Details");
     }
 
     const depHeaders = [
-      'Member Id No', 'ID', 'Relationship', 'Title', 'First Name', 'Middle Name',
-      'Last Name', 'ID Type', 'ID Number', 'Date Of Birth', 'Gender', 'Country', 'City'
+      "Member Id No",
+      "ID",
+      "Relationship",
+      "Title",
+      "First Name",
+      "Middle Name",
+      "Last Name",
+      "ID Type",
+      "ID Number",
+      "Date Of Birth",
+      "Gender",
+      "Country",
+      "City",
     ];
-    let depSheetData = workbook.Sheets['Dependants Details']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Dependants Details'], { header: 1 })
+    let depSheetData = workbook.Sheets["Dependants Details"]
+      ? XLSX.utils.sheet_to_json(workbook.Sheets["Dependants Details"], {
+          header: 1,
+        })
       : [depHeaders];
 
     interface Dependant {
@@ -113,27 +192,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     dependantsDataTyped.forEach((dep: Dependant, index: number) => {
       if (!dep || !dep.relationship || !dep.firstName || !dep.idnos) {
         console.warn(`⚠️ Skipping invalid dependant at index ${index}`, dep);
+
         return;
       }
       depSheetData.push([
-        memberidno, depSheetData.length, dep.relationship, dep.title || '',
-        dep.firstName, dep.middleName || '', dep.surname || '',
-        dep.idtypes, dep.idnos, dep.dob, dep.gendere, dep.countrye, dep.cities
+        memberidno,
+        depSheetData.length,
+        dep.relationship,
+        dep.title || "",
+        dep.firstName,
+        dep.middleName || "",
+        dep.surname || "",
+        dep.idtypes,
+        dep.idnos,
+        dep.dob,
+        dep.gendere,
+        dep.countrye,
+        dep.cities,
       ]);
     });
 
     const depSheet = XLSX.utils.aoa_to_sheet(depSheetData as any[][]);
-    workbook.Sheets['Dependants Details'] = depSheet;
-    if (!workbook.SheetNames.includes('Dependants Details')) {
-      XLSX.utils.book_append_sheet(workbook, depSheet, 'Dependants Details');
+
+    workbook.Sheets["Dependants Details"] = depSheet;
+    if (!workbook.SheetNames.includes("Dependants Details")) {
+      XLSX.utils.book_append_sheet(workbook, depSheet, "Dependants Details");
     }
 
     const benHeaders = [
-      'Member Id No', 'ID', 'Relationship', 'Title', 'Full Name',
-      'Date Of Birth', 'Phone Number', 'Address', 'Email'
+      "Member Id No",
+      "ID",
+      "Relationship",
+      "Title",
+      "Full Name",
+      "Date Of Birth",
+      "Phone Number",
+      "Address",
+      "Email",
     ];
-    let benSheetData = workbook.Sheets['Beneficiaries Info']
-      ? XLSX.utils.sheet_to_json(workbook.Sheets['Beneficiaries Info'], { header: 1 })
+    let benSheetData = workbook.Sheets["Beneficiaries Info"]
+      ? XLSX.utils.sheet_to_json(workbook.Sheets["Beneficiaries Info"], {
+          header: 1,
+        })
       : [benHeaders];
 
     interface Beneficiary {
@@ -151,28 +251,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     beneficiariesDataTyped.forEach((ben: Beneficiary, index: number) => {
       if (!ben || !ben.relationship || !ben.beneficiary_fullname) {
         console.warn(`⚠️ Skipping invalid beneficiary at index ${index}`, ben);
+
         return;
       }
       benSheetData.push([
-        memberidno, benSheetData.length, ben.relationship, ben.title || '',
-        ben.beneficiary_fullname, ben.dob, ben.phone_number || '',
-        ben.beneficiary_address || '', ben.beneficiary_email || ''
+        memberidno,
+        benSheetData.length,
+        ben.relationship,
+        ben.title || "",
+        ben.beneficiary_fullname,
+        ben.dob,
+        ben.phone_number || "",
+        ben.beneficiary_address || "",
+        ben.beneficiary_email || "",
       ]);
     });
 
     const benSheet = XLSX.utils.aoa_to_sheet(benSheetData as any[][]);
-    workbook.Sheets['Beneficiaries Info'] = benSheet;
-    if (!workbook.SheetNames.includes('Beneficiaries Info')) {
-      XLSX.utils.book_append_sheet(workbook, benSheet, 'Beneficiaries Info');
+
+    workbook.Sheets["Beneficiaries Info"] = benSheet;
+    if (!workbook.SheetNames.includes("Beneficiaries Info")) {
+      XLSX.utils.book_append_sheet(workbook, benSheet, "Beneficiaries Info");
     }
 
-    const updatedBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    const updatedBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "buffer",
+    });
+
     await fs.writeFile(filePath, updatedBuffer);
     console.log("✅ Excel file updated successfully");
 
     const fileUrl = `https://www.birdviewmicroinsurance.com/kenyan-nurses-midwives-association.xlsx`;
     const transporter = nodemailer.createTransport({
-      host: 'mail5016.site4now.net',
+      host: "mail5016.site4now.net",
       port: 465,
       secure: true,
       auth: {
@@ -181,17 +293,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    const attachments: Array<{ filename: string; content?: any; path?: string }> = [
+    const attachments: Array<{
+      filename: string;
+      content?: any;
+      path?: string;
+    }> = [
       {
-        filename: 'kenyan-nurses-midwives-association.xlsx',
+        filename: "kenyan-nurses-midwives-association.xlsx",
         content: updatedBuffer,
       },
     ];
 
     const uploads = files.supportingDocuments;
+
     if (uploads) {
       const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
-      uploadArray.forEach(file => {
+
+      uploadArray.forEach((file) => {
         attachments.push({
           filename: file.originalFilename,
           path: file.filepath,
@@ -201,8 +319,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const adminMailOptions = {
       from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
-      to: ['Gkangwana@birdviewinsurance.com', 'pkihuria@birdviewinsurance.com',
-        'customerservice@birdviewinsurance.com', 'akinyanjui@birdviewinsurance.com'],
+      to: [
+        "Gkangwana@birdviewinsurance.com",
+        "pkihuria@birdviewinsurance.com",
+        "customerservice@birdviewinsurance.com",
+        "akinyanjui@birdviewinsurance.com",
+      ],
       subject: `Updated Member Details from ${memberidno} - ${firstname}`,
       text: `Please find the updated Excel sheet.\nDownload link:\n${fileUrl}`,
       attachments,
@@ -214,8 +336,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error("⚠️ Admin email failed:", emailError);
     }
 
-    const fullName = `${firstname} ${lastname} ${middlename || ''}`.trim();
+    const fullName = `${firstname} ${lastname} ${middlename || ""}`.trim();
     const memberSubject = `${memberidno} - ${fullName} | Confirmation of Submission`;
+
     interface MemberFields {
       memberidno: string;
       groupname: string;
@@ -262,7 +385,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   📌 MEMBER DETAILS
       - Member ID: ${memberidno}
     - Group: ${groupname} (${groupnumber})
-    - Name: ${title} ${firstname} ${middlename || ''} ${lastname}
+    - Name: ${title} ${firstname} ${middlename || ""} ${lastname}
     - ID: ${idtype} ${idno}
     - DOB: ${dateofbirth}
     - Gender: ${gender}
@@ -272,17 +395,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     - Option : ${option}
 
   📌 DEPENDANTS
-  ${(dependantsData as DependantEmail[]).length > 0 ? (dependantsData as DependantEmail[]).map((d: DependantEmail, i: number) => `
+  ${
+    (dependantsData as DependantEmail[]).length > 0
+      ? (dependantsData as DependantEmail[])
+          .map(
+            (d: DependantEmail, i: number) => `
   Dependant ${i + 1}:
-  - ${d.relationship} - ${d.title || ''} ${d.firstName} ${d.middleName || ''} ${d.surname || ''}`).join('\n') : 'None'
-      }
+  - ${d.relationship} - ${d.title || ""} ${d.firstName} ${d.middleName || ""} ${d.surname || ""}`,
+          )
+          .join("\n")
+      : "None"
+  }
 
   📌 BENEFICIARIES
-  ${(beneficiariesData as BeneficiaryEmail[]).length > 0 ? (beneficiariesData as BeneficiaryEmail[]).map((b: BeneficiaryEmail, i: number) => `
+  ${
+    (beneficiariesData as BeneficiaryEmail[]).length > 0
+      ? (beneficiariesData as BeneficiaryEmail[])
+          .map(
+            (b: BeneficiaryEmail, i: number) => `
   Beneficiary ${i + 1}:
-  - ${b.relationship} - ${b.title || ''} ${b.beneficiary_fullname}
-  - Phone: ${b.phone_number || ''} | Email: ${b.beneficiary_email || ''}`).join('\n') : 'None'
-      }
+  - ${b.relationship} - ${b.title || ""} ${b.beneficiary_fullname}
+  - Phone: ${b.phone_number || ""} | Email: ${b.beneficiary_email || ""}`,
+          )
+          .join("\n")
+      : "None"
+  }
 
   📌 PAYMENT INSTRUCTIONS
 
@@ -310,10 +447,16 @@ Birdview Insurance`.trim();
       console.error("⚠️ Member email failed:", memberEmailErr);
     }
 
-    return res.status(200).json({ message: 'Form sent successfully', fileUrl, reset: true });
+    return res
+      .status(200)
+      .json({ message: "Form sent successfully", fileUrl, reset: true });
   } catch (error) {
     console.error("❌ Error in handler:", error);
-    const errorMessage = (error instanceof Error && error.message) ? error.message : 'Unknown server error';
+    const errorMessage =
+      error instanceof Error && error.message
+        ? error.message
+        : "Unknown server error";
+
     return res.status(500).json({ error: errorMessage });
   }
 }

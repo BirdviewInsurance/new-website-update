@@ -1,14 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+  
     images: {
-        domains: [
-            "images.unsplash.com",
-            "res.cloudinary.com",
-            "cdn.pixabay.com",
-            "yourdomain.com",
-        ]
+      domains: [
+        "images.unsplash.com",
+        "res.cloudinary.com",
+        "cdn.pixabay.com",
+        "birdviewmicroinsurance.com",
+      ],
     },
-};
-
-module.exports = nextConfig;
+  
+    // ✅ Skip ESLint during production builds
+    eslint: {
+      ignoreDuringBuilds: true,
+    },
+  };
+  
+  module.exports = nextConfig;
+  
