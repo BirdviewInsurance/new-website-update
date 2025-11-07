@@ -625,11 +625,14 @@ const AgentForm: React.FC = () => {
           <Modal
             className="backdrop-blur-sm"
             isOpen={openRegistration}
+            placement="center"
+            scrollBehavior="inside"
+            size="5xl"
             onOpenChange={setOpenRegistration}
           >
-            <ModalContent>
+            <ModalContent className="max-w-5xl mx-auto max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl">
               <ModalHeader>
-                <div className="relative flex flex-col items-center py-2">
+                <div className="relative flex flex-col items-center py-10">
                   <div className="mb-2">
                     <Image
                       alt="Logo"
@@ -638,34 +641,33 @@ const AgentForm: React.FC = () => {
                       width={220}
                     />
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-800">
-                    {isSimpleForm
-                      ? "Sub Agent Registration"
-                      : "Intermediary Registration"}
-                  </h3>
+                  <div className="relative flex w-full items-center justify-center pt-10">
+                    <h3 className="text-2xl font-semibold text-gray-800">
+                      {isSimpleForm
+                        ? "Sub Agent Registration"
+                        : "Intermediary Registration"}
+                    </h3>
+                  </div>
                   <div className="h-1 w-16 rounded-full bg-sky-600 mt-3" />
-                  <button
-                    className="text-sm text-sky-600 absolute left-4 top-4"
-                    onClick={() => setIsSimpleForm((s) => !s)}
-                  >
-                    {isSimpleForm
-                      ? "← Back to Agent Registration"
-                      : "Switch to Sub Agent Form"}
-                  </button>
 
                   <button
-                    aria-label="Close"
-                    className="absolute right-4 top-4 text-gray-600 hover:text-gray-900"
-                    onClick={closeModal}
-                  >
-                    <X />
-                  </button>
+                      className="absolute right-16 top-0 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      onClick={() => setIsSimpleForm((s) => !s)}
+                    >
+                      {isSimpleForm
+                        ? "← Back to Agent Registration"
+                        : "Switch to Sub Agent Form"}
+                    </button>
                 </div>
+                <br/>
               </ModalHeader>
 
-              <ModalBody>
+              <ModalBody className="overflow-y-auto max-h-[70vh] px-1">
                 {isSimpleForm ? (
-                  <form className="space-y-4" onSubmit={handleSimpleFormSubmit}>
+                  <form
+                    className="space-y-4 pb-4"
+                    onSubmit={handleSimpleFormSubmit}
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700">
@@ -740,7 +742,7 @@ const AgentForm: React.FC = () => {
                     </div>
                   </form>
                 ) : (
-                  <form className="space-y-6" onSubmit={handleSubmit}>
+                  <form className="space-y-6 pb-4" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-700">
