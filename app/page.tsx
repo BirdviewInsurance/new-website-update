@@ -457,7 +457,7 @@ export default function Home() {
                       alt="Scan to Get a Quote"
                       className="rounded-lg"
                       height={120}
-                      src="/images/qr-quote.jpg"
+                      src="/images/qr-quote.png"
                       width={120}
                     />
 
