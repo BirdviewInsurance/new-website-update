@@ -929,13 +929,15 @@ export const Navbar = () => {
                   variants={submenuVariants}
                 >
                   {[
-                    { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
-                    { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login"},
-                    { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
-                    { name: "Intermediary Registration", path: "/forms/intermediary-registration" },
-                    { name: "Agent Registration", path: "/forms/intermediary-registration" },
-                    { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
-                    { name: "Agent Welfare Registration", path: "/forms/Agents/" },
+                  { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                  { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                  { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
+                  { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
+                  { name: "Intermediary Registration", path: "/forms/Intermediary-Registration-Form" },
+                  { name: "Agent Registration", path: "/forms/Agents" },
+                  { name: "Group Registration", path: "/forms/group-form" },
+                  { name: "TukTuk Insurance Registration", path: "https://partners.birdviewinsurance.com/auth/login" },                
+                  { name: "Agent Welfare Registration", path: "/forms/Agents/" },
                   ].map((item, index, arr) => (
                     <div key={item.name} className="flex flex-col">
                       {/* Menu item */}
@@ -998,11 +1000,11 @@ export const Navbar = () => {
                   { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
                   { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
                   { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
-                  { name: "Intermediary Registration", path: "/intermediary-registration" },
-                  { name: "Agent Registration", path: "/agent-registration" },
-                  { name: "Group Registration", path: "/forms/group-form" },
-                  { name: "TukTuk Insurance Registration", path: "/forms/tuktuk-insurance-form" },
                   { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
+                  { name: "Intermediary Registration", path: "/forms/Intermediary-Registration-Form" },
+                  { name: "Agent Registration", path: "/forms/Agents" },
+                  { name: "Group Registration", path: "/forms/group-form" },
+                  { name: "TukTuk Insurance Registration", path: "https://partners.birdviewinsurance.com/auth/login" },                
                   { name: "Agent Welfare Registration", path: "/forms/Agents/" },
                 ].map((item, index, arr) => (
                   <div key={item.name} className="flex flex-col">
