@@ -407,7 +407,7 @@ const MemberForm: React.FC = () => {
     };
 
     try {
-      const res = await fetch("/api/kenyans-in-north-wales-member-form", {
+      const res = await fetch("/api/manchester-kenyan-community-member-form", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

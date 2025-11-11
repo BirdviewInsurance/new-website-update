@@ -1,21 +1,20 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+// app/api/intermediary-form/route.ts
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
 export interface IntermediaryFormForm {
-  account_name: number;
-  account_number: number;
+  account_name: string;
+  account_number: string;
   bank_branch: string;
   bank_name: string;
   city: string;
   company_name: string;
   company_number: string;
   intermediary_type: string;
-  country: number;
+  country: string;
   dateofbirth: string;
   eimail: string;
   firstname: string;
@@ -30,17 +29,11 @@ export interface IntermediaryFormForm {
   title: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
+    const body: IntermediaryFormForm = await req.json();
+
+    // Destructure
     const {
       intermediary_type,
       title,
@@ -63,25 +56,25 @@ export default async function handler(
       account_name,
       bank_branch,
       account_number,
-    } = req.body;
+    } = body;
 
-    const isValidDate = (date: string): boolean => {
-      const parsed: Date = new Date(date);
-
-      return parsed instanceof Date && !isNaN(parsed.getTime());
+    // Validate and clean date
+    const isValidDate = (date: string) => {
+      const parsed = new Date(date);
+      return !isNaN(parsed.getTime());
     };
-
     const cleanDateOfBirth = isValidDate(dateofbirth)
       ? new Date(dateofbirth).toISOString().split("T")[0]
-      : null;
+      : "";
 
+    // Prepare payload for primary API
     const agentPayload = {
-      intermidiary_type: intermediary_type,
+      intermediary_type,
       title,
       first_name: firstname,
       middle_name: middlename,
       surname: lastname,
-      dob: cleanDateOfBirth, // ✅ Date fixed
+      dob: cleanDateOfBirth,
       gender,
       nationality: "Kenyan",
       country_of_residence: country,
@@ -106,56 +99,52 @@ export default async function handler(
       is_active: false,
     };
 
-    // 📤 Submit to main API
+    // Submit to main API
     const primaryResponse = await fetch(
       "https://snownet-core-server.onrender.com/api/underwriting/collaborator/agents/create/",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(agentPayload),
-      },
+      }
     );
-
     const primaryData = await primaryResponse.json();
 
     if (!primaryResponse.ok) {
       console.error("❌ Main API Error:", primaryData);
-
-      return res
-        .status(primaryResponse.status)
-        .json({ error: primaryData?.error || "Failed to submit agent" });
-    }
-
-    // 📤 If Broker, also submit to Broker endpoint
-    if (intermediary_type === "Broker") {
-      await fetch(
-        "https://snownet-core-server.onrender.com/api/underwriting/collaborator/brokers/create/",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(agentPayload),
-        },
+      return NextResponse.json(
+        { error: primaryData?.error || "Failed to submit agent" },
+        { status: primaryResponse.status }
       );
     }
 
-    // 📁 File management
+    // If Broker, also submit to broker endpoint
+    if (intermediary_type === "Broker") {
+      try {
+        await fetch(
+          "https://snownet-core-server.onrender.com/api/underwriting/collaborator/brokers/create/",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(agentPayload),
+          }
+        );
+      } catch (err) {
+        console.warn("⚠️ Broker submission failed:", err);
+      }
+    }
+
+    // Excel file management
     const publicDir = path.join(process.cwd(), "public");
-
     await fs.mkdir(publicDir, { recursive: true });
-
     const filePath = path.join(publicDir, "intermediary_data.xlsx");
     const fileBuffer = await fs.readFile(filePath).catch(() => null);
 
-    let workbook;
-
-    if (fileBuffer) {
-      workbook = XLSX.read(fileBuffer, { type: "buffer" });
-    } else {
-      workbook = XLSX.utils.book_new();
-    }
+    const workbook = fileBuffer
+      ? XLSX.read(fileBuffer, { type: "buffer" })
+      : XLSX.utils.book_new();
 
     let worksheet = workbook.Sheets[intermediary_type];
-
     if (!worksheet) {
       const headers = [
         "Title",
@@ -179,15 +168,11 @@ export default async function handler(
         "Bank Branch",
         "Account Number",
       ];
-
       worksheet = XLSX.utils.aoa_to_sheet([headers]);
       XLSX.utils.book_append_sheet(workbook, worksheet, intermediary_type);
     }
 
-    const existingData = XLSX.utils.sheet_to_json(worksheet, {
-      header: 1,
-    }) as any[][];
-
+    const existingData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
     existingData.push([
       title,
       firstname,
@@ -199,7 +184,7 @@ export default async function handler(
       idtype,
       idno,
       pin_no,
-      dateofbirth,
+      cleanDateOfBirth,
       country,
       city,
       eimail,
@@ -211,51 +196,27 @@ export default async function handler(
       account_number,
     ]);
     workbook.Sheets[intermediary_type] = XLSX.utils.aoa_to_sheet(existingData);
-
-    const updatedBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "buffer",
-    });
-
+    const updatedBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
     await fs.writeFile(filePath, updatedBuffer);
-
     const fileUrl = `https://www.birdviewmicroinsurance.com/intermediary_data.xlsx`;
 
-    // 📧 Email Setup
-    const emailMap = {
-      Agent: [
-        "omenjeri@birdviewinsurance.com",
-        "jgatwiri@birdviewinsurance.com",
-        "DGikuma@birdviewinsurance.com",
-      ],
-      Broker: [
-        "omenjeri@birdviewinsurance.com",
-        "jgatwiri@birdviewinsurance.com",
-        "DGikuma@birdviewinsurance.com",
-      ],
-      "Diaspora Agent": [
-        "akinyanjui@birdviewinsurance.com",
-        "DGikuma@birdviewinsurance.com",
-      ],
-      "Recruitment Agent": [
-        "Smirie@birdviewinsurance.com",
-        "Pkiabi@birdviewinsurance.com",
-        "DGikuma@birdviewinsurance.com",
-      ],
+    // Email setup
+    const emailMap: Record<string, string[]> = {
+      Agent: ["omenjeri@birdviewinsurance.com", "jgatwiri@birdviewinsurance.com", "DGikuma@birdviewinsurance.com"],
+      Broker: ["omenjeri@birdviewinsurance.com", "jgatwiri@birdviewinsurance.com", "DGikuma@birdviewinsurance.com"],
+      "Diaspora Agent": ["akinyanjui@birdviewinsurance.com", "DGikuma@birdviewinsurance.com"],
+      "Recruitment Agent": ["Smirie@birdviewinsurance.com", "Pkiabi@birdviewinsurance.com", "DGikuma@birdviewinsurance.com"],
     };
 
-    const subjectMap = {
+    const subjectMap: Record<string, string> = {
       Agent: "New Agent Submissions",
       Broker: "New Broker Submissions",
       "Diaspora Agent": "New Diaspora Agent Submission",
       "Recruitment Agent": "New Recruitment Agent Submission",
     };
 
-    type IntermediaryType = keyof typeof emailMap;
-    const recipients = emailMap[intermediary_type as IntermediaryType] || [];
-    const subject =
-      subjectMap[intermediary_type as IntermediaryType] ||
-      "New Intermediary Submission";
+    const recipients = emailMap[intermediary_type] ?? ["customerservice@birdviewinsurance.com"];
+    const subject = subjectMap[intermediary_type] ?? "New Intermediary Submission";
 
     const transporter = nodemailer.createTransport({
       host: "mail5016.site4now.net",
@@ -265,22 +226,17 @@ export default async function handler(
         user: "customerservice@birdviewinsurance.com",
         pass: "B!rdv!ew@2024",
       },
-      logger: true,
-      debug: true,
     });
 
     const singleSheetBuffer = XLSX.write(
-      {
-        SheetNames: [intermediary_type],
-        Sheets: { [intermediary_type]: workbook.Sheets[intermediary_type] },
-      },
-      { bookType: "xlsx", type: "buffer" },
+      { SheetNames: [intermediary_type], Sheets: { [intermediary_type]: workbook.Sheets[intermediary_type] } },
+      { bookType: "xlsx", type: "buffer" }
     );
 
     const mailOptions = {
       from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
       to: recipients,
-      subject: subject,
+      subject,
       text: `A new submission has been made under ${intermediary_type}. You can download the full data sheet here:\n${fileUrl}`,
       attachments: [
         {
@@ -295,25 +251,29 @@ export default async function handler(
       console.log("✅ Email sent successfully");
     } catch (emailError) {
       console.error("⚠️ Email failed:", emailError);
-      const pendingPath = path.join(publicDir, "pending_emails.json");
-      let pending = await fs.readFile(pendingPath, "utf-8").catch(() => "[]");
-      const pendingEmails = JSON.parse(pending);
 
+      // Save pending email safely
+      const pendingPath = path.join(publicDir, "pending_emails.json");
+      const lockFile = path.join(publicDir, "pending_emails.lock");
+
+      // Simple lock mechanism to avoid concurrent writes
+      await fs.writeFile(lockFile, "locked").catch(() => {});
+      const pendingData = await fs.readFile(pendingPath, "utf-8").catch(() => "[]");
+      const pendingEmails = JSON.parse(pendingData);
       pendingEmails.push(mailOptions);
       await fs.writeFile(pendingPath, JSON.stringify(pendingEmails, null, 2));
+      await fs.unlink(lockFile).catch(() => {});
 
-      return res
-        .status(202)
-        .json({ message: "Submitted, email pending", fileUrl });
+      return NextResponse.json({ message: "Submitted, email pending", fileUrl }, { status: 202 });
     }
 
-    res.status(200).json({
+    return NextResponse.json({
       message: "Intermediary submitted successfully!",
       data: primaryData,
       fileUrl,
     });
   } catch (error) {
     console.error("❌ Unexpected Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

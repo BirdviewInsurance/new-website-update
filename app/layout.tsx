@@ -13,6 +13,7 @@ import CookieConsent from "@/components/CookieConsent";
 
 // ✅ SEO metadata
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url || "https://birdviewmicroinsurance.com/"),
   title: {
     default: siteConfig.name,
     template: `%s - ${siteConfig.name}`,

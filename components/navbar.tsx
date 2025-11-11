@@ -920,34 +920,27 @@ export const Navbar = () => {
               </Button>
 
               <AnimatePresence>
-                {openMenu === "portals" && (
-                  <motion.div
-                    animate="visible"
-                    className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
-                    exit="hidden"
-                    initial="hidden"
-                    variants={submenuVariants}
-                  >
-                    {[
-                      { name: "Agent Portal", path: "/agent-portal" },
-                      { name: "Broker Portal", path: "/broker-portal" },
-                      { name: "Provider Portal", path: "/provider-portal" },
-                      {
-                        name: "Intermediary Registration",
-                        path: "/intermediary-registration",
-                      },
-                      {
-                        name: "Agent Registration",
-                        path: "/agent-registration",
-                      },
-                      {
-                        name: "Group Registration",
-                        path: "/group-registration",
-                      },
-                    ].map((item) => (
+              {openMenu === "portals" && (
+                <motion.div
+                  animate="visible"
+                  className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                  exit="hidden"
+                  initial="hidden"
+                  variants={submenuVariants}
+                >
+                  {[
+                    { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                    { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login"},
+                    { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
+                    { name: "Intermediary Registration", path: "/forms/intermediary-registration" },
+                    { name: "Agent Registration", path: "/forms/intermediary-registration" },
+                    { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
+                    { name: "Agent Welfare Registration", path: "/forms/Agents/" },
+                  ].map((item, index, arr) => (
+                    <div key={item.name} className="flex flex-col">
+                      {/* Menu item */}
                       <div
-                        key={item.name}
-                        className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors"
+                        className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors font-semibold"
                         onClick={() => {
                           router.push(item.path);
                           setOpenMenu(null);
@@ -955,10 +948,16 @@ export const Navbar = () => {
                       >
                         {item.name}
                       </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+
+                      {/* Line separator (except after last item) */}
+                      {index !== arr.length - 1 && (
+                        <div className="border-t border-danger mx-2 my-1"></div>
+                      )}
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
             </div>
           </NavbarItem>
         </NavbarContent>
@@ -987,28 +986,29 @@ export const Navbar = () => {
             </Button>
 
             <AnimatePresence>
-              {openMenu === "portals" && (
-                <motion.div
-                  animate="visible"
-                  className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
-                  exit="hidden"
-                  initial="hidden"
-                  variants={submenuVariants}
-                >
-                  {[
-                    { name: "Agent Portal", path: "/agent-portal" },
-                    { name: "Broker Portal", path: "/broker-portal" },
-                    { name: "Provider Portal", path: "/provider-portal" },
-                    {
-                      name: "Intermediary Registration",
-                      path: "/intermediary-registration",
-                    },
-                    { name: "Agent Registration", path: "/agent-registration" },
-                    { name: "Group Registration", path: "/group-registration" },
-                  ].map((item) => (
+            {openMenu === "portals" && (
+              <motion.div
+                animate="visible"
+                exit="hidden"
+                initial="hidden"
+                variants={submenuVariants}
+                className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+              >
+                {[
+                  { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                  { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                  { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
+                  { name: "Intermediary Registration", path: "/intermediary-registration" },
+                  { name: "Agent Registration", path: "/agent-registration" },
+                  { name: "Group Registration", path: "/forms/group-form" },
+                  { name: "TukTuk Insurance Registration", path: "/forms/tuktuk-insurance-form" },
+                  { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
+                  { name: "Agent Welfare Registration", path: "/forms/Agents/" },
+                ].map((item, index, arr) => (
+                  <div key={item.name} className="flex flex-col">
+                    {/* Menu item */}
                     <div
-                      key={item.name}
-                      className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors"
+                      className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors font-semibold"
                       onClick={() => {
                         router.push(item.path);
                         setOpenMenu(null);
@@ -1016,10 +1016,16 @@ export const Navbar = () => {
                     >
                       {item.name}
                     </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+
+                    {/* Separator (except for last item) */}
+                    {index !== arr.length - 1 && (
+                      <div className="border-t border-danger mx-2 my-1"></div>
+                    )}
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
           </div>
           {/* Mobile menu toggle */}
           <button

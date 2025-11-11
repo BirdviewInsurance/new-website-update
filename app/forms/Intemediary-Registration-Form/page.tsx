@@ -21,7 +21,7 @@ import {
   Select,
   SelectItem,
   Button,
-  toast,
+  addToast,
 } from "@heroui/react";
 import { X } from "lucide-react";
 
@@ -313,12 +313,24 @@ const AgentForm: React.FC = () => {
     setOpenRegistration(true);
   }, []);
 
-  /* ============================
-     Toast helpers (Hero UI toast object)
-     ============================ */
-  const notifySuccess = (message: string) => (toast as any).success(message);
+/* ============================
+   Toast helpers (Hero UI toast object)
+   ============================ */
+  const notifySuccess = (message: string) =>
+    addToast({
+      title: "Success",
+      description: message,
+      variant: "solid",
+      severity: "success",
+    });
 
-  const notifyError = (message: string) => (toast as any).error(message);
+  const notifyError = (message: string) =>
+    addToast({
+      title: "Error",
+      description: message,
+      variant: "solid",
+      severity: "danger",
+    });
 
   /* ============================
      Helpers: auto-focus + scroll to first invalid field
@@ -444,17 +456,23 @@ const AgentForm: React.FC = () => {
     e.preventDefault();
     setLoaderIcon(true);
     setErrors({});
-
+  
+    // Prevent duplicate submissions
     if (localStorage.getItem("intermediarySubmitted") === "true") {
-      notifyError("You have already submitted the form.");
+      addToast({
+        title: "Submission Error",
+        description: "You have already submitted the form.",
+        variant: "solid",
+        severity: "danger",
+      });
       setLoaderIcon(false);
-
       return;
     }
-
+  
+    // Validation
     const errorsObj: ErrorsType = {};
-
-    // age validation (skip for Broker)
+  
+    // Age validation (skip for Broker)
     if (formData.intermediary_type !== "Broker" && formData.dateofbirth) {
       const selectedDate = new Date(formData.dateofbirth);
       const today = new Date();
@@ -464,96 +482,113 @@ const AgentForm: React.FC = () => {
         (today.getMonth() === selectedDate.getMonth() &&
           today.getDate() >= selectedDate.getDate());
       const actualAge = hadBirthday ? age : age - 1;
-
-      if (actualAge < 18)
-        errorsObj.dateofbirth = "You must be at least 18 years old.";
+      if (actualAge < 18) errorsObj.dateofbirth = "You must be at least 18 years old.";
     }
-
-    // kra pin required for Kenya
+  
+    // KRA pin required for Kenya
     if (formData.country === "Kenya" && !String(formData.pin_no || "").trim()) {
       errorsObj.pin_no = "KRA PIN is required for residents of Kenya.";
     }
-
-    // country restrictions
+  
+    // Country restrictions
     if (
-      ["Broker", "Agent", "Recruitment Agent"].includes(
-        formData.intermediary_type || "",
-      ) &&
+      ["Broker", "Agent", "Recruitment Agent"].includes(formData.intermediary_type || "") &&
       formData.country !== "Kenya"
     ) {
       errorsObj.country = "This intermediary type must be based in Kenya.";
     }
-    if (
-      formData.intermediary_type === "Diaspora Agent" &&
-      formData.country === "Kenya"
-    ) {
+    if (formData.intermediary_type === "Diaspora Agent" && formData.country === "Kenya") {
       errorsObj.country = "Diaspora Agents cannot be based in Kenya.";
     }
-
-    // if errors, set + focus first invalid
+  
+    // Show errors if any
     if (Object.keys(errorsObj).length > 0) {
       setErrors(errorsObj);
       setLoaderIcon(false);
       focusFirstError(Object.keys(errorsObj));
-      notifyError("Please fix the highlighted errors and try again.");
-
+      addToast({
+        title: "Validation Error",
+        description: "Please fix the highlighted errors and try again.",
+        variant: "solid",
+        severity: "danger",
+      });
       return;
     }
-
-    // autofill company name if blank
+  
+    // Autofill company name if blank
     if (!formData.company_name?.trim() && formData.firstname?.trim()) {
       formData.company_name = formData.firstname;
     }
-
+  
     try {
       const res = await axios.post("/api/intermediary-form", formData, {
         headers: { "Content-Type": "application/json" },
         timeout: 10000,
       });
-
-      // reset
-      setFormData({
-        intermediary_type: "",
-        title: "",
-        firstname: "",
-        middlename: "",
-        lastname: "",
-        gender: "",
-        mobileno: "",
-        postal_address: "",
-        idtype: "",
-        idno: "",
-        pin_no: "",
-        dateofbirth: "",
-        country: "",
-        city: "",
-        eimail: "",
-        company_name: "",
-        company_number: "",
-        bank_name: "",
-        account_name: "",
-        bank_branch: "",
-        account_number: "",
-      });
-
+  
       if (res.status === 200) {
         localStorage.setItem("intermediarySubmitted", "true");
-        notifySuccess(
-          (res.data as any).message || "Form submitted successfully!",
-        );
-        setTimeout(() => router.push("/"), 8000);
+  
+        // Reset form
+        setFormData({
+          intermediary_type: "",
+          title: "",
+          firstname: "",
+          middlename: "",
+          lastname: "",
+          gender: "",
+          mobileno: "",
+          postal_address: "",
+          idtype: "",
+          idno: "",
+          pin_no: "",
+          dateofbirth: "",
+          country: "",
+          city: "",
+          eimail: "",
+          company_name: "",
+          company_number: "",
+          bank_name: "",
+          account_name: "",
+          bank_branch: "",
+          account_number: "",
+        });
+  
+        addToast({
+          title: "Success",
+          description: (res.data as any)?.message || "Form submitted successfully!",
+          variant: "solid",
+          severity: "success",
+        });
+  
+        setTimeout(() => router.push("/"), 4000);
       } else {
-        notifyError((res.data as any).error || "Something went wrong");
+        addToast({
+          title: "Submission Error",
+          description: (res.data as any)?.error || "Something went wrong.",
+          variant: "solid",
+          severity: "danger",
+        });
       }
     } catch (err: any) {
       console.error("Submission failed:", err);
-      notifyError(
-        err?.response?.data?.error || err.message || "Submission failed",
-      );
+  
+      let message = "Submission failed";
+      if (err.response?.status === 404) message = "API route not found";
+      else if (err.code === "ECONNABORTED") message = "Request timed out";
+      else if (err.response?.data?.error) message = err.response.data.error;
+      else if (err.message) message = err.message;
+  
+      addToast({
+        title: "Error",
+        description: message,
+        variant: "solid",
+        severity: "danger",
+      });
     } finally {
       setLoaderIcon(false);
     }
-  };
+  };  
 
   const closeModal = () => {
     setOpenRegistration(false);
