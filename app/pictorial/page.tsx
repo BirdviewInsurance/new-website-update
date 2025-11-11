@@ -125,7 +125,7 @@ export default function CorporatePictorial() {
               style={{
                 background: `linear-gradient(135deg, ${brandPrimary}, ${brandAccent})`,
               }}
-              onClick={() => router.push("/contact")}
+              onClick={() => router.push("https://quote.birdviewinsurance.com/")}
             >
               Get a Quote
             </Button>
