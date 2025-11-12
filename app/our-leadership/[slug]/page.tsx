@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-const allLeaders = [
+export const allLeaders = [
   {
     name: "Geoffery Kangwana",
     slug: "geoffery-kangwana",
@@ -20,7 +20,7 @@ const allLeaders = [
       title: "Championing Actuarial Excellence",
       text: "Geoffrey’s actuarial expertise and strategic insight continue to shape Birdview’s long-term stability and growth.",
       button: "Explore Geoffrey’s Strategic Vision",
-      link: "/insights/geoffrey-kangwana-leadership",
+      link: "/insights/geoffrey-kangwana",
     },
   },
   {
@@ -34,7 +34,7 @@ const allLeaders = [
       title: "Empowering Diaspora Connections",
       text: "Richard’s global experience bridges communities, creating insurance solutions that uplift Kenyans at home and abroad.",
       button: "Read Richard’s Impact Story",
-      link: "/insights/richard-muiru-diaspora-vision",
+      link: "/insights/richard-muiru",
     },
   },
   {
@@ -48,7 +48,7 @@ const allLeaders = [
       title: "Driving Strategic Growth",
       text: "James’s leadership fuses innovation, experience, and strategic foresight to propel Birdview toward market excellence.",
       button: "Discover James’s Leadership Approach",
-      link: "/insights/james-kimani-strategy",
+      link: "/insights/james-kimani",
     },
   },
   {
@@ -62,7 +62,7 @@ const allLeaders = [
       title: "Building Strategic Partnerships",
       text: "Obed’s business development acumen fuels Birdview’s expansion and strengthens alliances across key markets.",
       button: "Explore Obed’s Growth Initiatives",
-      link: "/insights/obed-menjeri-business-development",
+      link: "/insights/obed-menjeri-business",
     },
   },
   {
@@ -76,7 +76,7 @@ const allLeaders = [
       title: "Championing Organizational Transformation",
       text: "James’s leadership in policy, human capital, and governance empowers Birdview’s sustainable organizational evolution.",
       button: "Learn About James’s Transformative Approach",
-      link: "/insights/james-nyakundi-transformation",
+      link: "/insights/james-nyakundi",
     },
   },
   {
@@ -84,13 +84,13 @@ const allLeaders = [
     slug: "rodgers-moindi",
     role: "Chief Executive Officer",
     category: "Executive Leadership",
-    bio: "Rodgers Moindi embodies transformative leadership rooted in innovation, trust, and long-term value creation. As CEO, he drives Birdview’s mission to deliver protection and prosperity for communities and clients alike.",
+    bio: "Rodgers Ongosi Moindi is a seasoned Finance and Accounting professional with over 15 years of progressive experience in the insurance and financial services sector. He possesses deep expertise in financial planning and analysis, strategic budgeting, credit management, regulatory compliance, and corporate reporting. Before his appointment as Chief Executive Officer of Birdview Microinsurance Ltd, Rodgers held senior leadership positions at leading insurers, including Sanlam General Insurance Ltd and Jubilee Health Insurance Ltd. In these roles, he successfully steered financial operations, strengthened internal controls, enhanced compliance frameworks, and provided strategic guidance on key initiatives that improved financial performance and corporate governance.Throughout his career, Rodgers has played a pivotal role in implementing IFRS 17 standards, developing and executing credit control policies, leading system migrations, and overseeing complex business restructuring projects. His leadership is marked by integrity, strategic foresight, and a commitment to financial excellence.Rodgers holds a Bachelor’s degree in Business Management (Finance and Banking) from Moi University and is a Certified Public Accountant (CPA Finalist) and a Certified Credit Professional (Finalist). He is also a member of the Institute of Certified Public Accountants of Kenya (ICPAK). ",
     image: "/assets/managementPhotos/Rodgers-Moindi.png",
     cta: {
       title: "Leading with Purpose and Innovation",
       text: "Rodgers inspires growth through trust-driven leadership and a commitment to community empowerment.",
       button: "Read Rodgers’s CEO Message",
-      link: "/insights/rodgers-moindi-leadership",
+      link: "/insights/rodgers-moindi",
     },
   },
   {
@@ -104,7 +104,7 @@ const allLeaders = [
       title: "Stewarding Financial Excellence",
       text: "Mary’s financial leadership ensures sustainable growth, transparency, and sound fiscal management at Birdview.",
       button: "Explore Mary’s Financial Insights",
-      link: "/insights/mary-mundia-finance",
+      link: "/insights/mary-mundia",
     },
   },
   {
@@ -118,7 +118,7 @@ const allLeaders = [
       title: "Driving Business Expansion",
       text: "Obed’s vision for sustainable partnerships and market growth drives Birdview’s mission forward with purpose.",
       button: "Read Obed’s Growth Vision",
-      link: "/insights/obed-menjeri-expansion",
+      link: "/insights/obed-menjeri",
     },
   },
   {
@@ -132,23 +132,23 @@ const allLeaders = [
       title: "Expanding Inclusive Insurance Access",
       text: "Esdor’s passion for inclusive insurance drives innovation and outreach to underserved communities.",
       button: "Explore Esdor’s Mission",
-      link: "/insights/esdor-yahuma-inclusion",
+      link: "/insights/esdor-yahuma",
     },
   },
-  {
-    name: "Kevin Osiga",
-    slug: "kevin-osiga",
-    role: "Underwriting Manager",
-    category: "Executive Leadership",
-    bio: "Kevin Osiga oversees underwriting operations with precision and a commitment to efficiency. His leadership ensures risk is managed effectively while maintaining client trust and operational excellence.",
-    image: "/assets/managementPhotos/Kevin-Osiga.png",
-    cta: {
-      title: "Redefining Underwriting Excellence",
-      text: "Kevin’s focus on precision and efficiency ensures strong risk management and sustainable business performance.",
-      button: "Learn About Kevin’s Approach",
-      link: "/insights/kevin-osiga-underwriting",
-    },
-  },
+  // {
+  //   name: "Kevin Osiga",
+  //   slug: "kevin-osiga",
+  //   role: "Underwriting Manager",
+  //   category: "Executive Leadership",
+  //   bio: "Kevin Osiga oversees underwriting operations with precision and a commitment to efficiency. His leadership ensures risk is managed effectively while maintaining client trust and operational excellence.",
+  //   image: "/assets/managementPhotos/Kevin-Osiga.png",
+  //   cta: {
+  //     title: "Redefining Underwriting Excellence",
+  //     text: "Kevin’s focus on precision and efficiency ensures strong risk management and sustainable business performance.",
+  //     button: "Learn About Kevin’s Approach",
+  //     link: "/insights/kevin-osiga-underwriting",
+  //   },
+  // },
   {
     name: "Ann Kinyanjui",
     slug: "ann-kinyanjui",
@@ -160,7 +160,7 @@ const allLeaders = [
       title: "Strengthening Diaspora Engagement",
       text: "Ann’s data-driven and community-focused approach empowers Birdview’s diaspora business growth.",
       button: "Read Ann’s Diaspora Vision",
-      link: "/insights/ann-kinyanjui-diaspora",
+      link: "/insights/ann-kinyanjui",
     },
   },
   {
@@ -174,7 +174,7 @@ const allLeaders = [
       title: "Global Strategy for Local Impact",
       text: "Dr. Oloo’s insights continue to shape strategy frameworks that empower growth and positive societal transformation.",
       button: "Discover Dr. Oloo’s Strategy Playbook",
-      link: "/insights/strategy-playbook",
+      link: "/insights/alice-oloo",
     },
   },
   {
@@ -188,7 +188,7 @@ const allLeaders = [
       title: "Building Sustainable Financial Futures",
       text: "John’s leadership in investment planning and risk optimization helps shape resilient corporate foundations.",
       button: "Explore John’s Financial Perspectives",
-      link: "/insights/financial-perspectives",
+      link: "/insights/john-mwangi",
     },
   },
 ];

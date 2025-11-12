@@ -14,6 +14,7 @@ export default function ComplaintsPage() {
     phone: "",
     complaint: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -21,29 +22,46 @@ export default function ComplaintsPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    (toast as any).success(
-      "Your complaint has been submitted. Our team will contact you shortly.",
-    );
-    setFormData({ name: "", email: "", phone: "", complaint: "" });
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/complaints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        (toast as any).success("Your complaint has been submitted successfully.");
+        setFormData({ name: "", email: "", phone: "", complaint: "" });
+      } else {
+        (toast as any).error(data.message || "Failed to submit complaint.");
+      }
+    } catch (err) {
+      console.error(err);
+      (toast as any).error("Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <section
       className="relative min-h-screen bg-cover bg-center bg-no-repeat py-24 px-6 md:px-20 overflow-hidden"
-      style={{
-        backgroundImage: "url('/images/complaints.png')", // 🖼️ Use an HD corporate photo
-      }}
+      style={{ backgroundImage: "url('/images/complaints.png')" }}
     >
       {/* Overlay + subtle blur */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-600/60 via-red-600/30 to-black/40 backdrop-blur-sm -z-10" />
 
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto text-center text-white"
         initial={{ opacity: 0, y: 30 }}
         transition={{ duration: 0.8 }}
+        className="max-w-4xl mx-auto text-center text-white"
       >
         <h1 className="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">
           Complaints & Feedback
@@ -52,14 +70,10 @@ export default function ComplaintsPage() {
           At{" "}
           <span className="font-semibold text-red-300">Birdview Insurance</span>
           , we take your satisfaction seriously. If you have experienced a
-          concern, we are here to listen, investigate, and resolve it promptly
-          with professionalism and transparency.
+          concern, we are here to listen, investigate, and resolve it promptly.
         </p>
 
-        <Card
-          className="bg-white/95 dark:bg-gray-900/90 rounded-2xl border border-blue-100 dark:border-gray-700"
-          shadow="lg"
-        >
+        <Card className="bg-white/95 dark:bg-gray-900/90 rounded-2xl border border-blue-100 dark:border-gray-700" shadow="lg">
           <CardBody className="p-8 md:p-10">
             <form className="space-y-6 text-left" onSubmit={handleSubmit}>
               <div className="grid md:grid-cols-2 gap-6">
@@ -108,6 +122,8 @@ export default function ComplaintsPage() {
                   className="bg-gradient-to-r from-blue-600 to-red-600 text-white font-semibold shadow-md hover:opacity-90 transition-all"
                   size="lg"
                   type="submit"
+                  isLoading={loading} // ✅ Correct prop
+                  disabled={loading}
                 >
                   Submit Complaint
                 </Button>
@@ -119,18 +135,11 @@ export default function ComplaintsPage() {
         <div className="mt-10 text-gray-200 text-sm md:text-base max-w-3xl mx-auto leading-relaxed">
           <p>
             Our complaints process adheres to regulatory standards under the{" "}
-            <span className="font-semibold text-red-300">
-              Insurance Regulatory Authority (IRA)
-            </span>
-            . Once submitted, your complaint will be acknowledged within 24
-            hours, and a resolution will be provided within 14 business days.
+            <span className="font-semibold text-red-300">Insurance Regulatory Authority (IRA)</span>. Once submitted, your complaint will be acknowledged within 24 hours, and a resolution will be provided within 14 business days.
           </p>
           <p className="mt-4">
             If your issue remains unresolved, you may escalate it to the{" "}
-            <span className="text-blue-300 font-semibold">
-              Commissioner of Insurance
-            </span>{" "}
-            for independent review.
+            <span className="text-blue-300 font-semibold">Commissioner of Insurance</span> for independent review.
           </p>
         </div>
       </motion.div>

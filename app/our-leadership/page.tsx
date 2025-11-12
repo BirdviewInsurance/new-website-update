@@ -59,11 +59,11 @@ export default function OurLeadership() {
       title: "Assistant Business Development Manager",
       img: "/assets/managementPhotos/Esdor-Yahuma.png",
     },
-    {
-      name: "Kevin Osiga",
-      title: "Underwriting Manager",
-      img: "/assets/managementPhotos/Kevin-Osiga.png",
-    },
+    // {
+    //   name: "Kevin Osiga",
+    //   title: "Underwriting Manager",
+    //   img: "/assets/managementPhotos/Kevin-Osiga.png",
+    // },
     {
       name: "Ann Kinyanjui",
       title: "Diaspora Business Development Manager",
