@@ -12,7 +12,7 @@ export default function OurLeadership() {
 
   const board = [
     {
-      name: "Geoffery Kangwana",
+      name: "Geoffrey Kangwana",
       title: "Chairman - Board Of Directors",
       img: "/assets/managementPhotos/Geoffrey-Kangwana.png",
     },
