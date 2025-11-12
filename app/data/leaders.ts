@@ -1,7 +1,7 @@
 export const allLeaders = [
     {
-      name: "Geoffery Kangwana",
-      slug: "geoffery-kangwana",
+      name: "Geoffrey Kangwana",
+      slug: "geoffrey-kangwana",
       role: "Chairman - Board Of Directors",
       category: "Board of Directors",
       bio: "Mr. Geoffrey Kangwana serves as the Chairman of the Board of Directors, bringing a wealth of actuarial expertise to the role. With a distinguished background that includes being a Fellow of the Institute and Faculty of Actuaries in the UK, Geoffrey holds both bachelor's and master's degrees in Actuarial Science. Geoffrey is an insurance expert, having held significant positions such as Head of Actuarial at Jubilee Health Insurance Kenya and Senior Consultant at Deloitte UK. Geoffrey’s combination of academic achievements and practical experience positions him well to contribute to Birdview’s strategic initiatives and ongoing success in the insurance sector.",
