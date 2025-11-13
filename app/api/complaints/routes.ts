@@ -1,51 +1,57 @@
+import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const { name, email, phone, complaint } = await req.json();
 
     if (!name || !email || !complaint) {
-      return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    // Create transporter
+    // ✅ Configure your email transport (use your provider credentials)
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
+      host: process.env.SMTP_HOST, // e.g. smtp.gmail.com
       port: Number(process.env.SMTP_PORT) || 587,
-      secure: false, // true for 465, false for 587
+      secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER, // Your email address
+        pass: process.env.SMTP_PASS, // Your email password or App Password
       },
     });
 
-    // Email options
+    // ✅ Compose the email
     const mailOptions = {
       from: `"Birdview Complaints" <${process.env.SMTP_USER}>`,
-      to: process.env.RECEIVER_EMAIL,
-      subject: `New Complaint from ${name}`,
-      text: `
-Name: ${name}
-Email: ${email}
-Phone: ${phone || "N/A"}
-
-Complaint:
-${complaint}
-      `,
+      to: process.env.RECEIVER_EMAIL || process.env.SMTP_USER, // Your support inbox
+      subject: `🧾 New Complaint from ${name}`,
       html: `
-<p><strong>Name:</strong> ${name}</p>
-<p><strong>Email:</strong> ${email}</p>
-<p><strong>Phone:</strong> ${phone || "N/A"}</p>
-<p><strong>Complaint:</strong><br/>${complaint.replace(/\n/g, "<br/>")}</p>
+        <h2>New Complaint Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || "N/A"}</p>
+        <p><strong>Complaint:</strong></p>
+        <p style="white-space: pre-line;">${complaint}</p>
+        <hr />
+        <p>Submitted on: ${new Date().toLocaleString()}</p>
       `,
     };
 
+    // ✅ Send the email
     await transporter.sendMail(mailOptions);
 
-    return NextResponse.json({ success: true });
-  } catch (err: any) {
-    console.error(err);
-    return NextResponse.json({ success: false, message: err.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      message: "Complaint submitted successfully",
+    });
+  } catch (error: any) {
+    console.error("❌ Email sending failed:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to send complaint email" },
+      { status: 500 }
+    );
   }
 }

@@ -67,7 +67,7 @@ export default function Page() {
           a: "Yes — dependent children can be added under family options. See plan schedule for details.",
         },
       ]}
-      heroImage="/images/last-expense-hero.jpg"
+      heroImage="/assets/productsPhotos/last-expense.png"
       heroKicker="Funeral & Final Costs"
       heroTagline="Financial peace of mind for final expenses — simple plans that protect families from unexpected funeral bills."
       overview={{

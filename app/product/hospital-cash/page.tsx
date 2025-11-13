@@ -56,7 +56,7 @@ export default function Page() {
           a: "This depends on the plan; check the benefits schedule.",
         },
       ]}
-      heroImage="/images/hospital-cash.jpg"
+      heroImage="/assets/productsPhotos/hospital_cash.png"
       heroKicker="Daily Hospital Benefit"
       heroTagline="A simple daily cash payment while you’re admitted — helps with incidental costs not covered by medical insurance."
       overview={{

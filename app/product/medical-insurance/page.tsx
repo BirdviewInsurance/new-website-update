@@ -71,7 +71,7 @@ export default function Page() {
           a: "Some conditions may be covered after a waiting period — check your policy wording.",
         },
       ]}
-      heroImage="/images/medical-insurance-hero.jpg"
+      heroImage="/assets/productsPhotos/medical.png"
       heroKicker="Comprehensive Care"
       heroTagline="Personal, family and corporate medical plans with an extensive provider network and flexible benefits."
       overview={{

@@ -769,7 +769,7 @@ const AgentForm: React.FC = () => {
                         {loaderIcon ? "Submitting..." : "Submit Sub Agent Form"}
                       </Button>
                       <Button
-                        variant="bordered"
+                        variant="solid"
                         className="bg-gradient-to-r from-red-600 to-red-500 text-white"
                         onPress={() => setIsSimpleForm(false)}
                       >
@@ -1220,7 +1220,7 @@ const AgentForm: React.FC = () => {
                       </Button>
                       <Button
                        className="bg-gradient-to-r from-red-600 to-red-500 text-white"
-                       variant="bordered"
+                       variant="solid"
                         onPress={closeModal}>
                         Cancel
                       </Button>

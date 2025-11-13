@@ -1,4 +1,3 @@
-// app/api/intermediary-form/route.ts
 import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";

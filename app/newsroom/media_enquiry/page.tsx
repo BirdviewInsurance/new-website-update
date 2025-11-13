@@ -71,7 +71,7 @@ export default function MediaEnquiryCard() {
               <img
                 alt="Media Relations"
                 className="w-16 h-16 rounded-xl object-cover border border-gray-200 dark:border-white/20"
-                src="/media-relations.jpg"
+                src="/images/media-relations.png"
               />
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
