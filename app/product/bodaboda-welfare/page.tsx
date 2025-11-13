@@ -53,7 +53,7 @@ export default function Page() {
           a: "Protective equipment cover is available as an add-on on selected plans.",
         },
       ]}
-      heroImage="/images/bodaboda.jpg"
+      heroImage="/assets/productsPhotos/motorbike.jpg"
       heroKicker="Driver-first Protection"
       heroTagline="Affordable, practical cover built for boda drivers — accident benefits, hospital support and income protection."
       overview={{

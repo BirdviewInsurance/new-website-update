@@ -131,7 +131,7 @@ export default function Page() {
             a: "We typically mobilize the nearest available resource within hours depending on location and medical needs.",
           },
         ]}
-        heroImage="/images/evacuation-hero.jpg"
+        heroImage="/assets/productsPhotos/Evacuation-and-Repatriation.png"
         heroKicker="Crisis & Travel Support"
         heroTagline="Rapid medical evacuation and dignified repatriation worldwide — when time matters most."
         overview={{

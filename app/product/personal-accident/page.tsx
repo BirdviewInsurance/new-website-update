@@ -60,7 +60,7 @@ export default function Page() {
           a: "Yes for standard accidental coverage — specialised BodaBoda or TukTuk plans are recommended for professional riders.",
         },
       ]}
-      heroImage="/images/personal-accident.jpg"
+      heroImage="/assets/productsPhotos/personal-accident.png"
       heroKicker="Accidental Injury & Death"
       heroTagline="Lump-sum and weekly benefit payouts for accidental injury, permanent disability and accidental death."
       overview={{

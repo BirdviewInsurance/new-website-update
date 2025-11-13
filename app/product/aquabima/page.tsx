@@ -50,7 +50,7 @@ export default function Page() {
           a: "This product targets small-scale artisanal fishermen; commercial fleet cover is available under bespoke marine policies.",
         },
       ]}
-      heroImage="/images/aquabima.jpg"
+      heroImage="/assets/productsPhotos/aqua_culture.jpeg"
       heroKicker="Fisherfolk & Water Communities"
       heroTagline="Insurance tailored for fishermen and coastal communities — accident cover, equipment loss and death benefits."
       overview={{

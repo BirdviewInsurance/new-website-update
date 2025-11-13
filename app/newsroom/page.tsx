@@ -176,7 +176,7 @@ export default function Press() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('/images/media.png')",
+            backgroundImage: "url('/images/media.jpg')",
             backgroundAttachment: "fixed",
           }}
         />

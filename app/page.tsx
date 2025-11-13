@@ -222,21 +222,21 @@ export default function Home() {
 
   const testimonials: Testimonial[] = [
     {
-      name: "Alice Mwangi",
-      role: "Software Engineer",
-      avatar: "/assets/managementPhotos/Ann-Kinyanjui.png",
+      name: "Pioneer Feeds",
+      role: "Animal Feed Supplier",
+      avatar: "/assets/clients/logo-1.jpg",
       text: "Birdview Insurance made choosing the right plan incredibly easy. Highly recommend!",
     },
     {
-      name: "John Kamau",
-      role: "Business Owner",
-      avatar: "/assets/managementPhotos/Richard-Muiru.png",
+      name: "Our Lady Of Lourdes - Mwea Hospital",
+      role: "Health Care Provider",
+      avatar: "/assets/clients/logo.png",
       text: "Fast, reliable, and trustworthy. Their coverage saved us during an unexpected event.",
     },
     {
-      name: "Grace Njeri",
-      role: "Freelancer",
-      avatar: "/assets/managementPhotos/Mary-Mundia.png",
+      name: "Tatu City",
+      role: "Urban Developer",
+      avatar: "/assets/clients/tatu-city.png",
       text: "Excellent customer service and flexible plans that fit my needs perfectly.",
     },
   ];
@@ -277,7 +277,7 @@ export default function Home() {
   const faqs = [
     {
       q: "What types of insurance do you offer?",
-      a: "We provide comprehensive coverage including Health, Auto, Life, Property, Travel, and Business Insurance. Each plan is customizable to suit individual or corporate needs.",
+      a: "We provide the follwing coverage including Evacuation & Repatriation, Last Expense, Medical, Hospital Cash, Personal Accident, Bodaboda Welfare, TukTuk Welfare, Probation Guard and AQUABIMA. Each plan is customizable to suit individual or corporate needs.",
     },
     {
       q: "How can I get a quote?",

@@ -50,7 +50,7 @@ export default function Page() {
           a: "Bail support is discretionary and subject to policy limits and underwriting.",
         },
       ]}
-      heroImage="/images/probation-guard.jpg"
+      heroImage="/assets/productsPhotos/prob_guard.png"
       heroKicker="Supervised Protection"
       heroTagline="A safeguard solution providing monitoring, legal assistance and limited liability cover for people on probation and related services."
       overview={{
