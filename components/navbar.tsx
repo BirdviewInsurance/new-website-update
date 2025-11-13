@@ -411,7 +411,7 @@ export const Navbar = () => {
           },
           {
             label: "Get a Quote",
-            href: "/product/evacuation-repatriation/quote",
+            href: "https://quote.birdviewinsurance.com/?ProductID=1",
           },
           { label: "FAQs", href: "/product/evacuation-repatriation/faqs" },
         ],
@@ -428,14 +428,15 @@ export const Navbar = () => {
           { label: "Claim Process", href: "/product/last-expense/claims" },
           { label: "Policy Terms", href: "/product/last-expense/policy-terms" },
           { label: "Enroll Now", href: "/product/last-expense/enroll" },
+          { label: "Get a Quote", href: "https://quote.birdviewinsurance.com/?ProductID=2" },
         ],
       },
       {
         title: "Medical Insurance",
         links: [
           {
-            label: "Individual Plans",
-            href: "/product/medical-insurance/individual",
+            label: "Overview",
+            href: "/product/medical-insurance",
           },
           { label: "Benefits & Premiums", href: "/products/medical" },
           { label: "Family Plans", href: "/product/medical-insurance/family" },
@@ -453,7 +454,7 @@ export const Navbar = () => {
           },
           {
             label: "Request a Quote",
-            href: "/product/medical-insurance/quote",
+            href: "https://quote.birdviewinsurance.com/?ProductID=3",
           },
         ],
       },
@@ -462,7 +463,7 @@ export const Navbar = () => {
         links: [
           {
             label: "How It Works",
-            href: "/product/hospital-cash/how-it-works",
+            href: "/product/hospital-cash",
           },
           { label: "Benefits & Premiums", href: "/products/hospital_cash" },
           {
@@ -473,6 +474,7 @@ export const Navbar = () => {
           { label: "Claim Procedure", href: "/product/hospital-cash/claims" },
           { label: "Pricing Plans", href: "/product/hospital-cash/pricing" },
           { label: "FAQs", href: "/product/hospital-cash/faqs" },
+          { label: "Get a Quote", href: "https://quote.birdviewinsurance.com/?ProductID=4" },
         ],
       },
       {
@@ -480,7 +482,7 @@ export const Navbar = () => {
         links: [
           {
             label: "Coverage Summary",
-            href: "/product/personal-accident/coverage",
+            href: "/product/personal-accident",
           },
           {
             label: "Benefits & Compensation",
@@ -493,6 +495,7 @@ export const Navbar = () => {
           { label: "Claim Steps", href: "/product/personal-accident/claims" },
           { label: "Get Covered", href: "/product/personal-accident/enroll" },
           { label: "FAQs", href: "/product/personal-accident/faqs" },
+          { label: "Get a Quote", href: "https://quote.birdviewinsurance.com/?ProductID=5" },
         ],
       },
       {
@@ -500,7 +503,7 @@ export const Navbar = () => {
         links: [
           {
             label: "What’s Covered",
-            href: "/product/bodaboda-welfare/coverage",
+            href: "/product/bodaboda-welfare",
           },
           {
             label: "Accident & Hospitalization Benefits",

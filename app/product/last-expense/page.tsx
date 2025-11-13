@@ -49,11 +49,11 @@ export default function Page() {
       ]}
       cta={{
         label: "Enroll Now — Protect Your Family",
-        href: "/Products/last-expense/enroll",
+        href: "https://quote.birdviewinsurance.com/?ProductID=2",
       }}
       ctaSecondary={{
         label: "See Plans & Pricing",
-        href: "/Products/last-expense/pricing",
+        href: "/products/last_expense",
       }}
       eligibility={{
         heading: "Who can apply",

@@ -42,11 +42,11 @@ export default function Page() {
       ]}
       cta={{
         label: "Get Accident Cover",
-        href: "/Products/personal-accident/enroll",
+        href: "https://quote.birdviewinsurance.com/?ProductID=5",
       }}
       ctaSecondary={{
         label: "Calculate Benefit",
-        href: "/Products/personal-accident/calculator",
+        href: "/products/personal_accident",
       }}
       eligibility={{
         heading: "Eligible applicants",

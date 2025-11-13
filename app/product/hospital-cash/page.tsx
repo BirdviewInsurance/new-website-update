@@ -39,10 +39,10 @@ export default function Page() {
           ],
         },
       ]}
-      cta={{ label: "Compare Plans", href: "/Products/hospital-cash/pricing" }}
+      cta={{ label: "Compare Plans", href: "/products/hospital_cash/" }}
       ctaSecondary={{
         label: "Apply Now",
-        href: "/Products/hospital-cash/apply",
+        href: "https://quote.birdviewinsurance.com/?ProductID=4",
       }}
       eligibility={{
         heading: "Who should choose this",

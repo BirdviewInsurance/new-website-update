@@ -53,11 +53,11 @@ export default function Page() {
       ]}
       cta={{
         label: "Request a Quote",
-        href: "/Products/medical-insurance/quote",
+        href: "https://quote.birdviewinsurance.com/?ProductID=3",
       }}
       ctaSecondary={{
         label: "Find Hospitals",
-        href: "/Products/medical-insurance/hospitals",
+        href: "/providers",
       }}
       eligibility={{
         heading: "Entry requirements",

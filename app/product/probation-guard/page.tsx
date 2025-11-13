@@ -33,10 +33,10 @@ export default function Page() {
           ],
         },
       ]}
-      cta={{ label: "Speak with a Specialist", href: "/Contact/legal-support" }}
+      cta={{ label: "Speak with a Specialist", href: "/contact-us" }}
       ctaSecondary={{
         label: "Request a Quote",
-        href: "/Products/probation-guard/quote",
+        href: "/products/probation_guard",
       }}
       eligibility={{
         heading: "Applies to",

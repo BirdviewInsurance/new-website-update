@@ -350,10 +350,10 @@ const ProbationGuard: React.FC = () => {
               />
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onClick={onClose}>
+              <Button variant="solid" className="text-white font-semibold px-10 py-6 rounded-xl shadow-lg hover:scale-105 transition-transform" color="danger" onClick={onClose}>
                 Cancel
               </Button>
-              <Button color="danger" onClick={handleSubmit}>
+              <Button color="primary" className="text-white font-semibold px-10 py-6 rounded-xl shadow-lg hover:scale-105 transition-transform" onClick={handleSubmit}>
                 Submit
               </Button>
             </ModalFooter>
