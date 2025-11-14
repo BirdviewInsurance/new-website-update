@@ -64,6 +64,12 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <head>
+        {/* ✅ Google Search Console Verification */}
+        <meta
+          name="google-site-verification"
+          content="0qnc1ZBwmtuyekrO4231Q-Yd4Mee2DiWpCLyurtRWRc"
+        />
+
         {/* ✅ SEO Meta */}
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta
