@@ -203,31 +203,50 @@ export const Navbar = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && searchQuery.trim() !== "") {
+  const handleSearchSubmit = (e?: React.FormEvent | React.KeyboardEvent<HTMLInputElement>) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if (searchQuery.trim() !== "") {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setIsDrawerOpen(false); // close mobile drawer if open
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearchSubmit(e);
+    }
+  };
+
   const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper:
-          "bg-default-100 rounded-lg border border-primary/20 shadow-sm",
-        input: "text-sm placeholder:text-primary font-semibold",
-      }}
-      placeholder="Search..."
-      size="sm"
-      startContent={
-        <SearchIcon className="text-base text-primary font-semibold pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      onKeyDown={handleSearchSubmit}
-    />
+    <div className="relative flex items-center w-full">
+      <Input
+        aria-label="Search"
+        classNames={{
+          inputWrapper:
+            "bg-default-100 rounded-lg border border-primary/20 shadow-sm pr-10",
+          input: "text-sm placeholder:text-primary font-semibold",
+        }}
+        placeholder="Search..."
+        size="sm"
+        startContent={
+          <SearchIcon className="text-base text-primary font-semibold pointer-events-none flex-shrink-0" />
+        }
+        type="search"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      <button
+        className="absolute right-2 p-1 text-primary hover:text-danger transition-colors"
+        onClick={handleSearchSubmit}
+        type="button"
+        aria-label="Submit search"
+      >
+        <SearchIcon className="w-4 h-4" />
+      </button>
+    </div>
   );
 
   // const retrieveInput = (
@@ -697,7 +716,7 @@ export const Navbar = () => {
         links: [
           { label: "Blog", href: "/blog" },
           { label: "Newsroom", href: "/newsroom" },
-          { label: "FAQs", href: "/faqs" },
+          { label: "FAQs", href: "/faq" },
         ],
       },
     ],
@@ -923,46 +942,46 @@ export const Navbar = () => {
               </Button>
 
               <AnimatePresence>
-              {openMenu === "portals" && (
-                <motion.div
-                  animate="visible"
-                  className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
-                  exit="hidden"
-                  initial="hidden"
-                  variants={submenuVariants}
-                >
-                  {[
-                  { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
-                  { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
-                  { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
-                  { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
-                  { name: "Intermediary Registration", path: "/forms/Intermediary-Registration-Form" },
-                  { name: "Agent Registration", path: "/forms/Agents" },
-                  { name: "Group Registration", path: "/forms/group-form" },
-                  { name: "TukTuk Insurance Registration", path: "https://partners.birdviewinsurance.com/auth/login" },                
-                  { name: "Agent Welfare Registration", path: "/forms/Agents/" },
-                  ].map((item, index, arr) => (
-                    <div key={item.name} className="flex flex-col">
-                      {/* Menu item */}
-                      <div
-                        className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors font-semibold"
-                        onClick={() => {
-                          router.push(item.path);
-                          setOpenMenu(null);
-                        }}
-                      >
-                        {item.name}
-                      </div>
+                {openMenu === "portals" && (
+                  <motion.div
+                    animate="visible"
+                    className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                    exit="hidden"
+                    initial="hidden"
+                    variants={submenuVariants}
+                  >
+                    {[
+                      { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                      { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                      { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
+                      { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
+                      { name: "Intermediary Registration", path: "/forms/Intermediary-Registration-Form" },
+                      { name: "Agent Registration", path: "/forms/Agents" },
+                      { name: "Group Registration", path: "/forms/group-form" },
+                      { name: "TukTuk Insurance Registration", path: "https://partners.birdviewinsurance.com/auth/login" },
+                      { name: "Agent Welfare Registration", path: "/forms/Agents/" },
+                    ].map((item, index, arr) => (
+                      <div key={item.name} className="flex flex-col">
+                        {/* Menu item */}
+                        <div
+                          className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors font-semibold"
+                          onClick={() => {
+                            router.push(item.path);
+                            setOpenMenu(null);
+                          }}
+                        >
+                          {item.name}
+                        </div>
 
-                      {/* Line separator (except after last item) */}
-                      {index !== arr.length - 1 && (
-                        <div className="border-t border-danger mx-2 my-1"></div>
-                      )}
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                        {/* Line separator (except after last item) */}
+                        {index !== arr.length - 1 && (
+                          <div className="border-t border-danger mx-2 my-1"></div>
+                        )}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </NavbarItem>
         </NavbarContent>
@@ -991,46 +1010,46 @@ export const Navbar = () => {
             </Button>
 
             <AnimatePresence>
-            {openMenu === "portals" && (
-              <motion.div
-                animate="visible"
-                exit="hidden"
-                initial="hidden"
-                variants={submenuVariants}
-                className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
-              >
-                {[
-                  { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
-                  { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
-                  { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
-                  { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
-                  { name: "Intermediary Registration", path: "/forms/Intermediary-Registration-Form" },
-                  { name: "Agent Registration", path: "/forms/Agents" },
-                  { name: "Group Registration", path: "/forms/group-form" },
-                  { name: "TukTuk Insurance Registration", path: "https://partners.birdviewinsurance.com/auth/login" },                
-                  { name: "Agent Welfare Registration", path: "/forms/Agents/" },
-                ].map((item, index, arr) => (
-                  <div key={item.name} className="flex flex-col">
-                    {/* Menu item */}
-                    <div
-                      className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors font-semibold"
-                      onClick={() => {
-                        router.push(item.path);
-                        setOpenMenu(null);
-                      }}
-                    >
-                      {item.name}
-                    </div>
+              {openMenu === "portals" && (
+                <motion.div
+                  animate="visible"
+                  exit="hidden"
+                  initial="hidden"
+                  variants={submenuVariants}
+                  className="absolute right-0 top-full mt-2 bg-white rounded-lg p-2 shadow-lg min-w-[220px]"
+                >
+                  {[
+                    { name: "Agent Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                    { name: "Broker Portal", path: "https://portal.birdviewinsurance.com/auth/login" },
+                    { name: "Provider Portal", path: "https://provider.birdviewinsurance.com/" },
+                    { name: "Welfare Portal", path: "https://partners.birdviewinsurance.com/auth/login" },
+                    { name: "Intermediary Registration", path: "/forms/Intermediary-Registration-Form" },
+                    { name: "Agent Registration", path: "/forms/Agents" },
+                    { name: "Group Registration", path: "/forms/group-form" },
+                    { name: "TukTuk Insurance Registration", path: "https://partners.birdviewinsurance.com/auth/login" },
+                    { name: "Agent Welfare Registration", path: "/forms/Agents/" },
+                  ].map((item, index, arr) => (
+                    <div key={item.name} className="flex flex-col">
+                      {/* Menu item */}
+                      <div
+                        className="px-3 py-2 rounded-md cursor-pointer text-primary hover:text-danger hover:bg-gray-100 transition-colors font-semibold"
+                        onClick={() => {
+                          router.push(item.path);
+                          setOpenMenu(null);
+                        }}
+                      >
+                        {item.name}
+                      </div>
 
-                    {/* Separator (except for last item) */}
-                    {index !== arr.length - 1 && (
-                      <div className="border-t border-danger mx-2 my-1"></div>
-                    )}
-                  </div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                      {/* Separator (except for last item) */}
+                      {index !== arr.length - 1 && (
+                        <div className="border-t border-danger mx-2 my-1"></div>
+                      )}
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           {/* Mobile menu toggle */}
           <button

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import jsPDF from "jspdf";
 import { useInView } from "react-intersection-observer";
@@ -286,61 +287,64 @@ export default function FAQPage() {
 
       {/* Hero */}
       <header className="max-w-6xl mx-auto mb-10">
-        <div className="rounded-2xl overflow-hidden shadow-lg bg-white">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--brand-primary),rgba(255,255,255,0))] opacity-90" />
-            <div className="relative z-10 px-6 py-16 md:py-24 lg:py-28">
-              <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="max-w-2xl">
-                  <h1 className="text-4xl md:text-5xl font-semibold text-white">
-                    {brandName} Support & FAQs
-                  </h1>
-                  <p className="mt-3 text-lg text-white/90">
-                    Clear, concise answers to common questions about policies,
-                    claims, payments, and support.
-                  </p>
+        <div className="relative">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <Image
+              src="/images/hero-faqs.png"
+              alt="Birdview Insurance Corporate Team"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
 
-                  <div className="mt-6 flex gap-3 items-center">
-                    <div className="relative w-full md:w-[420px]">
-                      <input
-                        className="w-full rounded-full border border-white/30 bg-white/10 px-4 py-3 pr-12 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
-                        placeholder="Search for answers, e.g. 'claim', 'renewal'..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                      />
-                      <span className="absolute right-4 top-3 text-white/80">
-                        🔎
-                      </span>
-                    </div>
+          {/* Gradient overlay for brand colors */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 via-blue-600/60 to-red-600/70" />
 
-                    <button
-                      className="rounded-full px-5 py-3 bg-white text-[var(--brand-primary)] font-medium shadow-md hover:opacity-95"
-                      onClick={() => (window.location.href = "/contact")}
-                    >
-                      Contact Support
-                    </button>
+          {/* Content */}
+          <div className="relative z-10 px-6 py-16 md:py-24 lg:py-28">
+            <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="max-w-2xl">
+                <h1 className="text-4xl md:text-5xl font-semibold text-white">
+                  {brandName} Support & FAQs
+                </h1>
+                <p className="mt-3 text-lg text-white/90">
+                  Clear, concise answers to common questions about policies,
+                  claims, payments, and support.
+                </p>
+
+                {/* Search + CTA */}
+                <div className="mt-6 flex gap-3 items-center">
+                  <div className="relative w-full md:w-[420px]">
+                    <input
+                      className="w-full rounded-full border border-white/30 bg-white/10 px-4 py-3 pr-12 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      placeholder="Search for answers, e.g. 'claim', 'renewal'..."
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                    <span className="absolute right-4 top-3 text-white/80">
+                      🔎
+                    </span>
                   </div>
-                </div>
 
-                <div
-                  aria-hidden
-                  className="hidden md:block w-48 h-48 rounded-xl"
-                >
-                  {/* Decorative brand mark or illustration placeholder */}
-                  <div className="w-full h-full bg-[linear-gradient(135deg,var(--brand-danger),var(--brand-primary))] rounded-xl shadow-2xl flex items-center justify-center text-white font-bold">
-                    {brandName.split(" ")[0]}
-                  </div>
-                </div>
-
-                {/* PDF button top-right */}
-                <div className="absolute top-6 right-6">
                   <button
-                    className="hidden md:inline-flex items-center gap-2 bg-[var(--brand-primary)] text-white px-4 py-2 rounded-full shadow-md hover:opacity-95"
-                    onClick={handleDownloadPDF}
+                    className="rounded-full px-5 py-3 bg-white text-blue-600 font-medium shadow-md hover:opacity-95"
+                    onClick={() => (window.location.href = "/contact-us")}
                   >
-                    📄 Download FAQ as PDF
+                    Contact Support
                   </button>
                 </div>
+              </div>
+
+              {/* PDF button */}
+              <div className="absolute top-6 right-6">
+                <button
+                  className="hidden md:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:opacity-95"
+                  onClick={handleDownloadPDF}
+                >
+                  📄 Download FAQ as PDF
+                </button>
               </div>
             </div>
           </div>

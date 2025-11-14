@@ -98,23 +98,45 @@ export async function POST(req: Request) {
       is_active: false,
     };
 
-    // Submit to main API
-    const primaryResponse = await fetch(
-      "https://snownet-core-server.onrender.com/api/underwriting/collaborator/agents/create/",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(agentPayload),
-      }
-    );
-    const primaryData = await primaryResponse.json();
+    // Submit to main API with timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
 
-    if (!primaryResponse.ok) {
-      console.error("❌ Main API Error:", primaryData);
-      return NextResponse.json(
-        { error: primaryData?.error || "Failed to submit agent" },
-        { status: primaryResponse.status }
+    let primaryResponse: Response;
+    let primaryData: any = {};
+
+    try {
+      primaryResponse = await fetch(
+        "https://snownet-core-server.onrender.com/api/underwriting/collaborator/agents/create/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(agentPayload),
+          signal: controller.signal,
+        }
       );
+      clearTimeout(timeoutId);
+      primaryData = await primaryResponse.json();
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === "AbortError") {
+        console.warn("⚠️ External API timeout, continuing with local save");
+        // Continue processing even if external API times out
+        primaryResponse = new Response(
+          JSON.stringify({ message: "External API timeout, form saved locally" }),
+          { status: 202 }
+        );
+        primaryData = { message: "Form saved locally" };
+      } else {
+        throw fetchError;
+      }
+    }
+
+    // If external API failed but we got a timeout response, continue with local save
+    if (!primaryResponse.ok && primaryResponse.status !== 202) {
+      console.error("❌ Main API Error:", primaryData);
+      // Don't fail completely - still save to Excel and send email
+      // Return a warning but continue processing
     }
 
     // If Broker, also submit to broker endpoint
@@ -266,11 +288,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Submitted, email pending", fileUrl }, { status: 202 });
     }
 
+    // Return success even if external API had issues (form is saved locally)
+    const isPartialSuccess = primaryResponse.status === 202 || !primaryResponse.ok;
+    
     return NextResponse.json({
-      message: "Intermediary submitted successfully!",
+      message: isPartialSuccess 
+        ? "Form saved successfully! External API had issues, but your data has been recorded."
+        : "Intermediary submitted successfully!",
       data: primaryData,
       fileUrl,
-    });
+      warning: isPartialSuccess ? "External API unavailable, but form saved locally" : undefined,
+    }, { status: isPartialSuccess ? 202 : 200 });
   } catch (error) {
     console.error("❌ Unexpected Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

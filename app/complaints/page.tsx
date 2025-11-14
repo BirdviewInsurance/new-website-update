@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card, CardBody } from "@heroui/card";
 import { Input, Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { toast } from "@heroui/react";
+import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
 
 export default function ComplaintsPage() {
@@ -36,14 +36,14 @@ export default function ComplaintsPage() {
       const data = await res.json();
 
       if (data.success) {
-        (toast as any).success("Your complaint has been submitted successfully.");
+        toast.success("Your complaint has been submitted successfully.");
         setFormData({ name: "", email: "", phone: "", complaint: "" });
       } else {
-        (toast as any).error(data.message || "Failed to submit complaint.");
+        toast.error(data.message || "Failed to submit complaint.");
       }
     } catch (err) {
       console.error(err);
-      (toast as any).error("Something went wrong. Please try again later.");
+      toast.error("Something went wrong. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -54,6 +54,29 @@ export default function ComplaintsPage() {
       className="relative min-h-screen bg-cover bg-center bg-no-repeat py-24 px-6 md:px-20 overflow-hidden"
       style={{ backgroundImage: "url('/images/complaints.png')" }}
     >
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            borderRadius: "10px",
+            background: "#1a202c",
+            color: "#fff",
+            padding: "12px 20px",
+            fontWeight: 500,
+          },
+          success: {
+            style: { background: "#16a34a", color: "#fff" },
+            duration: 4000,
+          },
+          error: {
+            style: { background: "#dc2626", color: "#fff" },
+            duration: 4000,
+          },
+        }}
+      />
+
       {/* Overlay + subtle blur */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-600/60 via-red-600/30 to-black/40 backdrop-blur-sm -z-10" />
 

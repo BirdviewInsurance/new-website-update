@@ -313,9 +313,9 @@ const AgentForm: React.FC = () => {
     setOpenRegistration(true);
   }, []);
 
-/* ============================
-   Toast helpers (Hero UI toast object)
-   ============================ */
+  /* ============================
+     Toast helpers (Hero UI toast object)
+     ============================ */
   const notifySuccess = (message: string) =>
     addToast({
       title: "Success",
@@ -383,15 +383,15 @@ const AgentForm: React.FC = () => {
         intermediary_type: value,
         ...(isBroker
           ? {
-              title: "",
-              firstname: "",
-              middlename: "",
-              lastname: "",
-              gender: "",
-              idtype: "",
-              idno: "",
-              dateofbirth: "",
-            }
+            title: "",
+            firstname: "",
+            middlename: "",
+            lastname: "",
+            gender: "",
+            idtype: "",
+            idno: "",
+            dateofbirth: "",
+          }
           : {}),
         country:
           value === "Diaspora Agent"
@@ -422,7 +422,7 @@ const AgentForm: React.FC = () => {
     try {
       const res = await axios.post("/api/sub-agent-form", simpleForm, {
         headers: { "Content-Type": "application/json" },
-        timeout: 10000,
+        timeout: 30000, // Increased to 30 seconds
       });
 
       setSimpleForm({
@@ -433,19 +433,33 @@ const AgentForm: React.FC = () => {
         email: "",
       });
 
-      if (res.status === 200) {
+      if (res.status === 200 || res.status === 202) {
         localStorage.setItem("subAgentSubmitted", "true");
-        notifySuccess(
-          (res.data as any).message || "Form submitted successfully!",
-        );
+        const responseData = res.data as any;
+        if (res.status === 202) {
+          addToast({
+            title: "Partially Successful",
+            description: responseData?.message || "Form saved locally. External API had issues.",
+            variant: "solid",
+            severity: "warning",
+          });
+        } else {
+          notifySuccess(responseData?.message || "Form submitted successfully!");
+        }
         setTimeout(() => router.push("/"), 8000);
       } else {
         notifyError((res.data as any).error || "Something went wrong");
       }
     } catch (err: any) {
-      notifyError(
-        err?.response?.data?.error || err.message || "Submission failed",
-      );
+      let errorMessage = "Submission failed";
+      if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+        errorMessage = "Request timed out. Your form may have been saved. Please check with support or try again.";
+      } else if (err?.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      notifyError(errorMessage);
     } finally {
       setLoaderIcon(false);
     }
@@ -456,7 +470,7 @@ const AgentForm: React.FC = () => {
     e.preventDefault();
     setLoaderIcon(true);
     setErrors({});
-  
+
     // Prevent duplicate submissions
     if (localStorage.getItem("intermediarySubmitted") === "true") {
       addToast({
@@ -468,10 +482,10 @@ const AgentForm: React.FC = () => {
       setLoaderIcon(false);
       return;
     }
-  
+
     // Validation
     const errorsObj: ErrorsType = {};
-  
+
     // Age validation (skip for Broker)
     if (formData.intermediary_type !== "Broker" && formData.dateofbirth) {
       const selectedDate = new Date(formData.dateofbirth);
@@ -484,12 +498,12 @@ const AgentForm: React.FC = () => {
       const actualAge = hadBirthday ? age : age - 1;
       if (actualAge < 18) errorsObj.dateofbirth = "You must be at least 18 years old.";
     }
-  
+
     // KRA pin required for Kenya
     if (formData.country === "Kenya" && !String(formData.pin_no || "").trim()) {
       errorsObj.pin_no = "KRA PIN is required for residents of Kenya.";
     }
-  
+
     // Country restrictions
     if (
       ["Broker", "Agent", "Recruitment Agent"].includes(formData.intermediary_type || "") &&
@@ -500,7 +514,7 @@ const AgentForm: React.FC = () => {
     if (formData.intermediary_type === "Diaspora Agent" && formData.country === "Kenya") {
       errorsObj.country = "Diaspora Agents cannot be based in Kenya.";
     }
-  
+
     // Show errors if any
     if (Object.keys(errorsObj).length > 0) {
       setErrors(errorsObj);
@@ -514,21 +528,21 @@ const AgentForm: React.FC = () => {
       });
       return;
     }
-  
+
     // Autofill company name if blank
     if (!formData.company_name?.trim() && formData.firstname?.trim()) {
       formData.company_name = formData.firstname;
     }
-  
+
     try {
       const res = await axios.post("/api/intermediary-form", formData, {
         headers: { "Content-Type": "application/json" },
-        timeout: 10000,
+        timeout: 30000, // Increased to 30 seconds
       });
-  
-      if (res.status === 200) {
+
+      if (res.status === 200 || res.status === 202) {
         localStorage.setItem("intermediarySubmitted", "true");
-  
+
         // Reset form
         setFormData({
           intermediary_type: "",
@@ -553,14 +567,17 @@ const AgentForm: React.FC = () => {
           bank_branch: "",
           account_number: "",
         });
-  
+
+        const responseData = res.data as any;
+        const toastSeverity = res.status === 202 ? "warning" : "success";
+
         addToast({
-          title: "Success",
-          description: (res.data as any)?.message || "Form submitted successfully!",
+          title: res.status === 202 ? "Partially Successful" : "Success",
+          description: responseData?.message || "Form submitted successfully!",
           variant: "solid",
-          severity: "success",
+          severity: toastSeverity,
         });
-  
+
         setTimeout(() => router.push("/"), 4000);
       } else {
         addToast({
@@ -572,13 +589,18 @@ const AgentForm: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Submission failed:", err);
-  
+
       let message = "Submission failed";
-      if (err.response?.status === 404) message = "API route not found";
-      else if (err.code === "ECONNABORTED") message = "Request timed out";
-      else if (err.response?.data?.error) message = err.response.data.error;
-      else if (err.message) message = err.message;
-  
+      if (err.response?.status === 404) {
+        message = "API route not found. Please contact support.";
+      } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+        message = "Request timed out. Your form may have been saved. Please check with support or try again.";
+      } else if (err.response?.data?.error) {
+        message = err.response.data.error;
+      } else if (err.message) {
+        message = err.message;
+      }
+
       addToast({
         title: "Error",
         description: message,
@@ -588,7 +610,7 @@ const AgentForm: React.FC = () => {
     } finally {
       setLoaderIcon(false);
     }
-  };  
+  };
 
   const closeModal = () => {
     setOpenRegistration(false);
@@ -686,15 +708,15 @@ const AgentForm: React.FC = () => {
                   <div className="h-1 w-16 rounded-full bg-sky-600 mt-3" />
 
                   <button
-                      className="absolute right-16 top-0 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                      onClick={() => setIsSimpleForm((s) => !s)}
-                    >
-                      {isSimpleForm
-                        ? "← Back to Agent Registration"
-                        : "Switch to Sub Agent Form"}
-                    </button>
+                    className="absolute right-16 top-0 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    onClick={() => setIsSimpleForm((s) => !s)}
+                  >
+                    {isSimpleForm
+                      ? "← Back to Agent Registration"
+                      : "Switch to Sub Agent Form"}
+                  </button>
                 </div>
-                <br/>
+                <br />
               </ModalHeader>
 
               <ModalBody className="overflow-y-auto max-h-[70vh] px-1">
@@ -1219,8 +1241,8 @@ const AgentForm: React.FC = () => {
                         {loaderIcon ? "Submitting..." : "Submit Registration"}
                       </Button>
                       <Button
-                       className="bg-gradient-to-r from-red-600 to-red-500 text-white"
-                       variant="solid"
+                        className="bg-gradient-to-r from-red-600 to-red-500 text-white"
+                        variant="solid"
                         onPress={closeModal}>
                         Cancel
                       </Button>

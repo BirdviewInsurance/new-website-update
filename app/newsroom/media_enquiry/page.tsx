@@ -52,7 +52,7 @@ export default function MediaEnquiryCard() {
       `Name: ${form.name}\nOrganization: ${form.org}\nEmail: ${form.email}\nPhone: ${form.phone}\n\nMessage:\n${form.message}`,
     );
 
-    window.location.href = `mailto:media@birdviewinsurance.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:smedia@birdviewinsurance.com?subject=${subject}&body=${body}`;
     setOpen(false);
   };
 
@@ -87,9 +87,9 @@ export default function MediaEnquiryCard() {
             <div className="flex flex-col gap-1 mt-4 sm:mt-0 text-sm">
               <a
                 className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary"
-                href="mailto:media@birdviewinsurance.com"
+                href="mailto:smedia@birdviewinsurance.com"
               >
-                <Mail className="w-4 h-4" /> media@birdviewinsurance.com
+                <Mail className="w-4 h-4" /> smedia@birdviewinsurance.com
               </a>
               <a
                 className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary"

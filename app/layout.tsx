@@ -176,6 +176,11 @@ export default function RootLayout({
             Birdview Diaspora Insurance,
             Birdview Diaspora Insurance Solutions,
             Birdview Diaspora Insurance Solutions Kenya,
+            KESWA,
+            KESWA Insurance,
+            KESWA Insurance Solutions,
+            KESWA Insurance Solutions Kenya,
+            KESWA Insurance Solutions Kenya,
           "
           name="keywords"
         />
