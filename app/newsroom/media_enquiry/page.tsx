@@ -166,7 +166,7 @@ export default function MediaEnquiryCard() {
                   Media Contact
                 </h5>
                 <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Jane Mwangi, Head of Media Relations
+                 Head of Media Relations
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                   For all press & corporate communications
