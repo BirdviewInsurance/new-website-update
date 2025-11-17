@@ -1,22 +1,8 @@
-// pages/api/submit-member.ts
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
-import {
-  IncomingForm,
-  type Fields,
-  type Files,
-  type File as FormidableFile,
-  type Options as FormidableOptions,
-} from "formidable";
 import * as XLSX from "xlsx";
 import nodemailer from "nodemailer";
-
-export const config = {
-  api: { bodyParser: false },
-};
 
 // --- Types ---
 type SheetMatrix = (string | number | null)[][];
@@ -43,57 +29,6 @@ interface Beneficiary {
   beneficiary_email?: string;
 }
 
-// --- Helpers ---
-interface FlatFields {
-  [key: string]: string;
-}
-
-async function parseForm(
-  req: NextApiRequest,
-  options?: Partial<FormidableOptions>,
-): Promise<{ fields: FlatFields; files: Files }> {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({
-      multiples: true,
-      keepExtensions: true,
-      ...(options || {}),
-    });
-
-    form.parse(req, (err, fields, files) => {
-      if (err) return reject(err);
-
-      const flatFields: FlatFields = {};
-
-      for (const key of Object.keys(fields)) {
-        const value = fields[key];
-
-        if (Array.isArray(value)) {
-          flatFields[key] = value[0] ?? "";
-        } else if (typeof value === "string") {
-          flatFields[key] = value;
-        } else {
-          flatFields[key] = "";
-        }
-      }
-
-      resolve({ fields: flatFields, files });
-    });
-  });
-}
-
-const getField = (fields: Fields, key: string): string => {
-  const value = fields[key];
-
-  if (value === undefined || value === null) return "";
-  if (Array.isArray(value)) {
-    const v = value[0];
-
-    return typeof v === "string" ? v : "";
-  }
-
-  return typeof value === "string" ? value : "";
-};
-
 const safeJSONParse = <T>(text: string): T[] => {
   try {
     if (!text) return [];
@@ -104,17 +39,7 @@ const safeJSONParse = <T>(text: string): T[] => {
   }
 };
 
-// --- Handler ---
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
-  }
-
+export async function POST(req: Request) {
   const publicDir = path.join(process.cwd(), "public");
   const uploadDir = path.join(publicDir, "uploads");
   const filePath = path.join(
@@ -125,9 +50,32 @@ export default async function handler(
   try {
     await fs.mkdir(uploadDir, { recursive: true });
 
-    const { fields, files } = await parseForm(req, { uploadDir });
+    const formData = await req.formData();
 
-    // Safe extraction of fields (parseForm already returns FlatFields with string values)
+    // Extract form fields and files
+    const fields: Record<string, string> = {};
+    const uploadedFiles: Array<{ filename: string; filepath: string }> = [];
+
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value instanceof File) {
+        // Handle file uploads
+        const arrayBuffer = await value.arrayBuffer();
+        const filename = value.name || `upload_${Date.now()}_${key}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.writeFile(filepath, new Uint8Array(arrayBuffer));
+        
+        uploadedFiles.push({
+          filename: value.name || filename,
+          filepath,
+        });
+      } else {
+        // Handle form fields
+        fields[key] = value.toString();
+      }
+    }
+
+    // Safe extraction of fields
     const memberidno = fields.memberidno || "";
     const groupname = fields.groupname || "";
     const groupnumber = fields.groupnumber || "";
@@ -336,24 +284,13 @@ export default async function handler(
       },
     ];
 
-    // Handle uploaded supporting documents field if present
-    const uploadField = files.supportingDocuments as
-      | FormidableFile
-      | FormidableFile[]
-      | undefined;
-
-    if (uploadField) {
-      const uploadArray = Array.isArray(uploadField)
-        ? uploadField
-        : [uploadField];
-
-      uploadArray.forEach((file) => {
-        attachments.push({
-          filename: file.originalFilename ?? "upload",
-          path: (file as any).filepath ?? (file as any).filePath ?? undefined, // defensive
-        });
+    // Add uploaded files to attachments
+    uploadedFiles.forEach((file) => {
+      attachments.push({
+        filename: file.filename,
+        path: file.filepath,
       });
-    }
+    });
 
     const fileUrl = `https://www.birdviewmicroinsurance.com/kenyans_in_south_wales_member_details.xlsx`;
 
@@ -456,14 +393,17 @@ Birdview Insurance`.trim();
       console.error("⚠️ Member email failed:", memberEmailErr);
     }
 
-    return res
-      .status(200)
-      .json({ message: "Form sent successfully", fileUrl, reset: true });
+    return NextResponse.json({
+      message: "Form sent successfully",
+      fileUrl,
+      reset: true,
+    });
   } catch (err: any) {
     console.error("❌ Error in handler:", err);
 
-    return res
-      .status(500)
-      .json({ error: err?.message || "Unknown server error" });
+    return NextResponse.json(
+      { error: err?.message || "Unknown server error" },
+      { status: 500 }
+    );
   }
 }

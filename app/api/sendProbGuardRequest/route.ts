@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export interface SendProbGuardRequestForm {
@@ -9,12 +8,10 @@ export interface SendProbGuardRequestForm {
   request: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method === "POST") {
-    const { name, email, phone, request }: SendProbGuardRequestForm = req.body;
+export async function POST(req: Request) {
+  try {
+    const body: SendProbGuardRequestForm = await req.json();
+    const { name, email, phone, request } = body;
 
     const transporter = nodemailer.createTransport({
       host: "mail5016.site4now.net",
@@ -44,22 +41,17 @@ export default async function handler(
       `,
     };
 
-    try {
-      await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
-      return res
-        .status(200)
-        .json({ message: "Probation Guard request sent successfully." });
-    } catch (error) {
-      console.error("Nodemailer Error:", error);
+    return NextResponse.json({
+      message: "Probation Guard request sent successfully.",
+    });
+  } catch (error) {
+    console.error("Nodemailer Error:", error);
 
-      return res
-        .status(500)
-        .json({ error: "Failed to send probation guard request." });
-    }
+    return NextResponse.json(
+      { error: "Failed to send probation guard request." },
+      { status: 500 }
+    );
   }
-
-  res.setHeader("Allow", ["POST"]);
-
-  return res.status(405).end(`Method ${req.method} Not Allowed`);
 }

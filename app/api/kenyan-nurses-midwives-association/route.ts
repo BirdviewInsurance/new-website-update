@@ -1,22 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
-import { IncomingForm } from "formidable";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export async function POST(req: Request) {
   const publicDir = path.join(process.cwd(), "public");
   const uploadDir = path.join(publicDir, "uploads");
   const filePath = path.join(
@@ -24,29 +12,33 @@ export default async function handler(
     "kenyan-nurses-midwives-association.xlsx",
   );
 
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
   try {
     await fs.mkdir(uploadDir, { recursive: true });
 
-    const form = new IncomingForm({
-      multiples: true,
-      uploadDir,
-      keepExtensions: true,
-    });
+    const formData = await req.formData();
 
-    const { fields, files } = await new Promise<{ fields: any; files: any }>(
-      (resolve, reject) => {
-        form.parse(req, (err, fields, files) => {
-          if (err) reject(err);
-          else resolve({ fields, files });
+    // Extract form fields
+    const fields: Record<string, string> = {};
+    const uploadedFiles: Array<{ filename: string; filepath: string }> = [];
+
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value instanceof File) {
+        // Handle file uploads
+        const arrayBuffer = await value.arrayBuffer();
+        const filename = value.name || `upload_${Date.now()}_${key}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.writeFile(filepath, new Uint8Array(arrayBuffer));
+        
+        uploadedFiles.push({
+          filename: value.name || filename,
+          filepath,
         });
-      },
-    );
+      } else {
+        // Handle form fields
+        fields[key] = value.toString();
+      }
+    }
 
     console.log("📝 Raw fields received:", fields);
 
@@ -304,18 +296,13 @@ export default async function handler(
       },
     ];
 
-    const uploads = files.supportingDocuments;
-
-    if (uploads) {
-      const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
-
-      uploadArray.forEach((file) => {
-        attachments.push({
-          filename: file.originalFilename,
-          path: file.filepath,
-        });
+    // Add uploaded files to attachments
+    uploadedFiles.forEach((file) => {
+      attachments.push({
+        filename: file.filename,
+        path: file.filepath,
       });
-    }
+    });
 
     const adminMailOptions = {
       from: '"Birdview Insurance" <customerservice@birdviewinsurance.com>',
@@ -447,9 +434,11 @@ Birdview Insurance`.trim();
       console.error("⚠️ Member email failed:", memberEmailErr);
     }
 
-    return res
-      .status(200)
-      .json({ message: "Form sent successfully", fileUrl, reset: true });
+    return NextResponse.json({
+      message: "Form sent successfully",
+      fileUrl,
+      reset: true,
+    });
   } catch (error) {
     console.error("❌ Error in handler:", error);
     const errorMessage =
@@ -457,6 +446,9 @@ Birdview Insurance`.trim();
         ? error.message
         : "Unknown server error";
 
-    return res.status(500).json({ error: errorMessage });
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
   }
 }

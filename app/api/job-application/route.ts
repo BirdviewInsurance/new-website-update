@@ -1,71 +1,62 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-// pages/api/agent-form.js
-
-import fs from "fs";
+import { NextResponse } from "next/server";
+import fs from "fs/promises";
 import path from "path";
 
-import formidable from "formidable";
+export async function POST(req: Request) {
+  try {
+    const formData = await req.formData();
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-export const config = {
-  api: {
-    bodyParser: false, // Required for formidable
-  },
-};
+    // Ensure upload directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method === "POST") {
-    const uploadDir = path.join(process.cwd(), "/public/uploads");
+    // Extract form fields
+    const fullname = formData.get("fullname")?.toString();
+    const email = formData.get("email")?.toString();
+    const position = formData.get("position")?.toString();
+    const coverLetter = formData.get("coverLetter")?.toString();
+    const resumeFile = formData.get("resume") as File | null;
 
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Validate fields
+    if (!fullname || !email || !position || !resumeFile) {
+      return NextResponse.json(
+        { error: "All fields are required" },
+        { status: 400 }
+      );
     }
 
-    const form = new formidable.IncomingForm({
-      uploadDir,
-      keepExtensions: true,
-      maxFileSize: 5 * 1024 * 1024, // 5MB
+    // Validate file size (5MB limit)
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    if (resumeFile.size > maxFileSize) {
+      return NextResponse.json(
+        { error: "File size exceeds 5MB limit" },
+        { status: 400 }
+      );
+    }
+
+    // Save resume file with timestamp
+    const timestamp = Date.now();
+    const originalFilename = resumeFile.name || "resume";
+    const fileExtension = originalFilename.split(".").pop() || "";
+    const newFilename = `${timestamp}-${originalFilename}`;
+    const newPath = path.join(uploadDir, newFilename);
+
+    // Convert File to Uint8Array and save
+    const arrayBuffer = await resumeFile.arrayBuffer();
+    await fs.writeFile(newPath, new Uint8Array(arrayBuffer));
+
+    // You can save this data to a database here or send an email notification.
+
+    return NextResponse.json({
+      message: "Application submitted successfully!",
+      filename: newFilename,
     });
+  } catch (error) {
+    console.error("Error handling form data:", error);
 
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.error("Form parsing error:", err);
-
-        return res.status(500).json({ error: "Error parsing the form" });
-      }
-
-      try {
-        const { fullname, email, position, coverLetter } = fields;
-        const resumeFile = files.resume;
-
-        // Validate fields
-        if (!fullname || !email || !position || !resumeFile) {
-          return res.status(400).json({ error: "All fields are required" });
-        }
-
-        // Rename resume with a timestamp
-        const resume = Array.isArray(resumeFile) ? resumeFile[0] : resumeFile;
-        const newFilename = `${Date.now()}-${resume.originalFilename}`;
-        const newPath = path.join(uploadDir, newFilename);
-
-        fs.renameSync(resume.filepath, newPath);
-
-        // You can save this data to a database here or send an email notification.
-
-        return res.status(200).json({
-          message: "Application submitted successfully!",
-          filename: newFilename,
-        });
-      } catch (error) {
-        console.error("Error handling form data:", error);
-
-        return res.status(500).json({ error: "Internal server error" });
-      }
-    });
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

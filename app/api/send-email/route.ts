@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export interface SendEmailForm {
@@ -11,13 +10,10 @@ export interface SendEmailForm {
   phone: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method === "POST") {
-    const { firstName, lastName, email, phone, enquiryType, details } =
-      req.body;
+export async function POST(req: Request) {
+  try {
+    const body: SendEmailForm = await req.json();
+    const { firstName, lastName, email, phone, enquiryType, details } = body;
 
     // Create a transporter object using your email service configuration
     const transporter = nodemailer.createTransport({
@@ -54,14 +50,19 @@ export default async function handler(
     try {
       // Send the email
       await transporter.sendMail(mailOptions);
-      res.status(200).json({ message: "Form sent successfully" });
+      return NextResponse.json({ message: "Form sent successfully" });
     } catch (error: any) {
       console.error(error);
-      res.status(500).json({ error: "Error sending Form" });
+      return NextResponse.json(
+        { error: "Error sending Form" },
+        { status: 500 }
+      );
     }
-  } else {
-    // Handle any other HTTP method
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+  } catch (error: any) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Error processing request" },
+      { status: 500 }
+    );
   }
 }

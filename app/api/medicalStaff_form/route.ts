@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
@@ -41,17 +39,9 @@ export interface MedicalstaffFormForm {
   dependantsData: Dependant[];
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
+    const body: MedicalstaffFormForm = await req.json();
     const {
       policyScheme,
       relationship,
@@ -70,7 +60,7 @@ export default async function handler(
       mobileno,
       eimail,
       dependantsData = [],
-    } = req.body;
+    } = body;
 
     console.log("Received Dependants Data:", dependantsData); // ✅ Fixed log message
 
@@ -259,7 +249,7 @@ export default async function handler(
     try {
       await transporter.sendMail(mailOptions);
 
-      return res.status(200).json({ message: "Form sent successfully" });
+      return NextResponse.json({ message: "Form sent successfully" });
     } catch (emailError: any) {
       console.error("Email failed to send, storing for retry:", emailError);
       const pendingEmailsPath = path.join(publicDir, "pending_emails.json");
@@ -274,15 +264,17 @@ export default async function handler(
         JSON.stringify(pendingEmails, null, 2),
       );
 
-      return res
-        .status(202)
-        .json({ message: "Form sent successfully", fileUrl });
+      return NextResponse.json(
+        { message: "Form sent successfully", fileUrl },
+        { status: 202 }
+      );
     }
   } catch (error: any) {
     console.error("Full Error Details:", error);
 
-    return res
-      .status(500)
-      .json({ error: error?.message || "Unknown error occurred" });
+    return NextResponse.json(
+      { error: error?.message || "Unknown error occurred" },
+      { status: 500 }
+    );
   }
 }

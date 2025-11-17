@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
@@ -29,17 +27,9 @@ export interface GlobalAgentFormForm {
   postal_address: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
+    const body: GlobalAgentFormForm = await req.json();
     const {
       title,
       firstname,
@@ -61,7 +51,7 @@ export default async function handler(
       account_name,
       bank_branch,
       account_number,
-    } = req.body;
+    } = body;
 
     const agentPayload = {
       title,
@@ -109,9 +99,10 @@ export default async function handler(
     if (!response.ok) {
       console.error("❌ API Error:", data);
 
-      return res
-        .status(response.status)
-        .json({ error: data?.error || "Failed to submit agent" });
+      return NextResponse.json(
+        { error: data?.error || "Failed to submit agent" },
+        { status: response.status }
+      );
     }
 
     // Excel appending
@@ -265,16 +256,23 @@ export default async function handler(
         JSON.stringify(pendingEmails, null, 2),
       );
 
-      return res
-        .status(202)
-        .json({ message: "Agent submitted, email pending", fileUrl });
+      return NextResponse.json(
+        { message: "Agent submitted, email pending", fileUrl },
+        { status: 202 }
+      );
     }
 
-    res
-      .status(200)
-      .json({ message: "Agent submitted successfully!", data, fileUrl });
+    return NextResponse.json({
+      message: "Agent submitted successfully!",
+      data,
+      fileUrl,
+    });
   } catch (error) {
     console.error("❌ Unexpected Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
+

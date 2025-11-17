@@ -1,71 +1,45 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
-
-// ✅ Correct Formidable import for v2/v3
-import { IncomingForm, type File as FormidableFile } from "formidable";
 import * as XLSX from "xlsx";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// ✅ Helper to parse form safely
-function parseForm(req: NextApiRequest): Promise<{ fields: any; files: any }> {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({
-      multiples: true,
-      keepExtensions: true,
-    });
-
-    form.parse(req, (err, fields, files) => {
-      if (err) return reject(err);
-      resolve({ fields, files });
-    });
-  });
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export async function POST(req: Request) {
   const publicDir = path.join(process.cwd(), "public");
   const uploadDir = path.join(publicDir, "uploads");
   const filePath = path.join(publicDir, "kenyans-in-bristol.xlsx");
 
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
   try {
     await fs.mkdir(uploadDir, { recursive: true });
 
-    // ✅ Parse form with proper typings
-    const form = new IncomingForm({
-      multiples: true,
-      uploadDir,
-      keepExtensions: true,
-    });
+    const formData = await req.formData();
 
-    const { fields, files } = await new Promise<{ fields: any; files: any }>(
-      (resolve, reject) => {
-        form.parse(req, (err, fields, files) => {
-          if (err) reject(err);
-          else resolve({ fields, files });
+    // Extract form fields and files
+    const fields: Record<string, string> = {};
+    const uploadedFiles: Array<{ filename: string; filepath: string }> = [];
+
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value instanceof File) {
+        // Handle file uploads
+        const arrayBuffer = await value.arrayBuffer();
+        const filename = value.name || `upload_${Date.now()}_${key}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.writeFile(filepath, new Uint8Array(arrayBuffer));
+        
+        uploadedFiles.push({
+          filename: value.name || filename,
+          filepath,
         });
-      },
-    );
+      } else {
+        // Handle form fields
+        fields[key] = value.toString();
+      }
+    }
 
     console.log("📝 Raw fields received:", fields);
 
-    // ✅ Ensure all fields exist and cast safely
+    // Ensure all fields exist and cast safely
     const {
       memberidno = "",
       groupname = "",
@@ -87,7 +61,7 @@ export default async function handler(
       option = "",
     } = fields;
 
-    // ✅ JSON parsing with safety fallback
+    // JSON parsing with safety fallback
     const parseJsonSafe = <T>(value: any): T[] => {
       try {
         return typeof value === "string" ? JSON.parse(value) : value || [];
@@ -286,18 +260,10 @@ export default async function handler(
       path?: string;
     }> = [{ filename: "kenyans-in-bristol.xlsx", content: updatedBuffer }];
 
-    // ✅ Supporting documents
-    const uploads = files.supportingDocuments;
-
-    const uploadArray: FormidableFile[] = uploads
-      ? Array.isArray(uploads)
-        ? uploads
-        : [uploads]
-      : [];
-
-    uploadArray.forEach((file) => {
+    // Add uploaded files to attachments
+    uploadedFiles.forEach((file) => {
       attachments.push({
-        filename: file.originalFilename || "document",
+        filename: file.filename,
         path: file.filepath,
       });
     });
@@ -326,7 +292,7 @@ export default async function handler(
       text: `Dear ${fullName},\n\nThank you for your submission.\n\nYour details have been recorded successfully.\n\nRegards,\nBirdview Insurance`,
     });
 
-    return res.status(200).json({
+    return NextResponse.json({
       message: "Form sent successfully",
       fileUrl: "https://www.birdviewmicroinsurance.com/kenyans-in-bristol.xlsx",
       reset: true,
@@ -334,8 +300,9 @@ export default async function handler(
   } catch (error: any) {
     console.error("❌ Error:", error);
 
-    return res
-      .status(500)
-      .json({ error: error.message || "Unknown server error" });
+    return NextResponse.json(
+      { error: error.message || "Unknown server error" },
+      { status: 500 }
+    );
   }
 }

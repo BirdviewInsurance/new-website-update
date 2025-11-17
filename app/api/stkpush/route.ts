@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import axios from "axios";
 
 // Environment variable guards added automatically
@@ -27,24 +26,19 @@ export interface StkpushForm {
   idno: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    return res
-      .status(405)
-      .json({ success: false, error: "Method not allowed" });
-  }
-
+export async function POST(req: Request) {
   try {
-    const { phone, idno, amount } = req.body;
+    const body: StkpushForm = await req.json();
+    const { phone, idno, amount } = body;
 
     if (!phone || !idno || !amount) {
-      return res.status(400).json({
-        success: false,
-        error: "Phone, ID number, and amount are required",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Phone, ID number, and amount are required",
+        },
+        { status: 400 }
+      );
     }
 
     // 🔹 Credentials (keep in .env.local)
@@ -114,7 +108,7 @@ export default async function handler(
 
     const stkData = stkRes.data as { CheckoutRequestID: string };
 
-    return res.status(200).json({
+    return NextResponse.json({
       success: true,
       checkoutRequestID: stkData.CheckoutRequestID,
       message:
@@ -126,9 +120,13 @@ export default async function handler(
       JSON.stringify(error?.response?.data || error?.message, null, 2),
     );
 
-    return res.status(500).json({
-      success: false,
-      error: error?.response?.data || error?.message,
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error?.response?.data || error?.message,
+      },
+      { status: 500 }
+    );
   }
 }
+

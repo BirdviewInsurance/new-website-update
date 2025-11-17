@@ -4,7 +4,7 @@ export default function FaqsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="w-screen max-w-none overflow-hidden">
+    <section className="w-screen max-w-none overflow-hidden bg-background">
       {children}
     </section>
   );

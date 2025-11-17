@@ -277,7 +277,7 @@ export default function FAQPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 p-6 md:p-12">
+    <div className="w-screen max-w-none min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 overflow-x-hidden">
       <style>{`
         :root{
           --brand-primary: var(--color-primary, #0ea5e9);
@@ -286,8 +286,8 @@ export default function FAQPage() {
       `}</style>
 
       {/* Hero */}
-      <header className="max-w-6xl mx-auto mb-10">
-        <div className="relative">
+      <header className="w-full mb-10 md:mb-16">
+        <div className="relative w-full">
           {/* Background Image */}
           <div className="absolute inset-0">
             <Image
@@ -303,8 +303,8 @@ export default function FAQPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 via-blue-600/60 to-red-600/70" />
 
           {/* Content */}
-          <div className="relative z-10 px-6 py-16 md:py-24 lg:py-28">
-            <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-16 md:py-24 lg:py-28">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="max-w-2xl">
                 <h1 className="text-4xl md:text-5xl font-semibold text-white">
                   {brandName} Support & FAQs
@@ -351,230 +351,225 @@ export default function FAQPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left column - sections / contact */}
-          <aside className="col-span-1">
-            <div className="sticky top-6 space-y-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <h4 className="text-sm font-semibold text-gray-800">
-                  Browse by topic
-                </h4>
-                <div className="mt-3 flex flex-col gap-2">
-                  {sections.map((s) => (
-                    <button
-                      key={s}
-                      className={`text-left px-3 py-2 rounded-md text-sm w-full ${section === s ? "bg-[var(--brand-primary)] text-white" : "text-gray-700 hover:bg-gray-50"}`}
-                      onClick={() => setSection(s as any)}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <h4 className="text-sm font-semibold text-gray-800">
-                  Need help now?
-                </h4>
-                <p className="text-sm text-gray-600 mt-2">
-                  24/7 claims hotline and priority support for policyholders.
-                </p>
-                <div className="mt-3">
-                  <a
-                    className="block w-full text-center rounded-md px-3 py-2 bg-[var(--brand-danger)] text-white font-semibold"
-                    href="tel:+254700000000"
-                  >
-                    Call Claims
-                  </a>
-                </div>
-                <div className="mt-3 text-xs text-gray-500">
-                  Or email{" "}
-                  <a className="underline" href="mailto:support@birdview.co.ke">
-                    support@birdview.co.ke
-                  </a>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <h4 className="text-sm font-semibold text-gray-800">
-                  Still can't find it?
-                </h4>
-                <p className="text-sm text-gray-600 mt-2">
-                  Submit a support request and we'll get back within 1 business
-                  day.
-                </p>
-                <div className="mt-3">
-                  <a
-                    className="block w-full text-center rounded-md px-3 py-2 border border-[var(--brand-primary)] text-[var(--brand-primary)]"
-                    href="/support/request"
-                  >
-                    Open Request
-                  </a>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Right column - faqs */}
-          <section className="col-span-3">
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Frequently Asked Questions
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  Select a topic or search to narrow results. Click a question
-                  to view the answer.
-                </p>
-
-                <div className="mt-6 border-t border-gray-100 pt-4 space-y-3">
-                  {visible.map((f) => (
-                    <div key={f.id} className="">
-                      <button
-                        className="w-full text-left flex items-start justify-between gap-4 p-3 rounded-md hover:bg-gray-50"
-                        id={f.id}
-                        onClick={() => {
-                          setActive(active === f.id ? null : f.id);
-                          // update hash for deep-linking
-                          if (window && window.history && window.location) {
-                            const newHash = `#${f.id}`;
-
-                            history.replaceState(null, "", newHash);
-                          }
-                        }}
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-gray-800">
-                              {f.q}
-                            </span>
-                          </div>
-                          <div className="mt-2 text-xs text-gray-500">
-                            {f.section}
-                          </div>
-                        </div>
-
-                        <div className="shrink-0">
-                          <motion.div
-                            animate={{ rotate: active === f.id ? 180 : 0 }}
-                            className="text-gray-400"
-                          >
-                            <svg
-                              fill="none"
-                              height="20"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                              width="20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M6 9l6 6 6-6"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </motion.div>
-                        </div>
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {active === f.id && (
-                          <motion.div
-                            animate={{ opacity: 1, height: "auto" }}
-                            className="px-4 pb-4 text-sm text-gray-700"
-                            exit={{ opacity: 0, height: 0 }}
-                            initial={{ opacity: 0, height: 0 }}
-                            transition={{
-                              type: "spring",
-                              damping: 20,
-                              stiffness: 300,
-                            }}
-                          >
-                            <div className="prose max-w-none">{f.a}</div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  ))}
-
-                  {visible.length === 0 && (
-                    <div className="p-6 text-center text-sm text-gray-600">
-                      No matching FAQs — try a different search.
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Section summaries (optional) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <main className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 pb-12 md:pb-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
+            {/* Left column - sections / contact */}
+            <aside className="col-span-1">
+              <div className="sticky top-6 space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <h5 className="font-semibold text-gray-800">Claims</h5>
-                  <p className="text-sm text-gray-600 mt-2">
-                    How to lodge claims, timeline expectations and required
-                    documentation.
-                  </p>
-                </div>
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <h5 className="font-semibold text-gray-800">Payments</h5>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Payment options, renewals, and invoices.
-                  </p>
-                </div>
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <h5 className="font-semibold text-gray-800">Support</h5>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Priority support and contact channels.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="mt-6 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-danger)] text-white rounded-xl p-6 shadow-lg">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                  <h4 className="text-xl font-semibold">
-                    Still have questions?
+                  <h4 className="text-sm font-semibold text-gray-800">
+                    Browse by topic
                   </h4>
-                  <p className="text-sm mt-1 text-white/90">
-                    Our team is ready to help — whether it's a complex claim or
-                    a bespoke corporate policy.
-                  </p>
+                  <div className="mt-3 flex flex-col gap-2">
+                    {sections.map((s) => (
+                      <button
+                        key={s}
+                        className={`text-left px-3 py-2 rounded-md text-sm w-full ${section === s ? "bg-[var(--brand-primary)] text-white" : "text-gray-700 hover:bg-gray-50"}`}
+                        onClick={() => setSection(s as any)}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <motion.div
-                  ref={ref}
-                  animate={controls}
-                  className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 mt-6 flex-nowrap"
-                  initial="hidden"
-                  variants={{
-                    hidden: { opacity: 0, y: 30 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.8, ease: "easeOut" },
-                    },
-                  }}
-                >
-                  <a
-                    className="rounded-full px-5 py-2 sm:px-6 sm:py-2.5 bg-white text-[var(--brand-primary)] font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                    href="/contact"
-                  >
-                    Contact us
-                  </a>
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                  <h4 className="text-sm font-semibold text-gray-800">
+                    Need help now?
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-2">
+                    24/7 claims hotline and priority support for policyholders.
+                  </p>
+                  <div className="mt-3">
+                    <a
+                      className="block w-full text-center rounded-md px-3 py-2 bg-[var(--brand-danger)] text-white font-semibold"
+                      href="tel:+254700000000"
+                    >
+                      Call Claims
+                    </a>
+                  </div>
+                  <div className="mt-3 text-xs text-gray-500">
+                    Or email{" "}
+                    <a className="underline" href="mailto:support@birdview.co.ke">
+                      support@birdview.co.ke
+                    </a>
+                  </div>
+                </div>
 
-                  <a
-                    className="rounded-full px-5 py-2 sm:px-6 sm:py-2.5 border border-white text-white font-semibold shadow-md hover:bg-white hover:text-[var(--brand-primary)] transition-all duration-300 hover:scale-105"
-                    href="/support/request"
-                  >
-                    Open a request
-                  </a>
-                </motion.div>
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                  <h4 className="text-sm font-semibold text-gray-800">
+                    Still can't find it?
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Submit a support request and we'll get back within 1 business
+                    day.
+                  </p>
+                  <div className="mt-3">
+                    <a
+                      className="block w-full text-center rounded-md px-3 py-2 border border-[var(--brand-primary)] text-[var(--brand-primary)]"
+                      href="/support/request"
+                    >
+                      Open Request
+                    </a>
+                  </div>
+                </div>
               </div>
-            </div>
-          </section>
+            </aside>
+
+            {/* Right column - faqs */}
+            <section className="col-span-3">
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Frequently Asked Questions
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Select a topic or search to narrow results. Click a question
+                    to view the answer.
+                  </p>
+
+                  <div className="mt-6 border-t border-gray-100 pt-4 space-y-3">
+                    {visible.map((f) => (
+                      <div key={f.id} className="">
+                        <button
+                          className="w-full text-left flex items-start justify-between gap-4 p-3 rounded-md hover:bg-gray-50"
+                          id={f.id}
+                          onClick={() => {
+                            setActive(active === f.id ? null : f.id);
+                            // update hash for deep-linking
+                            if (window && window.history && window.location) {
+                              const newHash = `#${f.id}`;
+
+                              history.replaceState(null, "", newHash);
+                            }
+                          }}
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-medium text-gray-800">
+                                {f.q}
+                              </span>
+                            </div>
+                            <div className="mt-2 text-xs text-gray-500">
+                              {f.section}
+                            </div>
+                          </div>
+
+                          <div className="shrink-0">
+                            <motion.div
+                              animate={{ rotate: active === f.id ? 180 : 0 }}
+                              className="text-gray-400"
+                            >
+                              <svg
+                                fill="none"
+                                height="20"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                width="20"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M6 9l6 6 6-6"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </motion.div>
+                          </div>
+                        </button>
+
+                        <AnimatePresence initial={false}>
+                          {active === f.id && (
+                            <motion.div
+                              animate={{ opacity: 1, height: "auto" }}
+                              className="px-4 pb-4 text-sm text-gray-700"
+                              exit={{ opacity: 0, height: 0 }}
+                              initial={{ opacity: 0, height: 0 }}
+                              transition={{
+                                type: "spring",
+                                damping: 20,
+                                stiffness: 300,
+                              }}
+                            >
+                              <div className="prose max-w-none">{f.a}</div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
+
+                    {visible.length === 0 && (
+                      <div className="p-6 text-center text-sm text-gray-600">
+                        No matching FAQs — try a different search.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Section summaries (optional) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <h5 className="font-semibold text-gray-800">Claims</h5>
+                    <p className="text-sm text-gray-600 mt-2">
+                      How to lodge claims, timeline expectations and required
+                      documentation.
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <h5 className="font-semibold text-gray-800">Payments</h5>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Payment options, renewals, and invoices.
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <h5 className="font-semibold text-gray-800">Support</h5>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Priority support and contact channels.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="mt-8 md:mt-10 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-danger)] text-white rounded-xl p-6 md:p-8 lg:p-10 shadow-lg">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8">
+                  <div className="flex-1">
+                    <h4 className="text-xl md:text-2xl font-semibold">
+                      Still have questions?
+                    </h4>
+                    <p className="text-sm md:text-base mt-2 text-white/90 max-w-2xl">
+                      Our team is ready to help — whether it's a complex claim or
+                      a bespoke corporate policy.
+                    </p>
+                  </div>
+
+                  <motion.div
+                    ref={ref}
+                    animate={controls}
+                    className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3 sm:gap-4 w-full lg:w-auto flex-shrink-0"
+                    initial="hidden"
+                    variants={{
+                      hidden: { opacity: 0, y: 30 },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.8, ease: "easeOut" },
+                      },
+                    }}
+                  >
+                    <a
+                      className="rounded-full px-6 py-3 sm:px-8 sm:py-3 bg-white text-[var(--brand-primary)] font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-center whitespace-nowrap"
+                      href="/contact-us"
+                    >
+                      Contact us
+                    </a>
+                  </motion.div>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
       </main>
     </div>

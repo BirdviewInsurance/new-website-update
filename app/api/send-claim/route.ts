@@ -1,71 +1,48 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
-import { IncomingForm } from "formidable";
-
-// Helper to parse formidable multipart form data in an async/await style
-function parseForm(req: NextApiRequest): Promise<{ fields: any; files: any }> {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({ multiples: true });
-
-    form.parse(req, (err, fields, files) => {
-      if (err) return reject(err);
-      resolve({ fields, files });
-    });
-  });
-}
-
+import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import fs from "fs/promises";
+import path from "path";
 
-import fs from "fs";
+export async function POST(req: Request) {
+  try {
+    const formData = await req.formData();
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+    // Ensure upload directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+    // Extract form fields
+    const policy_no = formData.get("policy_no")?.toString();
+    const national_id = formData.get("national_id")?.toString();
+    const contactperson = formData.get("contactperson")?.toString();
 
-  const form = new IncomingForm({ multiples: true });
+    // Prepare attachments from uploaded files
+    const attachments: Array<{ filename: string; path: string }> = [];
+    const supportingDocuments = formData.getAll("supportingDocuments");
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error("Form parsing error:", err);
-
-      return res.status(500).json({ message: "Form parsing failed" });
-    }
-
-    const { policy_no, national_id, contactperson } = fields;
-
-    // Prepare attachments
-    const attachments = [];
-    const uploadedFiles = Array.isArray(files.supportingDocuments)
-      ? files.supportingDocuments
-      : [files.supportingDocuments];
-
-    for (const file of uploadedFiles) {
-      if (file?.filepath) {
+    for (const file of supportingDocuments) {
+      if (file instanceof File) {
+        const arrayBuffer = await file.arrayBuffer();
+        const filename = file.name || `document_${Date.now()}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.writeFile(filepath, new Uint8Array(arrayBuffer));
+        
         attachments.push({
-          filename: file.originalFilename || file.newFilename || "file",
-          content: fs.createReadStream(file.filepath),
+          filename: file.name || filename,
+          path: filepath,
         });
       }
     }
 
     // Email transporter
     const transporter = nodemailer.createTransport({
-      host: "mail5016.site4now.net", // Replace with your email provider's SMTP server
-      port: 465, // Replace with your email provider's SMTP port
-      secure: true, // Set to true for 465, false for other ports
+      host: "mail5016.site4now.net",
+      port: 465,
+      secure: true,
       auth: {
-        user: "Claims@birdviewinsurance.com", // Your email address
-        pass: "B!rdv!ew@2024", // Your email password
+        user: "Claims@birdviewinsurance.com",
+        pass: "B!rdv!ew@2024",
       },
     });
 
@@ -85,10 +62,19 @@ Contact Person: ${contactperson}
 
     try {
       await transporter.sendMail(mailOptions);
-      res.status(200).json({ message: "Email sent successfully!" });
+      return NextResponse.json({ message: "Email sent successfully!" });
     } catch (emailErr) {
       console.error("Error sending email:", emailErr);
-      res.status(500).json({ message: "Failed to send email." });
+      return NextResponse.json(
+        { message: "Failed to send email." },
+        { status: 500 }
+      );
     }
-  });
+  } catch (error) {
+    console.error("Error processing claim:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

@@ -1,34 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import * as fssync from "fs";
 import * as path from "path";
-
-import formidable, { Fields, Files, File } from "formidable";
 import * as XLSX from "xlsx";
 import nodemailer from "nodemailer";
 import archiver from "archiver";
 import axios from "axios";
 import FormData from "form-data";
-
-// Disable Next.js body parsing (formidable handles this)
-export const config = {
-  api: { bodyParser: false },
-};
-
-// Helper to parse multipart form data
-async function parseForm(
-  req: NextApiRequest,
-): Promise<{ fields: Fields; files: Files }> {
-  return new Promise((resolve, reject) => {
-    const form = formidable({ multiples: true, keepExtensions: true });
-
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      else resolve({ fields, files });
-    });
-  });
-}
 
 // Utility to create ZIP archive
 async function createZip(
@@ -79,50 +57,42 @@ async function uploadZipToSnownet(
   }
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-): Promise<void> {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method not allowed" });
-
-    return;
-  }
-
+export async function POST(req: Request) {
   try {
-    const { fields, files } = await parseForm(req);
+    const formData = await req.formData();
 
-    // Convert fields to simple object
-    const formData: Record<string, string> = {};
+    // Convert FormData to simple object
+    const formFields: Record<string, string> = {};
+    const uploadedFiles: { filename: string; filepath: string; fieldName: string }[] = [];
+    const fileNames: Record<string, string> = {};
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-    Object.keys(fields).forEach((k) => {
-      const value = fields[k];
+    await fs.mkdir(uploadDir, { recursive: true });
 
-      formData[k] = Array.isArray(value)
-        ? value[0] !== undefined
-          ? String(value[0])
-          : ""
-        : value !== undefined
-          ? String(value)
-          : "";
-    });
+    // Process form data and files
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value instanceof File) {
+        // Handle file uploads
+        const arrayBuffer = await value.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const filename = value.name || `upload_${Date.now()}_${key}`;
+        const filepath = path.join(uploadDir, filename);
 
-    // Extract uploaded files safely
-    const uploadedFiles: { filename: string; filepath: string }[] = [
-      "idCopy",
-      "pinCopy",
-      "logBookOrKraPin",
-    ].flatMap((k) => {
-      const f = files[k];
+        await fs.writeFile(filepath, new Uint8Array(buffer));
 
-      if (!f) return [];
-      const arr = Array.isArray(f) ? f : [f];
+        uploadedFiles.push({
+          filename: value.name || filename,
+          filepath,
+          fieldName: key,
+        });
 
-      return arr.map((file: File) => ({
-        filename: file.originalFilename || "unknown",
-        filepath: file.filepath,
-      }));
-    });
+        // Store filename by field name for easy lookup
+        fileNames[key] = value.name || filename;
+      } else {
+        // Handle form fields
+        formFields[key] = value.toString();
+      }
+    }
 
     // Prepare Excel file
     const publicDir = path.join(process.cwd(), "public");
@@ -166,26 +136,29 @@ export default async function handler(
 
     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
 
+    // Get file names from uploaded files
+    const idCopyName = fileNames["idCopy"] || "N/A";
+    const pinCopyName = fileNames["pinCopy"] || "N/A";
+    const logBookName = fileNames["logBookOrKraPin"] || "N/A";
+
     rows.push([
-      formData.products || "",
-      formData.timeOnRisk || "",
-      formData.pinNumber || "",
-      formData.policyHolder || "",
-      formData.email || "",
-      formData.registrationNumber || "",
-      formData.chasisNo || "",
-      formData.coverType || "",
-      formData.certificateStartDate || "",
-      formData.period || "",
-      formData.certificateToDate || "",
-      files.idCopy ? (files.idCopy as File[])[0]?.originalFilename : "N/A",
-      files.pinCopy ? (files.pinCopy as File[])[0]?.originalFilename : "N/A",
-      files.logBookOrKraPin
-        ? (files.logBookOrKraPin as File[])[0]?.originalFilename
-        : "N/A",
-      formData.vehicleMake || "",
-      formData.yearOfMake || "",
-      formData.licenseToCarry || "",
+      formFields.products || "",
+      formFields.timeOnRisk || "",
+      formFields.pinNumber || "",
+      formFields.policyHolder || "",
+      formFields.email || "",
+      formFields.registrationNumber || "",
+      formFields.chasisNo || "",
+      formFields.coverType || "",
+      formFields.certificateStartDate || "",
+      formFields.period || "",
+      formFields.certificateToDate || "",
+      idCopyName,
+      pinCopyName,
+      logBookName,
+      formFields.vehicleMake || "",
+      formFields.yearOfMake || "",
+      formFields.licenseToCarry || "",
       new Date().toISOString(),
     ]);
 
@@ -199,13 +172,13 @@ export default async function handler(
 
     // Zip and upload to Snownet
     const zipPath = await createZip(
-      formData.policyHolder,
+      formFields.policyHolder,
       uploadedFiles,
       excelPath,
     );
     const snownetResponse = await uploadZipToSnownet(
       zipPath,
-      formData.policyHolder,
+      formFields.policyHolder,
     );
     const snownetLink =
       snownetResponse?.fileUrl || snownetResponse?.url || "Upload Failed";
@@ -224,7 +197,7 @@ export default async function handler(
     await transporter.sendMail({
       from: "customerservice@birdviewinsurance.com",
       to: ["Rmuiru@birdviewinsurance.com", "Eyahuma@birdviewinsurance.com"],
-      subject: `New Insurance Proposal: ${formData.policyHolder}`,
+      subject: `New Insurance Proposal: ${formFields.policyHolder}`,
       text: `A new proposal was submitted.\n\nZIP Storage Link: ${snownetLink}`,
       attachments: [
         ...uploadedFiles.map((f) => ({
@@ -235,9 +208,12 @@ export default async function handler(
       ],
     });
 
-    res.status(200).json({ success: true, snownetZipLink: snownetLink });
+    return NextResponse.json({ success: true, snownetZipLink: snownetLink });
   } catch (err: any) {
     console.error("❌ API Error:", err);
-    res.status(500).json({ success: false, error: err.message });
+    return NextResponse.json(
+      { success: false, error: err.message || "Unknown error occurred" },
+      { status: 500 }
+    );
   }
 }

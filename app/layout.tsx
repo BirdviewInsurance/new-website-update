@@ -338,6 +338,7 @@ export default function RootLayout({
                       { href: "/blog", label: "Blogs" },
                       { href: "/newsroom", label: "News" },
                       { href: "/faq", label: "FAQ" },
+                      { href: "/form_compilation", label: "Forms" },
                       { href: "/downloads", label: "Downloads" },
                       { href: "/providers", label: "Providers" },
                       { href: "/pictorial", label: "Pictorial" },

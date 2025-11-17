@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
@@ -30,17 +28,9 @@ export interface BrokerFormForm {
   title: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
+    const body: BrokerFormForm = await req.json();
     // Destructure request body
     const {
       intermediary_type,
@@ -64,7 +54,7 @@ export default async function handler(
       account_name,
       bank_branch,
       account_number,
-    } = req.body as BrokerFormForm;
+    } = body;
 
     const sharedPayload = {
       title,
@@ -271,17 +261,23 @@ https://www.birdviewmicroinsurance.com/agent_data.xlsx`,
     const data = await submitRes.json();
 
     if (!submitRes.ok) {
-      return res
-        .status(submitRes.status)
-        .json({ error: data?.error || "Failed to submit agent/broker" });
+      return NextResponse.json(
+        { error: data?.error || "Failed to submit agent/broker" },
+        { status: submitRes.status }
+      );
     }
 
-    return res
-      .status(200)
-      .json({ message: `${intermediary_type} submitted successfully!`, data });
+    return NextResponse.json({
+      message: `${intermediary_type} submitted successfully!`,
+      data,
+    });
   } catch (error) {
     console.error("❌ Internal Error:", error);
 
-    return res.status(500).json({ error: "Internal Server Error" });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
+

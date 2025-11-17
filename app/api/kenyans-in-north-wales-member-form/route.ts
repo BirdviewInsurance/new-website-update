@@ -1,58 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
-import {
-  IncomingForm,
-  type Fields,
-  type Files,
-  type Options,
-} from "formidable";
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
-// Required for formidable with Next.js
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// ----------------------------
-// ✅ Formidable Parse Helper
-// ----------------------------
-function parseForm(
-  req: NextApiRequest,
-  options: Partial<Options> = {},
-): Promise<{ fields: Fields; files: Files }> {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({
-      multiples: true,
-      keepExtensions: true,
-      ...options,
-    });
-
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      else resolve({ fields, files });
-    });
-  });
-}
-
-// ----------------------------
-// ✅ MAIN HANDLER
-// ----------------------------
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
-
+export async function POST(req: Request) {
   try {
     const publicDir = path.join(process.cwd(), "public");
     const uploadDir = path.join(publicDir, "uploads");
@@ -63,27 +15,33 @@ export default async function handler(
 
     await fs.mkdir(uploadDir, { recursive: true });
 
-    // ✅ Parse form-data
-    const { fields, files } = await parseForm(req, {
-      uploadDir,
-    });
+    const formData = await req.formData();
 
-    // ----------------------------
-    // ✅ Extract Clean Fields
-    // ----------------------------
-    const getField = (key: string): string => {
-      const value = fields[key];
+    // Extract form fields and files
+    const fields: Record<string, string> = {};
+    const uploadedFiles: Array<{ filename: string; filepath: string }> = [];
 
-      if (value === undefined || value === null) return "";
-
-      if (Array.isArray(value)) {
-        const v = value[0];
-
-        return typeof v === "string" ? v : "";
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value instanceof File) {
+        // Handle file uploads
+        const arrayBuffer = await value.arrayBuffer();
+        const filename = value.name || `upload_${Date.now()}_${key}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.writeFile(filepath, new Uint8Array(arrayBuffer));
+        
+        uploadedFiles.push({
+          filename: value.name || filename,
+          filepath,
+        });
+      } else {
+        // Handle form fields
+        fields[key] = value.toString();
       }
+    }
 
-      return typeof value === "string" ? value : "";
-    };
+    // Helper to get field value
+    const getField = (key: string): string => fields[key] || "";
 
     const memberidno = getField("memberidno");
     const firstname = getField("firstname");
@@ -108,15 +66,21 @@ export default async function handler(
     const family_option = getField("family_option");
     const option = getField("option");
 
-    // ----------------------------
-    // ✅ Parse Dependants & Beneficiaries JSON
-    // ----------------------------
-    const dependantsData = JSON.parse(
-      getField("dependantsData") || "[]",
-    ) as any[];
-    const beneficiariesData = JSON.parse(
-      getField("beneficiariesData") || "[]",
-    ) as any[];
+    // Parse Dependants & Beneficiaries JSON
+    let dependantsData: any[] = [];
+    let beneficiariesData: any[] = [];
+
+    try {
+      dependantsData = JSON.parse(getField("dependantsData") || "[]");
+    } catch (err) {
+      console.warn("⚠️ Invalid dependantsData JSON");
+    }
+
+    try {
+      beneficiariesData = JSON.parse(getField("beneficiariesData") || "[]");
+    } catch (err) {
+      console.warn("⚠️ Invalid beneficiariesData JSON");
+    }
 
     // ----------------------------
     // ✅ Load or Create Excel Workbook
@@ -310,7 +274,7 @@ export default async function handler(
       },
     });
 
-    // ✅ Attach uploaded files
+    // Attach uploaded files
     const attachments: any[] = [
       {
         filename: "kenyans_in_north_wales_member_details.xlsx",
@@ -318,18 +282,13 @@ export default async function handler(
       },
     ];
 
-    const uploads = files.supportingDocuments;
-
-    if (uploads) {
-      const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
-
-      uploadArray.forEach((file: any) => {
-        attachments.push({
-          filename: file.originalFilename,
-          path: file.filepath,
-        });
+    // Add uploaded files to attachments
+    uploadedFiles.forEach((file) => {
+      attachments.push({
+        filename: file.filename,
+        path: file.filepath,
       });
-    }
+    });
 
     // ----------------------------
     // ✅ Send Admin Email
@@ -359,13 +318,16 @@ export default async function handler(
       text: `Dear ${fullName},\n\nThank you for your submission.\n\nYour membership has been received.`,
     });
 
-    return res.status(200).json({
+    return NextResponse.json({
       message: "Form submitted successfully",
       reset: true,
     });
   } catch (err: any) {
     console.error("❌ Server Error:", err);
 
-    return res.status(500).json({ error: err.message || "Server error" });
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: 500 }
+    );
   }
 }

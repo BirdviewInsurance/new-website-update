@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import PDFDocument from "pdfkit";
 
@@ -14,16 +13,9 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
   });
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+export async function POST(req: Request) {
   try {
-    const formData = req.body;
+    const formData = await req.json();
     const {
       insuredName,
       phone,
@@ -59,7 +51,10 @@ export default async function handler(
     } = formData;
 
     if (!insuredName) {
-      return res.status(400).json({ error: "Insured Name is required" });
+      return NextResponse.json(
+        { error: "Insured Name is required" },
+        { status: 400 }
+      );
     }
 
     // 🎨 PDF Setup
@@ -238,11 +233,15 @@ export default async function handler(
       ],
     });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Claim submitted successfully ✅" });
+    return NextResponse.json({
+      success: true,
+      message: "Claim submitted successfully ✅",
+    });
   } catch (error: any) {
     console.error("❌ Error in claim API:", error);
-    res.status(500).json({ error: "Error processing claim" });
+    return NextResponse.json(
+      { error: "Error processing claim" },
+      { status: 500 }
+    );
   }
 }

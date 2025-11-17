@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
@@ -16,18 +14,10 @@ export interface RegistrationFormForm {
   mobileno: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
-    const { fullnames, mobileno, email, agencies } = req.body;
+    const body: RegistrationFormForm = await req.json();
+    const { fullnames, mobileno, email, agencies } = body;
 
     // ✅ Ensure public directory exists
     const publicDir = path.join(process.cwd(), "public");
@@ -109,9 +99,12 @@ export default async function handler(
 
     // ✅ Send Email
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "Form sent successfully" });
+    return NextResponse.json({ message: "Form sent successfully" });
   } catch (error: any) {
     console.error("Full Error Details:", error);
-    res.status(500).json({ error: error?.message || "Unknown error occurred" });
+    return NextResponse.json(
+      { error: error?.message || "Unknown error occurred" },
+      { status: 500 }
+    );
   }
 }

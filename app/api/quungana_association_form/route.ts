@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
@@ -55,17 +53,9 @@ export interface QuunganaAssociationFormForm {
   title: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
+    const body: QuunganaAssociationFormForm = await req.json();
     const {
       memberidno,
       groupname,
@@ -86,9 +76,9 @@ export default async function handler(
       eimail,
       dependantsData = [],
       beneficiariesData = [],
-    } = req.body;
+    } = body;
 
-    console.log("✅ Received Form Data:", JSON.stringify(req.body, null, 2));
+    console.log("✅ Received Form Data:", JSON.stringify(body, null, 2));
     console.log(
       "✅ Received Dependants Data:",
       JSON.stringify(dependantsData, null, 2),
@@ -436,12 +426,13 @@ Birdview Insurance
       text: memberEmailBody,
     });
 
-    return res.status(200).json({ message: "Form sent successfully", fileUrl });
+    return NextResponse.json({ message: "Form sent successfully", fileUrl });
   } catch (error: any) {
     console.error("❌ Full Error Details:", error);
 
-    return res
-      .status(500)
-      .json({ error: error?.message || "Unknown error occurred" });
+    return NextResponse.json(
+      { error: error?.message || "Unknown error occurred" },
+      { status: 500 }
+    );
   }
 }

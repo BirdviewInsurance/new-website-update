@@ -1,64 +1,41 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import type { Options } from "formidable";
-
+import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-
 import * as XLSX from "xlsx";
-import { IncomingForm } from "formidable";
 import nodemailer from "nodemailer";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-/**
- * Helper to parse formidable multipart form data in an async/await style
- * Accepts optional IncomingForm options (uploadDir, keepExtensions, multiples, etc).
- */
-function parseForm(
-  req: NextApiRequest,
-  formOptions?: Partial<Options>,
-): Promise<{ fields: any; files: any }> {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({
-      multiples: true,
-      ...(formOptions || {}),
-    });
-
-    form.parse(req as any, (err, fields, files) => {
-      if (err) return reject(err);
-      resolve({ fields, files });
-    });
-  });
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+export async function POST(req: Request) {
   const publicDir = path.join(process.cwd(), "public");
   const uploadDir = path.join(publicDir, "uploads");
   const filePath = path.join(publicDir, "kenyan-oxfordshire-men-welfare.xlsx");
 
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
   try {
     await fs.mkdir(uploadDir, { recursive: true });
 
-    // parse form with uploadDir and keep extensions
-    const { fields, files } = await parseForm(req, {
-      multiples: true,
-      uploadDir,
-      keepExtensions: true,
-    });
+    const formData = await req.formData();
+
+    // Extract form fields and files
+    const fields: Record<string, string> = {};
+    const uploadedFiles: Array<{ filename: string; filepath: string }> = [];
+
+    for (const [key, value] of Array.from(formData.entries())) {
+      if (value instanceof File) {
+        // Handle file uploads
+        const arrayBuffer = await value.arrayBuffer();
+        const filename = value.name || `upload_${Date.now()}_${key}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.writeFile(filepath, new Uint8Array(arrayBuffer));
+        
+        uploadedFiles.push({
+          filename: value.name || filename,
+          filepath,
+        });
+      } else {
+        // Handle form fields
+        fields[key] = value.toString();
+      }
+    }
 
     console.log("📝 Raw fields received:", fields);
 
@@ -78,10 +55,10 @@ export default async function handler(
       city,
       address,
       mobileno,
-      eimail, // keeping original field name used in the form; rename here if the field is actually "email"
+      eimail,
       family_option,
       option,
-    } = fields as Record<string, any>;
+    } = fields;
 
     // parse dependants and beneficiaries safely
     let dependantsData: any[] = [];
@@ -90,7 +67,7 @@ export default async function handler(
       dependantsData =
         typeof fields.dependantsData === "string"
           ? JSON.parse(fields.dependantsData)
-          : fields.dependantsData || [];
+          : [];
       console.log("👨‍👩‍👧 Dependants parsed:", dependantsData);
     } catch (err) {
       console.warn("⚠️ Invalid dependantsData JSON", err);
@@ -289,7 +266,7 @@ export default async function handler(
         user: "customerservice@birdviewinsurance.com",
         pass: "B!rdv!ew@2024",
       },
-    } as SMTPTransport.Options);
+    });
 
     // attachments: add the generated workbook
     const attachments: NonNullable<nodemailer.SendMailOptions["attachments"]> =
@@ -300,24 +277,13 @@ export default async function handler(
         },
       ];
 
-    // include any uploaded supporting documents (formidable file objects)
-    const uploads = (files as any)?.supportingDocuments;
-
-    if (uploads) {
-      const uploadArray = Array.isArray(uploads) ? uploads : [uploads];
-
-      uploadArray.forEach((file: any) => {
-        // formidable v2 file shape: filepath, originalFilename (v2), or old: path, name
-        const filename =
-          file.originalFilename || file.originalname || file.name || "upload";
-        const filepath = file.filepath || file.path;
-
-        attachments.push({
-          filename,
-          path: filepath,
-        } as any);
+    // Add uploaded files to attachments
+    uploadedFiles.forEach((file) => {
+      attachments.push({
+        filename: file.filename,
+        path: file.filepath,
       });
-    }
+    });
 
     const fileUrl = `https://www.birdviewmicroinsurance.com/kenyan-oxfordshire-men-welfare.xlsx`;
 
@@ -414,14 +380,17 @@ Birdview Insurance`.trim();
       console.error("⚠️ Member email failed:", memberEmailErr);
     }
 
-    return res
-      .status(200)
-      .json({ message: "Form sent successfully", fileUrl, reset: true });
+    return NextResponse.json({
+      message: "Form sent successfully",
+      fileUrl,
+      reset: true,
+    });
   } catch (error: any) {
     console.error("❌ Error in handler:", error);
 
-    return res
-      .status(500)
-      .json({ error: error?.message || "Unknown server error" });
+    return NextResponse.json(
+      { error: error?.message || "Unknown server error" },
+      { status: 500 }
+    );
   }
 }

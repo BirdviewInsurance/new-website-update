@@ -71,18 +71,18 @@ export default function OurLeadership() {
     },
   ];
 
-  const advisors = [
-    {
-      name: "Dr. Alice Oloo",
-      title: "Senior Strategic Advisor",
-      img: "/assets/managementPhotos/Richard-Muiru.png",
-    },
-    {
-      name: "John Mwangi",
-      title: "Financial Consultant",
-      img: "/assets/managementPhotos/Obed-Menjeri.png",
-    },
-  ];
+  // const advisors = [
+  //   {
+  //     name: "Dr. Alice Oloo",
+  //     title: "Senior Strategic Advisor",
+  //     img: "/assets/managementPhotos/Richard-Muiru.png",
+  //   },
+  //   {
+  //     name: "John Mwangi",
+  //     title: "Financial Consultant",
+  //     img: "/assets/managementPhotos/Obed-Menjeri.png",
+  //   },
+  // ];
 
   return (
     <section className="relative w-full min-h-screen overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-black px-6 md:px-12 lg:px-24 py-20 space-y-28 transition-colors duration-700">
@@ -128,12 +128,12 @@ export default function OurLeadership() {
           icon: <Users2 className="text-red-600 w-8 h-8" />,
           data: executives,
         },
-        {
-          id: "advisors",
-          title: "Strategic Advisors",
-          icon: <Star className="text-blue-600 w-8 h-8" />,
-          data: advisors,
-        },
+        // {
+        //   id: "advisors",
+        //   title: "Strategic Advisors",
+        //   icon: <Star className="text-blue-600 w-8 h-8" />,
+        //   data: advisors,
+        // },
       ].map((section, sIdx) => (
         <motion.div
           key={section.id}
@@ -152,11 +152,10 @@ export default function OurLeadership() {
           </div>
 
           <div
-            className={`grid gap-10 ${
-              section.id === "advisors"
+            className={`grid gap-10 ${section.id === "advisors"
                 ? "md:grid-cols-2 max-w-4xl mx-auto"
                 : "md:grid-cols-3"
-            }`}
+              }`}
           >
             {section.data.map((person, i) => (
               <motion.div

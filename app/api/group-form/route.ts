@@ -1,22 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import * as XLSX from "xlsx";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
+export async function POST(req: Request) {
   try {
+    const body = await req.json();
     const {
       groupname,
       grouplocation,
@@ -39,7 +29,7 @@ export default async function handler(
       nosiblingclaims,
       nospouseclaims,
       noparentclaims,
-    } = req.body;
+    } = body;
 
     // ✅ Ensure public directory exists
     const publicDir = path.join(process.cwd(), "public");
@@ -176,7 +166,7 @@ export default async function handler(
       });
 
     // ✅ Respond with the file download URL
-    res.status(200).json({
+    return NextResponse.json({
       message: "Form submitted successfully.",
       downloadUrl: fileUrl,
     });
@@ -185,6 +175,9 @@ export default async function handler(
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
 
-    res.status(500).json({ error: errorMessage });
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
   }
 }

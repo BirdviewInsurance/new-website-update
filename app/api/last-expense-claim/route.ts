@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-
 import nodemailer from "nodemailer";
 import PDFDocument from "pdfkit";
 
@@ -17,16 +15,9 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
   });
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+export async function POST(req: Request) {
   try {
-    const formData = req.body;
+    const formData = await req.json();
     const {
       memberName,
       policyNumber,
@@ -60,7 +51,10 @@ export default async function handler(
     } = formData;
 
     if (!memberName) {
-      return res.status(400).json({ error: "Member Name is required" });
+      return NextResponse.json(
+        { error: "Member Name is required" },
+        { status: 400 }
+      );
     }
 
     // 1. Create PDF Document
@@ -224,11 +218,15 @@ export default async function handler(
       ],
     });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Last Expense Claim submitted ✅" });
+    return NextResponse.json({
+      success: true,
+      message: "Last Expense Claim submitted ✅",
+    });
   } catch (error) {
     console.error("❌ Error in Last Expense claim API:", error);
-    res.status(500).json({ error: "Error processing claim" });
+    return NextResponse.json(
+      { error: "Error processing claim" },
+      { status: 500 }
+    );
   }
 }

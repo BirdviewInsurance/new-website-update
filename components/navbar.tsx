@@ -154,11 +154,11 @@ const MobileMegaMenu = ({
       })}
 
       {/* Footer */}
-      <div className="mt-10 text-center text-sm text-white/70">
+      {/* <div className="mt-10 text-center text-sm text-white/70">
         © {new Date().getFullYear()}{" "}
         <span className="font-semibold text-white">Birdview Insurance</span>
         <p className="text-white/60 mt-1">Trusted Protection. Global Reach.</p>
-      </div>
+      </div> */}
     </div>
   );
 };
