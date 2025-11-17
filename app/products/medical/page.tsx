@@ -298,14 +298,14 @@ const Medical: React.FC = () => {
                       <TableColumn className="bg-blue-600 text-white font-bold p-3 min-w-[200px]">
                         Benefit
                       </TableColumn>
-                      {plansd.map((plan, index) => (
+                      {(plansd.map((plan, index) => (
                         <TableColumn
                           key={`plan-${index}`}
                           className="bg-blue-600 text-white font-bold text-center p-3"
                         >
                           {plan.name}
                         </TableColumn>
-                      ))}
+                      )) as any)}
                     </TableHeader>
                     <TableBody>
                       {headings.slice(0, 7).map((heading, rowIndex) => (
@@ -316,7 +316,7 @@ const Medical: React.FC = () => {
                           <TableCell className="bg-blue-600 text-white font-bold p-3 min-w-[200px] border border-gray-300">
                             {heading}
                           </TableCell>
-                          {plansd.map((plan, colIndex) => {
+                          {(plansd.map((plan, colIndex) => {
                             const value = plan.values[rowIndex];
                             const isNumber = isNumeric(value);
                             return (
@@ -334,7 +334,7 @@ const Medical: React.FC = () => {
                                 )}
                               </TableCell>
                             );
-                          })}
+                          }) as any)}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -353,11 +353,11 @@ const Medical: React.FC = () => {
                     <TableColumn className="text-primary text-center font-semibold">
                       Benefit Cover
                     </TableColumn>
-                    {familySizes.map((size, index) => (
+                    {(familySizes.map((size, index) => (
                       <TableColumn key={`family-${index}`} className="text-primary text-center font-semibold">
                         {size}
                       </TableColumn>
-                    ))}
+                    )) as any)}
                   </TableHeader>
                   <TableBody>
                     {inpatientPlans.map((row, idx) => (
@@ -368,11 +368,11 @@ const Medical: React.FC = () => {
                         <TableCell className="text-white text-center font-bold">
                           {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.inpatient)) * (exchangeRates[currency] || 1)} />
                         </TableCell>
-                        {row.premiums.map((premium, i) => (
+                        {(row.premiums.map((premium, i) => (
                           <TableCell key={`premium-${idx}-${i}`} className="text-white text-center font-bold">
                             {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(premium)) * (exchangeRates[currency] || 1)} />
                           </TableCell>
-                        ))}
+                        )) as any)}
                       </TableRow>
                     ))}
                   </TableBody>
@@ -435,11 +435,11 @@ const Medical: React.FC = () => {
                     <TableColumn className="text-primary text-center font-semibold">
                       Benefit Cover
                     </TableColumn>
-                    {familySizes.map((size, index) => (
+                    {(familySizes.map((size, index) => (
                       <TableColumn key={`outpatient-family-${index}`} className="text-primary text-center font-semibold">
                         {size}
                       </TableColumn>
-                    ))}
+                    )) as any)}
                   </TableHeader>
                   <TableBody>
                     {outpatientPlans.map((row, idx) => (
@@ -450,11 +450,11 @@ const Medical: React.FC = () => {
                         <TableCell className="text-white text-center font-bold">
                           {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.outpatient)) * (exchangeRates[currency] || 1)} />
                         </TableCell>
-                        {row.premiums.map((premium, i) => (
+                        {(row.premiums.map((premium, i) => (
                           <TableCell key={`outpatient-premium-${idx}-${i}`} className="text-white text-center font-bold">
                             {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(premium)) * (exchangeRates[currency] || 1)} />
                           </TableCell>
-                        ))}
+                        )) as any)}
                       </TableRow>
                     ))}
                   </TableBody>
