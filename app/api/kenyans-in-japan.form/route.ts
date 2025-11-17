@@ -13,7 +13,7 @@ if (!process.env.SMTP_PORT) throw new Error("Missing SMTP_PORT");
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
-    
+
     // Extract form fields
     const body: Record<string, any> = {};
     for (const [key, value] of Array.from(formData.entries())) {
@@ -78,12 +78,12 @@ export async function POST(req: Request) {
 
     // ✅ Nodemailer transporter
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST!,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
+      host: "mail5016.site4now.net",
+      port: 465,
+      secure: true,
       auth: {
-        user: process.env.SMTP_USER!,
-        pass: process.env.SMTP_PASS!,
+        user: "customerservice@birdviewinsurance.com",
+        pass: "B!rdv!ew@2024",
       },
     });
 
