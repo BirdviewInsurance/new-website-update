@@ -61,12 +61,6 @@ const forms = [
         category: "Registration",
     },
     {
-        title: "Kenyans in Japan Form",
-        description: "Registration form for Kenyans living in Japan.",
-        link: "/forms/KenyansInJapanForm",
-        category: "Diaspora",
-    },
-    {
         title: "Kenyans in North Wales Form",
         description: "Registration form for Kenyans living in North Wales, UK.",
         link: "/forms/KenyansInNorthWalesMemberForm",
