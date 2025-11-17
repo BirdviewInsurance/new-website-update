@@ -28,11 +28,17 @@ const Medical: React.FC = () => {
   );
 
   const currencySymbols: { [key: string]: string } = {
-    KES: "KSh",
+    KES: "Ksh.",
     USD: "$",
     EUR: "€",
     GBP: "£",
   };
+
+  const familySizes = ["M", "M+1", "M+2", "M+3", "M+4", "M+5", "M+6", "M+7"];
+
+  function isNumeric(value: any): boolean {
+    return !isNaN(value) && isFinite(value);
+  }
 
   const gradientClass =
     "bg-gradient-to-r from-indigo-600 via-blue-600 to-red-600";
@@ -65,51 +71,130 @@ const Medical: React.FC = () => {
     window.location.href = "https://quote.birdviewinsurance.com/?ProductID=3";
   };
 
-  /** ---- Sample Data (expand with your real data) ---- **/
-  const inpatientBreakdown = [
-    { benefit: "Ward Bed", limit: "Full Refund" },
-    { benefit: "ICU", limit: "Full Refund" },
-    { benefit: "Maternity", limit: "50,000" },
-    { benefit: "Major Surgery", limit: "Full Refund" },
-    { benefit: "Cancer Treatment", limit: "Full Refund" },
-  ];
-  const inpatientPremiums = [
-    { plan: "Plan A", premium: "10,000" },
-    { plan: "Plan B", premium: "20,000" },
+  /** ---- Real Data from Medical.jsx ---- **/
+  const headings = [
+    "Plan", "Benefit Cover", "Territorial Limit", "Hospital Bed Accommodation",
+    "Accident Waiting Period", "Child Dependant Maximum Age Limit At Purchase", "Adult Maximum Age Limit At Purchase",
+    "Adult Age Limit Extension On Renewal", "Dependant Age Limit Extension With Proof Of Schooling",
+    "Pre-Existing and/or Chronic Condition(1 year waiting period)", "Maternity Cover(1 year waiting period)", "Post Hospitalization Treatment",
+    "Inpatient Gynaecological Conditions", "Road Ambulance", "Ambulance Services", "Air Evacuation",
+    "Internal & External Medical Appliances", "Inpatient Non-Accident Dental Treatment (1 year waiting period)",
+    "Inpatient Non-Accident Ophthalmology (1 year waiting period)", "Lodger Benefit", "Psychiatric Hospitalization",
+    "Cancer Treatment (1 year waiting period)", "Pre-maturity and Congenital Conditions (1 year waiting period for maternity applies)", "Last Expense"
   ];
 
+  const plansd = [
+    {
+      name: "Plan 1",
+      values: [
+        "Plan 1", "200000", "East Africa (Kenya. Uganda, Tanzania, Rwanda)", "General Ward Bed", "0 Days", "18 Years", "70 Years", "100 Years",
+        "25 Years", "100000", "50000", "10000", "Covered", "Covered", "Covered",
+        "Covered", "40000", "50000", "50000", "Up to 10 Years", "Covered", "100000",
+        "100000", "50000"
+      ]
+    },
+    {
+      name: "Plan 2",
+      values: [
+        "Plan 2", "300000", "East Africa (Kenya. Uganda, Tanzania, Rwanda)", "General Ward Bed", "0 Days", "18 Years", "70 Years", "100 Years",
+        "25 Years", "150000", "60000", "15000", "Covered", "Covered", "Covered",
+        "Covered", "50000", "50000", "50000", "Up to 10 Years", "Covered", "150000",
+        "150000", "75000"
+      ]
+    },
+    {
+      name: "Plan 3",
+      values: [
+        "Plan 3", "500000", "East Africa (Kenya. Uganda, Tanzania, Rwanda)", "General Ward Bed", "0 Days", "18 Years", "70 Years", "100 Years",
+        "25 Years", "250000", "75000", "17500", "Covered", "Covered", "Covered",
+        "Covered", "75000", "50000", "50000", "Up to 10 Years", "Covered", "250000",
+        "250000", "100000"
+      ]
+    }
+  ];
+
+  const inpatientPlans = [
+    { plan: "Plan 1", inpatient: 200000, maternity: 50000, premiums: [5720, 8580, 9610, 10868, 12012, 13156, 14300, 14400] },
+    { plan: "Plan 2", inpatient: 300000, maternity: 60000, premiums: [6860, 10290, 11525, 13034, 14400, 14400, 14400, 14400] },
+    { plan: "Plan 3", inpatient: 500000, maternity: 75000, premiums: [8230, 12345, 13826, 14400, 14400, 14400, 14400, 14400] }
+  ];
+
+  const outpatientPlans = [
+    { plan: "Plan 1", outpatient: 50000, premiums: [8580, 14400, 14400, 14400, 14400, 14400, 14400, 14400] },
+  ];
+
+  const plans = [
+    {
+      plan: "Plan 1",
+      limit: 50000,
+      premium: "Covered To Full Limit",
+      premiumk: 5000,
+      premiumz: "None",
+    },
+  ];
+
+  const pland = [
+    { name: "Plan 1", limit: 5000, premium: "Covered To Full Limit" },
+    { name: "Plan 2", limit: 7500, premium: "Covered To Full Limit" },
+    { name: "Plan 3", limit: 10000, premium: "Covered To Full Limit" },
+  ];
+
+  const plansc = [
+    { plan: "Plan 1", limit: 5000, premium: "Covered To Full Limit" },
+    { plan: "Plan 2", limit: 7500, premium: "Covered To Full Limit" },
+    { plan: "Plan 3", limit: 10000, premium: "Covered To Full Limit" }
+  ];
+
+  const categories = [
+    "Benefit Cover",
+    "Dental Consultations & Gum Diseases",
+    "Extractions",
+    "Fillings (except precious metals)",
+    "Scaling",
+    "Dental X-Rays",
+    "Dental Prescriptions",
+  ];
+
+  // Inpatient breakdown will be rendered directly in the table
+
+  // Outpatient breakdown
   const outpatientBreakdown = [
-    { benefit: "Consultations", limit: "Full Refund" },
-    { benefit: "Diagnostics", limit: "Full Refund" },
-    { benefit: "Drugs", limit: "Full Refund" },
-    { benefit: "Physiotherapy", limit: "Full Refund" },
-  ];
-  const outpatientPremiums = [
-    { plan: "Plan A", premium: "5,000" },
-    { plan: "Plan B", premium: "12,000" },
-  ];
+    { label: "Plan 1", key: "plan" },
+    { label: "Benefit Cover", key: "limit" },
+    { label: "ARV Drugs Payable", key: "premium" },
+    { label: "General Medical Check-Ups", key: "premiumk" },
+    { label: "Co-Payment", key: "premiumz" },
+    { label: "KEPI & Baby friendly Regime Immunizations", key: "premiumk" },
+    { label: "Pre - existing and/or chronic conditions (1 year waiting period)", key: "premium" },
+    { label: "Pre-natal & Post-natal (1 year waiting period)", key: "premium" },
+  ].map(row => ({
+    benefit: row.label,
+    limit: typeof plans[0][row.key as keyof typeof plans[0]] === "number"
+      ? `${currencySymbols[currency]} ${(plans[0][row.key as keyof typeof plans[0]] as number * (exchangeRates[currency] || 1)).toLocaleString()}`
+      : plans[0][row.key as keyof typeof plans[0]] as string
+  }));
 
-  const dentalBreakdown = [
-    { benefit: "Consultation", limit: "Full Refund" },
-    { benefit: "Scaling", limit: "Full Refund" },
-    { benefit: "Fillings", limit: "Full Refund" },
-    { benefit: "X-rays", limit: "Full Refund" },
-  ];
-  const dentalPremiums = [
-    { plan: "Plan A", premium: "3,000" },
-    { plan: "Plan B", premium: "8,000" },
-  ];
+  // Dental breakdown
+  const dentalBreakdown = categories.map(category => ({
+    benefit: category,
+    limit: category === "Benefit Cover" ? `${currencySymbols[currency]} ${(5000 * (exchangeRates[currency] || 1)).toLocaleString()}` : "Covered To Full Limit"
+  }));
 
+  // Optical breakdown
   const opticalBreakdown = [
-    { benefit: "Eye Exams", limit: "Full Refund" },
-    { benefit: "Frames", limit: "15,000" },
-    { benefit: "Lenses", limit: "15,000" },
-    { benefit: "Contact Lenses", limit: "15,000" },
-  ];
-  const opticalPremiums = [
-    { plan: "Plan A", premium: "4,000" },
-    { plan: "Plan B", premium: "9,000" },
-  ];
+    { label: "Benefit Cover", key: "limit" },
+    { label: "Eyeglasses", key: "premium" },
+    { label: "Routine Optical Consultations", key: "premium" },
+    { label: "Optometrist Consultations & Eye Examinations", key: "premium" },
+    { label: "Prescribed Lenses and Replacement of Lenses", key: "premium" },
+    { label: "Optical Prescriptions", key: "premium" },
+    { label: "Frames", key: "premium" },
+  ].map(row => ({
+    benefit: row.label,
+    limit: row.label === "Benefit Cover"
+      ? `${currencySymbols[currency]} ${(plansc[0].limit * (exchangeRates[currency] || 1)).toLocaleString()}`
+      : plansc[0].premium
+  }));
 
   /** ---- Corporate Tab Styling ---- **/
   const tabClasses = {
@@ -204,31 +289,61 @@ const Medical: React.FC = () => {
               variant="underlined"
             >
               <Tab key="breakdown" title="Breakdown">
-                <Table
-                  removeWrapper
-                  className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
-                >
-                  <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
-                      Benefit
-                    </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
-                      Limit
-                    </TableColumn>
-                  </TableHeader>
-                  <TableBody>
-                    {inpatientBreakdown.map((row, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell className="text-white text-center">
-                          {row.benefit}
-                        </TableCell>
-                        <TableCell className="text-white text-center font-bold">
-                          {row.limit}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <div className="overflow-x-auto bg-gray-50 rounded-xl shadow-md p-4">
+                  <Table
+                    removeWrapper
+                    className="w-full"
+                  >
+                    <TableHeader>
+                      <TableColumn className="bg-blue-600 text-white font-bold p-3 min-w-[200px]">
+                        Benefit
+                      </TableColumn>
+                      <>
+                        {plansd.map((plan, index) => (
+                          <TableColumn
+                            key={`plan-${index}`}
+                            className="bg-blue-600 text-white font-bold text-center p-3"
+                          >
+                            {plan.name}
+                          </TableColumn>
+                        ))}
+                      </>
+                    </TableHeader>
+                    <TableBody>
+                      {headings.slice(0, 7).map((heading, rowIndex) => (
+                        <TableRow
+                          key={rowIndex}
+                          className={`${rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors`}
+                        >
+                          <TableCell className="bg-blue-600 text-white font-bold p-3 min-w-[200px] border border-gray-300">
+                            {heading}
+                          </TableCell>
+                          <>
+                            {plansd.map((plan, colIndex) => {
+                              const value = plan.values[rowIndex];
+                              const isNumber = isNumeric(value);
+                              return (
+                                <TableCell
+                                  key={`plan-cell-${rowIndex}-${colIndex}`}
+                                  className="text-center p-3 border border-gray-200"
+                                >
+                                  {isNumber ? (
+                                    <span className="text-green-600 font-semibold">
+                                      {currencySymbols[currency]}{" "}
+                                      <AnimatedNumber value={parseFloat(String(value)) * (exchangeRates[currency] || 1)} />
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-700">{value}</span>
+                                  )}
+                                </TableCell>
+                              );
+                            })}
+                          </>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </Tab>
               <Tab key="premium" title="Premiums">
                 <Table
@@ -236,22 +351,36 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Plan
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
-                      Premium
+                    <TableColumn className="text-primary text-center font-semibold">
+                      Benefit Cover
                     </TableColumn>
+                    <>
+                      {familySizes.map((size, index) => (
+                        <TableColumn key={`family-${index}`} className="text-primary text-center font-semibold">
+                          {size}
+                        </TableColumn>
+                      ))}
+                    </>
                   </TableHeader>
                   <TableBody>
-                    {inpatientPremiums.map((row, idx) => (
+                    {inpatientPlans.map((row, idx) => (
                       <TableRow key={idx}>
                         <TableCell className="text-white text-center">
                           {row.plan}
                         </TableCell>
                         <TableCell className="text-white text-center font-bold">
-                          {row.premium}
+                          {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.inpatient)) * (exchangeRates[currency] || 1)} />
                         </TableCell>
+                        <>
+                          {row.premiums.map((premium, i) => (
+                            <TableCell key={`premium-${idx}-${i}`} className="text-white text-center font-bold">
+                              {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(premium)) * (exchangeRates[currency] || 1)} />
+                            </TableCell>
+                          ))}
+                        </>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -281,10 +410,10 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Benefit
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Limit
                     </TableColumn>
                   </TableHeader>
@@ -308,22 +437,36 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Plan
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
-                      Premium
+                    <TableColumn className="text-primary text-center font-semibold">
+                      Benefit Cover
                     </TableColumn>
+                    <>
+                      {familySizes.map((size, index) => (
+                        <TableColumn key={`outpatient-family-${index}`} className="text-primary text-center font-semibold">
+                          {size}
+                        </TableColumn>
+                      ))}
+                    </>
                   </TableHeader>
                   <TableBody>
-                    {outpatientPremiums.map((row, idx) => (
+                    {outpatientPlans.map((row, idx) => (
                       <TableRow key={idx}>
                         <TableCell className="text-white text-center">
                           {row.plan}
                         </TableCell>
                         <TableCell className="text-white text-center font-bold">
-                          {row.premium}
+                          {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.outpatient)) * (exchangeRates[currency] || 1)} />
                         </TableCell>
+                        <>
+                          {row.premiums.map((premium, i) => (
+                            <TableCell key={`outpatient-premium-${idx}-${i}`} className="text-white text-center font-bold">
+                              {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(premium)) * (exchangeRates[currency] || 1)} />
+                            </TableCell>
+                          ))}
+                        </>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -351,10 +494,10 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Benefit
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Limit
                     </TableColumn>
                   </TableHeader>
@@ -378,21 +521,31 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Plan
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
-                      Premium
+                    <TableColumn className="text-primary text-center font-semibold">
+                      Benefit Cover
+                    </TableColumn>
+                    <TableColumn className="text-primary text-center font-semibold">
+                      Premium per Person
                     </TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {dentalPremiums.map((row, idx) => (
+                    {[
+                      { plan: "Plan 1", limit: 5000, premium: 1210 },
+                      { plan: "Plan 2", limit: 7500, premium: 1803 },
+                      { plan: "Plan 3", limit: 10000, premium: 2408 }
+                    ].map((row, idx) => (
                       <TableRow key={idx}>
                         <TableCell className="text-white text-center">
                           {row.plan}
                         </TableCell>
                         <TableCell className="text-white text-center font-bold">
-                          {row.premium}
+                          {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.limit)) * (exchangeRates[currency] || 1)} />
+                        </TableCell>
+                        <TableCell className="text-white text-center font-bold">
+                          {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.premium)) * (exchangeRates[currency] || 1)} />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -421,10 +574,10 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Benefit
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Limit
                     </TableColumn>
                   </TableHeader>
@@ -448,21 +601,31 @@ const Medical: React.FC = () => {
                   className={`rounded-2xl shadow-xl overflow-x-auto p-1 ${gradientClass}`}
                 >
                   <TableHeader className="bg-transparent">
-                    <TableColumn className="text-white text-center font-semibold">
+                    <TableColumn className="text-primary text-center font-semibold">
                       Plan
                     </TableColumn>
-                    <TableColumn className="text-white text-center font-semibold">
-                      Premium
+                    <TableColumn className="text-primary text-center font-semibold">
+                      Benefit Cover
+                    </TableColumn>
+                    <TableColumn className="text-primary text-center font-semibold">
+                      Premium per Person
                     </TableColumn>
                   </TableHeader>
                   <TableBody>
-                    {opticalPremiums.map((row, idx) => (
+                    {[
+                      { plan: "Plan 1", limit: 5000, premium: 1210 },
+                      { plan: "Plan 2", limit: 7500, premium: 1803 },
+                      { plan: "Plan 3", limit: 10000, premium: 2408 }
+                    ].map((row, idx) => (
                       <TableRow key={idx}>
                         <TableCell className="text-white text-center">
                           {row.plan}
                         </TableCell>
                         <TableCell className="text-white text-center font-bold">
-                          {row.premium}
+                          {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.limit)) * (exchangeRates[currency] || 1)} />
+                        </TableCell>
+                        <TableCell className="text-white text-center font-bold">
+                          {currencySymbols[currency]} <AnimatedNumber value={parseFloat(String(row.premium)) * (exchangeRates[currency] || 1)} />
                         </TableCell>
                       </TableRow>
                     ))}
