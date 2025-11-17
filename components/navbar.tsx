@@ -153,12 +153,6 @@ const MobileMegaMenu = ({
         );
       })}
 
-      {/* Footer */}
-      {/* <div className="mt-10 text-center text-sm text-white/70">
-        © {new Date().getFullYear()}{" "}
-        <span className="font-semibold text-white">Birdview Insurance</span>
-        <p className="text-white/60 mt-1">Trusted Protection. Global Reach.</p>
-      </div> */}
     </div>
   );
 };
@@ -765,20 +759,20 @@ export const Navbar = () => {
 
       {/* HeroUI Navbar */}
       <HeroUINavbar
-        className="bg-danger text-white shadow-md z-50"
+        className="bg-danger text-white shadow-md z-50 relative"
         maxWidth="xl"
         position="sticky"
       >
         {/* Left side (brand + nav items) */}
-        <NavbarContent className="basis-1/5 md:basis-full" justify="start">
-          <NavbarBrand as="li" className="max-w-fit md:hidden">
+        <NavbarContent className="basis-1/5 md:basis-full relative" justify="start">
+          <NavbarBrand as="li" className="max-w-fit md:hidden absolute left-0 top-0 -ml-6 md:ml-0">
             <NextLink
-              className="flex justify-start items-center gap-2 bg-white px-2 py-1 rounded-md shadow-md"
+              className="flex justify-start items-center gap-2 bg-white px-4 py-2 h-full"
               href="/"
             >
               <img
                 alt="Birdview Logo"
-                className="h-8 w-auto"
+                className="h-12 md:h-16 w-auto object-contain"
                 src="/images/logo1.png"
               />
             </NextLink>
