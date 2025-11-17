@@ -42,7 +42,7 @@ export default function OurLeadership() {
     {
       name: "Rodgers Moindi",
       title: "Chief Executive Officer",
-      img: "/assets/managementPhotos/Rodgers-Moindi.png",
+      img: "/assets/managementPhotos/Rodgers-Moindi.PNG",
     },
     {
       name: "Mary Mundia",
@@ -153,8 +153,8 @@ export default function OurLeadership() {
 
           <div
             className={`grid gap-10 ${section.id === "advisors"
-                ? "md:grid-cols-2 max-w-4xl mx-auto"
-                : "md:grid-cols-3"
+              ? "md:grid-cols-2 max-w-4xl mx-auto"
+              : "md:grid-cols-3"
               }`}
           >
             {section.data.map((person, i) => (
