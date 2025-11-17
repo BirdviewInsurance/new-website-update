@@ -60,7 +60,7 @@ export default function ESGPage() {
             Sustainability is not just a responsibility—it’s our legacy.
             Birdview integrates ESG values into every policy, decision, and
             community initiative we undertake, ensuring long-term value for our
-            clients, partners, and society.
+            clients, partners, and society at large.
           </p>
         </div>
 
