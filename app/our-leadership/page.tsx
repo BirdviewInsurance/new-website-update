@@ -42,7 +42,7 @@ export default function OurLeadership() {
     {
       name: "Rodgers Moindi",
       title: "Chief Executive Officer",
-      img: "/assets/managementPhotos/Rodgers-Moindi.PNG",
+      img: "/assets/managementPhotos/Rodgers-Moindi.png",
     },
     {
       name: "Mary Mundia",
