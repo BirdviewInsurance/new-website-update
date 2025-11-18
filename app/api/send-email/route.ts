@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const body: SendEmailForm = await req.json();
     const { firstName, lastName, email, phone, enquiryType, details } = body;
 
-    // Create a transporter object using your email service configuration
+    // ✅ Configure your email transport (use your provider credentials)
     const transporter = nodemailer.createTransport({
       host: "mail5016.site4now.net", // Replace with your email provider's SMTP server
       port: 465, // Replace with your email provider's SMTP port
