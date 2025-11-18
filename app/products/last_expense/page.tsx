@@ -214,140 +214,10 @@ const LastExpenses: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* Family */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
-          <Card className={`border-0 rounded-2xl ${gradientClass}`} shadow="lg">
-            <CardHeader className="text-white font-bold text-lg bg-transparent">
-              Family (up to 69 yrs)
-            </CardHeader>
-            <CardBody>
-              <div className="overflow-x-auto">
-                <Table
-                  removeWrapper
-                  aria-label="Family Plans"
-                  className="text-center min-w-max"
-                >
-                  <TableHeader className="bg-transparent">
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Plan
-                    </TableColumn>
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Benefit
-                    </TableColumn>
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Spouse
-                    </TableColumn>
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Per Child
-                    </TableColumn>
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Premium
-                    </TableColumn>
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Extra Child
-                    </TableColumn>
-                    <TableColumn className="bg-transparent text-center text-white font-semibold">
-                      Extra Spouse
-                    </TableColumn>
-                  </TableHeader>
-                  <TableBody>
-                    {[
-                      {
-                        plan: "Plan 1",
-                        limit: 50000,
-                        spouse: 50000,
-                        child: 50000,
-                        premium: 1000,
-                        extra_child: 260,
-                        extra_spouse: 510,
-                      },
-                      {
-                        plan: "Plan 2",
-                        limit: 100000,
-                        spouse: 100000,
-                        child: 100000,
-                        premium: 1930,
-                        extra_child: 510,
-                        extra_spouse: 1020,
-                      },
-                      {
-                        plan: "Plan 3",
-                        limit: 200000,
-                        spouse: 200000,
-                        child: 200000,
-                        premium: 3850,
-                        extra_child: 1020,
-                        extra_spouse: 2040,
-                      },
-                      {
-                        plan: "Plan 4",
-                        spouse: 250000,
-                        child: 250000,
-                        limit: 250000,
-                        premium: 5000,
-                        extra_child: 1280,
-                        extra_spouse: 2550,
-                      },
-                      {
-                        plan: "Plan 5",
-                        spouse: 300000,
-                        child: 300000,
-                        limit: 300000,
-                        premium: 5770,
-                        extra_child: 1530,
-                        extra_spouse: 3060,
-                      },
-                      {
-                        plan: "Plan 6",
-                        spouse: 500000,
-                        child: 500000,
-                        limit: 500000,
-                        premium: 9600,
-                        extra_child: 2550,
-                        extra_spouse: 5090,
-                      },
-                    ].map((row, idx) => (
-                      <TableRow
-                        key={idx}
-                        className="odd:bg-white/5 even:bg-white/10 hover:bg-white/20 transition-all"
-                      >
-                        <TableCell className="text-white">{row.plan}</TableCell>
-                        <TableCell className="text-white">
-                          {formatAmount(row.limit, "benefit")}
-                        </TableCell>
-                        <TableCell className="text-white">
-                          {formatAmount(row.spouse, "benefit")}
-                        </TableCell>
-                        <TableCell className="text-white">
-                          {formatAmount(row.child, "benefit")}
-                        </TableCell>
-                        <TableCell className="text-white">
-                          {formatAmount(row.premium, "premium")}
-                        </TableCell>
-                        <TableCell className="text-white">
-                          {formatAmount(row.extra_child, "premium")}
-                        </TableCell>
-                        <TableCell className="text-white">
-                          {formatAmount(row.extra_spouse, "premium")}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardBody>
-          </Card>
-        </motion.div>
-
         {/* Parents & Siblings */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
           whileInView={{ opacity: 1, y: 0 }}
         >
@@ -435,25 +305,224 @@ const LastExpenses: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* CTA */}
+      {/* Family - Full Width */}
       <motion.div
-        className="text-center mt-16"
-        initial={{ opacity: 0, scale: 0.9 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
+        initial={{ opacity: 0, y: 40 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
         viewport={{ once: true }}
-        whileInView={{ opacity: 1, scale: 1 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        className="w-full px-4 md:px-6 lg:px-8 xl:px-12 mt-10"
       >
-        <p className="text-lg font-semibold text-gray-800 mb-4">
-          Ready to take the next step?
-        </p>
-        <Button
-          className="bg-gradient-to-r from-blue-600 to-red-600 text-white font-semibold px-6"
-          size="lg"
-          startContent={<ShieldCheckIcon className="h-5 w-5" />}
-          onClick={handleClickLastExpsense}
-        >
-          Get Quote
-        </Button>
+        <Card className={`border-0 rounded-2xl ${gradientClass} shadow-lg w-full`}>
+          <CardHeader className="text-white font-bold text-lg bg-transparent">
+            Family (up to 69 yrs)
+          </CardHeader>
+          <CardBody className="p-2 md:p-6">
+            <div className="overflow-x-auto md:overflow-x-visible w-full">
+              <Table
+                removeWrapper
+                aria-label="Family Plans"
+                className="text-center w-full"
+                classNames={{
+                  wrapper: "w-full",
+                  table: "w-full table-fixed",
+                }}
+              >
+                <TableHeader className="bg-transparent">
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[12%]">
+                    Plan
+                  </TableColumn>
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[15%]">
+                    Benefit
+                  </TableColumn>
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[13%]">
+                    Spouse
+                  </TableColumn>
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[13%]">
+                    Per Child
+                  </TableColumn>
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[13%]">
+                    Premium
+                  </TableColumn>
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[13%]">
+                    Extra Child
+                  </TableColumn>
+                  <TableColumn className="bg-transparent text-center text-white font-semibold text-xs md:text-sm w-[13%]">
+                    Extra Spouse
+                  </TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {[
+                    {
+                      plan: "Plan 1",
+                      limit: 50000,
+                      spouse: 50000,
+                      child: 50000,
+                      premium: 1000,
+                      extra_child: 260,
+                      extra_spouse: 510,
+                    },
+                    {
+                      plan: "Plan 2",
+                      limit: 100000,
+                      spouse: 100000,
+                      child: 100000,
+                      premium: 1930,
+                      extra_child: 510,
+                      extra_spouse: 1020,
+                    },
+                    {
+                      plan: "Plan 3",
+                      limit: 200000,
+                      spouse: 200000,
+                      child: 200000,
+                      premium: 3850,
+                      extra_child: 1020,
+                      extra_spouse: 2040,
+                    },
+                    {
+                      plan: "Plan 4",
+                      spouse: 250000,
+                      child: 250000,
+                      limit: 250000,
+                      premium: 5000,
+                      extra_child: 1280,
+                      extra_spouse: 2550,
+                    },
+                    {
+                      plan: "Plan 5",
+                      spouse: 300000,
+                      child: 300000,
+                      limit: 300000,
+                      premium: 5770,
+                      extra_child: 1530,
+                      extra_spouse: 3060,
+                    },
+                    {
+                      plan: "Plan 6",
+                      spouse: 500000,
+                      child: 500000,
+                      limit: 500000,
+                      premium: 9600,
+                      extra_child: 2550,
+                      extra_spouse: 5090,
+                    },
+                  ].map((row, idx) => (
+                    <TableRow
+                      key={idx}
+                      className="odd:bg-white/5 even:bg-white/10 hover:bg-white/20 transition-all"
+                    >
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">{row.plan}</TableCell>
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">
+                        {formatAmount(row.limit, "benefit")}
+                      </TableCell>
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">
+                        {formatAmount(row.spouse, "benefit")}
+                      </TableCell>
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">
+                        {formatAmount(row.child, "benefit")}
+                      </TableCell>
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">
+                        {formatAmount(row.premium, "premium")}
+                      </TableCell>
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">
+                        {formatAmount(row.extra_child, "premium")}
+                      </TableCell>
+                      <TableCell className="text-white whitespace-nowrap text-xs md:text-sm px-1 md:px-2">
+                        {formatAmount(row.extra_spouse, "premium")}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardBody>
+        </Card>
+      </motion.div>
+
+      {/* CTA */}
+      {/* ULTRA PREMIUM CTA SECTION */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+        className="relative mt-24"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 via-blue-600 to-red-600 opacity-90 rounded-3xl blur-2xl"></div>
+
+        <div className="relative max-w-6xl mx-auto px-6 py-16 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-xl"
+          >
+            Protect Your Family With Dignity & Peace of Mind
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-lg md:text-xl text-gray-100 mt-4 max-w-3xl mx-auto leading-relaxed"
+          >
+            Get a Last Expense Cover that guarantees fast payout, dignity, and support
+            when your loved ones need it the most. Affordable plans. Instant quotation.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.35 }}
+            className="mt-10 flex flex-col md:flex-row justify-center items-center gap-5"
+          >
+            <Button
+              size="lg"
+              radius="full"
+              className="px-10 py-6 text-lg font-bold text-white shadow-xl bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 transition-all"
+              startContent={<ShieldCheckIcon className="h-6 w-6" />}
+              onClick={handleClickLastExpsense}
+            >
+              Get Instant Quote
+            </Button>
+
+            <Button
+              size="lg"
+              variant="bordered"
+              radius="full"
+              className="px-10 py-6 text-lg font-semibold border-white text-white hover:bg-white/20 backdrop-blur"
+              onClick={() => window.location.href = '/support/request'}
+            >
+              Talk to an Advisor
+            </Button>
+          </motion.div>
+
+          {/* Trust Badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-center text-white"
+          >
+            <div className="p-4">
+              <p className="text-xl font-extrabold drop-shadow">48-Hour Payout</p>
+              <p className="text-sm opacity-80">Guaranteed fast claim settlement</p>
+            </div>
+
+            <div className="p-4">
+              <p className="text-xl font-extrabold drop-shadow">Affordable Premiums</p>
+              <p className="text-sm opacity-80">Starting as low as Ksh. 510</p>
+            </div>
+
+            <div className="p-4">
+              <p className="text-xl font-extrabold drop-shadow">Family Protection</p>
+              <p className="text-sm opacity-80">Cover spouse, children & parents</p>
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
     </div>
   );

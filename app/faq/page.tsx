@@ -19,13 +19,13 @@ const FAQS: Faq[] = [
     id: "g-1",
     section: "General",
     q: "What is Birdview Insurance and what do you offer?",
-    a: `Birdview Insurance is a full-service insurer specializing in life, health, motor, and corporate solutions. We combine fast claims processing, tailored underwriting, and local expertise to serve both individual and corporate clients.`,
+    a: `Birdview Insurance (Birdview Microinsurance Limited) is a Kenyan diaspora-driven initiative providing essential financial security to Kenyans both locally and globally. We offer professional, affordable, and compassionate solutions including: Evacuation & Repatriation, Last Expense, Medical Insurance (with inpatient, outpatient, dental, and optical), Hospital Cash, Personal Accident, Bodaboda Welfare Cover, TukTuk Welfare Cover, Probation Guard, and AQUABIMA. We combine fast claims processing (48-hour payouts for Last Expense), tailored underwriting, and local expertise to serve both individual and corporate clients.`,
   },
   {
     id: "g-2",
     section: "General",
     q: "Where are you located and how can I contact Birdview?",
-    a: `Our head office is located in Nairobi, Kenya. You can contact us via the Contact page, email support@birdview.co.ke, or call +254 700 000 000. For immediate help use our 24/7 claims hotline.`,
+    a: `Our head office is located at Ground Floor, Fidelity Center, Waiyaki Way, Westlands, Nairobi, Kenya. You can contact us via our Contact page, email customerservice@birdviewinsurance.com, call +254 742 222 888 or +254 111 056 610, or chat with us on WhatsApp (+254 742 222 888). For immediate help, use our 24/7 claims hotline.`,
   },
 
   // Policy & Coverage
@@ -33,19 +33,19 @@ const FAQS: Faq[] = [
     id: "p-1",
     section: "Policy & Coverage",
     q: "How do I choose the right policy for me or my business?",
-    a: `Start with a quick needs assessment available on our website or speak to one of our advisors. We evaluate risk exposure, budget, and desired benefits to recommend a tailored policy.`,
+    a: `You can easily request a free online quote through our website at quote.birdviewinsurance.com, or schedule a call with one of our licensed agents for a personalized consultation. We evaluate your risk exposure, budget, and desired benefits to recommend a tailored policy. Each plan is customizable to suit individual or corporate needs.`,
   },
   {
     id: "p-2",
     section: "Policy & Coverage",
     q: "Can I add dependants or change beneficiaries?",
-    a: `Yes. Most personal policies allow you to add dependants or update beneficiaries. Changes may require documentation and could affect premiums — contact your agent for the exact process.`,
+    a: `Yes. Most personal policies, especially Medical and Last Expense plans, allow you to add dependants (spouse, children, parents) or update beneficiaries. Changes may require documentation and could affect premiums. Contact our support team at customerservice@birdviewinsurance.com or call +254 742 222 888 for the exact process and requirements.`,
   },
   {
     id: "p-3",
     section: "Policy & Coverage",
     q: "Do you offer group/corporate insurance plans?",
-    a: `Yes — we offer scalable group plans for SMEs and large corporations. Benefits commonly include group life, medical cover, and employee benefits packages with administrative support.`,
+    a: `Yes — we offer scalable group plans for SMEs and large corporations. Our corporate solutions include group medical cover, corporate group last expense, employee benefits packages, and administrative support. We provide tailored solutions for businesses of all sizes. Contact our corporate team for a customized quote.`,
   },
 
   // Claims & Procedures
@@ -53,19 +53,19 @@ const FAQS: Faq[] = [
     id: "c-1",
     section: "Claims & Procedures",
     q: "How do I lodge a claim?",
-    a: `To lodge a claim: 1) Login to your customer portal or use our claims form; 2) Provide the required documents (policy number, ID, incident report, supporting invoices/photos); 3) Submit the claim. We will acknowledge within 24 hours and assign a claims officer.`,
+    a: `To lodge a claim: 1) Visit our Claims page (/Claims/claims) or use the specific claim form for your product type (Medical, Personal Accident, Last Expense, Hospital Cash, or Evacuation & Repatriation); 2) Provide the required documents including your policy number, national ID, incident report, and supporting documents (invoices, photos, medical reports); 3) Submit the claim securely through our online portal. We will acknowledge your claim within 24 hours and assign a dedicated claims officer. For emergency evacuation claims, contact our 24/7 emergency desk immediately.`,
   },
   {
     id: "c-2",
     section: "Claims & Procedures",
-    q: "What documents are required for motor claims?",
-    a: `Typically: police abstract (if required), claim form, driver's license copy, vehicle logbook, repair estimate, photos of the damage, and any third-party statements. Requirements vary by case; the claims officer will confirm.`,
+    q: "What documents are required for Bodaboda/TukTuk welfare claims?",
+    a: `For Bodaboda and TukTuk Welfare claims, you typically need: police abstract (if required), completed claim form, driver's license copy, vehicle logbook, repair estimate from an authorized garage, photos of the damage, and any third-party statements. Requirements vary by case type (accident, theft, damage). Your assigned claims officer will confirm the exact documents needed for your specific situation.`,
   },
   {
     id: "c-3",
     section: "Claims & Procedures",
     q: "How long does a claim take to process?",
-    a: `We aim to acknowledge claims within 24 hours. Simple, well-documented claims are typically settled within 7-14 business days. Complex claims or those requiring investigations may take longer. We'll keep you updated at every stage.`,
+    a: `We aim to acknowledge all claims within 24 hours. For Last Expense claims, we guarantee payout within 48 hours of notification. Hospital Cash claims are typically settled within 48 hours. Most other well-documented claims are reviewed and settled within 7-14 business days once all documents are complete. Complex claims or those requiring investigations may take longer, but we'll keep you updated at every stage through your dashboard and email notifications.`,
   },
 
   // Payments & Renewals
@@ -73,19 +73,19 @@ const FAQS: Faq[] = [
     id: "m-1",
     section: "Payments & Renewals",
     q: "What payment methods do you accept?",
-    a: `We accept bank transfers, card payments (Visa/Mastercard), M-Pesa (where available), and scheduled direct debits for corporate clients. Payment methods available will display on the checkout or invoice.`,
+    a: `We accept various payment methods including bank transfers, card payments (Visa/Mastercard), M-Pesa, and scheduled direct debits for corporate clients. Payment methods available will display during checkout on our online quotation platform (quote.birdviewinsurance.com) or on your invoice. Contact our support team for assistance with payment arrangements.`,
   },
   {
     id: "m-2",
     section: "Payments & Renewals",
     q: "How do I renew my policy?",
-    a: `You can renew online via the customer portal, through your broker, or by contacting our support team. We send renewal reminders 30 and 7 days before expiry. Some policies support automatic renewal when payment details are stored.`,
+    a: `You can renew your policy online through our customer portal, through your broker or agent, or by contacting our support team at customerservice@birdviewinsurance.com or +254 742 222 888. We send renewal reminders 30 and 7 days before your policy expiry date. Some policies support automatic renewal when payment details are stored securely in your account.`,
   },
   {
     id: "m-3",
     section: "Payments & Renewals",
     q: "Can I change my payment frequency?",
-    a: `Yes — subject to policy terms. We can switch monthly, quarterly, or annual premiums. Frequency changes may affect the total premium due to different fees or discounts.`,
+    a: `Yes — subject to policy terms and conditions. We can switch between monthly, quarterly, or annual premium payment frequencies. Frequency changes may affect the total premium due to different administrative fees or discounts applied. Contact our support team to discuss your options and any impact on your premium.`,
   },
 
   // Customer Support & Contact
@@ -93,19 +93,19 @@ const FAQS: Faq[] = [
     id: "s-1",
     section: "Support",
     q: "How do I reach customer support?",
-    a: `Use our Contact page, email support@birdview.co.ke, call +254 700 000 000, or start a live chat from the website. For claims, use the dedicated claims hotline for faster handling.`,
+    a: `You can reach our customer support team through multiple channels: Visit our Contact page (/contact-us), email customerservice@birdviewinsurance.com, call +254 742 222 888 or +254 111 056 610, or chat with us on WhatsApp (+254 742 222 888). We also have a live chat feature on our website. For urgent claims, use our dedicated 24/7 claims hotline for faster handling.`,
   },
   {
     id: "s-2",
     section: "Support",
     q: "What are your support hours?",
-    a: `General support: Monday–Friday, 08:00–17:00 EAT. Claims hotline: 24/7 for urgent incidents.`,
+    a: `We have a 24/7 dedicated support team available via phone, email, and live chat to assist with inquiries, claims, or policy updates. Our claims hotline operates 24/7 for urgent incidents and emergency evacuation requests. General administrative support is available Monday through Friday, with extended hours for claims processing.`,
   },
   {
     id: "s-3",
     section: "Support",
     q: "How do I submit feedback or make a complaint?",
-    a: `We value feedback. Use the feedback form on our Contact page or email complaints@birdview.co.ke. Our complaints team will acknowledge within 3 working days and provide a resolution timeline.`,
+    a: `We value your feedback. You can submit feedback or file a complaint through our dedicated Complaints page (/complaints) on our website, use the feedback form on our Contact page, or email our complaints team. Our complaints team will acknowledge your complaint within 3 working days and provide a resolution timeline. For legal matters, contact our Legal Affairs Department at legal@birdviewinsurance.com or +254 700 888 222.`,
   },
 ];
 
@@ -384,7 +384,7 @@ export default function FAQPage() {
                   <div className="mt-3">
                     <a
                       className="block w-full text-center rounded-md px-3 py-2 bg-[var(--brand-danger)] text-white font-semibold"
-                      href="tel:+254700000000"
+                      href="tel:+254742222888"
                     >
                       Call Claims
                     </a>
@@ -392,7 +392,7 @@ export default function FAQPage() {
                   <div className="mt-3 text-xs text-gray-500">
                     Or email{" "}
                     <a className="underline" href="mailto:support@birdview.co.ke">
-                      support@birdview.co.ke
+                      customerservice@birdviewinsurance.com
                     </a>
                   </div>
                 </div>
