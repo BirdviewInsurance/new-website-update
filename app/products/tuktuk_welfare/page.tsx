@@ -20,10 +20,16 @@ import {
 } from "@heroui/react";
 
 import AnimatedNumber from "../../../components/AnimateNumber";
+import { useSearchParams } from "next/navigation";
 
 type ExchangeRates = Record<string, number>;
 
 const TuktukWelfareContent: React.FC = () => {
+  const params = useSearchParams();
+
+  const intermidiaryName = params.get("intermidiaryName") || "";
+  const intermidiaryNumber = params.get("intermidiaryNumber") || "";
+  const subIntermidiaryNumber = params.get("subIntermidiaryNumber") || "";
   const [currency, setCurrency] = useState("KES");
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [loadingRates, setLoadingRates] = useState(false);
@@ -141,6 +147,17 @@ const TuktukWelfareContent: React.FC = () => {
       daily: 30,
     },
   ];
+
+  const baseLink = `https://partners.birdviewinsurance.com/customer/quotation?intermidiaryName=${encodeURIComponent(
+    intermidiaryName
+  )}&intermidiaryNumber=${encodeURIComponent(
+    intermidiaryNumber
+  )}&subIntermidiaryNumber=${encodeURIComponent(subIntermidiaryNumber)}`;
+
+  const handleOptionClick = (selectedOption: string) => {
+    console.log("Selected:", selectedOption); // 👉 You can use it internally
+    window.location.href = baseLink; // 👉 No option added to URL
+  };
 
   return (
     <div className="relative bg-gradient-to-b from-gray-50 to-gray-100 py-16">
@@ -302,21 +319,23 @@ const TuktukWelfareContent: React.FC = () => {
                   {premiums.map((p, idx) => (
                     <TableRow
                       key={idx}
-                      className="odd:bg-white/5 even:bg-white/10 hover:bg-white/20 transition-all"
+                      onClick={() => handleOptionClick(p.option)}
+                      className="
+                      odd:bg-white/5 even:bg-white/10 
+                      hover:bg-white/20 
+                      transition-all 
+                      cursor-pointer 
+                      active:scale-[0.99]
+                    "
                     >
                       <TableCell className="text-white">{p.option}</TableCell>
-                      <TableCell className="text-white">
-                        {formatAmount(p.annual)}
-                      </TableCell>
-                      <TableCell className="text-white">
-                        {formatAmount(p.weekly)}
-                      </TableCell>
-                      <TableCell className="text-white">
-                        {formatAmount(p.daily)}
-                      </TableCell>
+                      <TableCell className="text-white">{formatAmount(p.annual)}</TableCell>
+                      <TableCell className="text-white">{formatAmount(p.weekly)}</TableCell>
+                      <TableCell className="text-white">{formatAmount(p.daily)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
+
               </Table>
             </div>
           </CardBody>
@@ -350,8 +369,8 @@ const TuktukWelfareContent: React.FC = () => {
                 className="bg-white text-red-600 font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-2xl transition-all"
                 size="lg"
                 onClick={() =>
-                  (window.location.href =
-                    "https://quote.birdviewinsurance.com/?ProductID=4")
+                (window.location.href =
+                  "https://quote.birdviewinsurance.com/?ProductID=4")
                 }
               >
                 Get Your TukTuk Cover
