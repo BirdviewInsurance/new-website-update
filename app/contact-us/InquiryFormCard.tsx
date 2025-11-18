@@ -70,6 +70,17 @@ export default function InquiryFormCard() {
     setLoading(false);
   };
 
+  const handleClear = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      enquiryType: "",
+      details: "",
+    });
+  };
+
   return (
     <div className="relative group">
       <div className="absolute -inset-[3px] rounded-2xl bg-gradient-to-br from-danger/70 to-primary/70 opacity-60 blur-lg group-hover:opacity-90 transition duration-500" />
@@ -132,9 +143,12 @@ export default function InquiryFormCard() {
               value={formData.details}
               onChange={handleChange}
             />
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4 gap-4">
+              <Button className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-transform" type="button" onClick={handleClear}>
+                Clear
+              </Button>
               <Button
-                className="bg-gradient-to-r from-primary to-danger text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-transform"
+                className="bg-gradient-to-r from-primary to-primary-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-transform"
                 isLoading={loading}
                 type="submit"
               >
@@ -147,9 +161,8 @@ export default function InquiryFormCard() {
 
       {snackbar.open && (
         <div
-          className={`fixed bottom-6 right-6 p-4 rounded-xl shadow-lg text-white ${
-            snackbar.type === "success" ? "bg-green-600" : "bg-red-600"
-          }`}
+          className={`fixed bottom-6 right-6 p-4 rounded-xl shadow-lg text-white ${snackbar.type === "success" ? "bg-green-600" : "bg-red-600"
+            }`}
         >
           {snackbar.message}
           <button

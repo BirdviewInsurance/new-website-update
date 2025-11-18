@@ -49,6 +49,10 @@ export default function ComplaintsPage() {
     }
   };
 
+  const handleClear = () => {
+    setFormData({ name: "", email: "", phone: "", complaint: "" });
+  };
+
   return (
     <section
       className="relative min-h-screen bg-cover bg-center bg-no-repeat py-24 px-6 md:px-20 overflow-hidden"
@@ -140,12 +144,15 @@ export default function ComplaintsPage() {
                 onChange={handleChange}
               />
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-4">
+                <Button className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold shadow-md hover:opacity-90 transition-all" size="lg" type="button" onClick={handleClear}>
+                  Clear
+                </Button>
                 <Button
-                  className="bg-gradient-to-r from-blue-600 to-red-600 text-white font-semibold shadow-md hover:opacity-90 transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-md hover:opacity-90 transition-all"
                   size="lg"
                   type="submit"
-                  isLoading={loading} // ✅ Correct prop
+                  isLoading={loading}
                   disabled={loading}
                 >
                   Submit Complaint
