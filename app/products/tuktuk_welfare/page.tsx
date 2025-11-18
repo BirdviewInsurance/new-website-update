@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import {
@@ -397,7 +397,17 @@ const TuktukWelfareContent: React.FC = () => {
 /** ✅ Wrap in HeroUIProvider for full theme consistency */
 const TuktukWelfare: React.FC = () => (
   <HeroUIProvider>
-    <TuktukWelfareContent />
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-600 text-lg">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <TuktukWelfareContent />
+    </Suspense>
   </HeroUIProvider>
 );
 
