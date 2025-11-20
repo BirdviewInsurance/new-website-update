@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function TukTukAccidentPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/tuktuk_welfare"
       ctaText="Get Accident & Property Cover"
       description="Protect your TukTuk and its passengers with coverage for accidents and property damage, reducing financial risks while ensuring quick recovery from incidents."
       features={[
@@ -15,7 +15,7 @@ export default function TukTukAccidentPage() {
         "Quick claims processing",
         "Individual and corporate fleet plans",
       ]}
-      imageSrc="/images/tuktuk-accident.jpg"
+      imageSrc="/images/product-photos/tuktuk-accident.jpg"
       subtitle="Coverage for Accidents and TukTuk Assets"
       title="Accident & Property Damage"
     />

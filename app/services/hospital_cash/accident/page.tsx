@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function AccidentHospitalPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/hospital_cash"
       ctaText="Enroll in Accident Cover"
       description="Accident Hospitalization cover ensures fast financial assistance for hospital stays resulting from accidents, helping you focus on recovery rather than costs."
       features={[

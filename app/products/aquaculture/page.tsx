@@ -132,45 +132,53 @@ export default function AquacultureInsurance() {
     <div className="bg-[#f4f7fa] min-h-screen px-4 md:px-12 py-12">
       {/* Hero Section */}
       <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto relative rounded-3xl overflow-hidden shadow-lg mb-16"
         initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-7xl mx-auto relative rounded-3xl overflow-hidden shadow-2xl mb-20"
       >
         <div
-          className="relative h-[420px] flex flex-col justify-center items-center text-center bg-cover bg-center"
+          className="relative h-[500px] flex flex-col justify-center items-center text-center 
+               bg-cover bg-center"
           style={{
             backgroundImage: "url('/assets/productsPhotos/bg_aqua.jpg')",
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-700/70 to-blue-600/70" />
+          {/* Deep corporate aqua-blue overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r 
+      from-blue-900/80 via-blue-800/70 to-blue-600/80" />
 
-          {/* Water wave background animation */}
+          {/* Glass shimmer effect */}
+          <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]" />
+
+          {/* Floating light particles (premium brand effect) */}
           <motion.div
-            animate={{ y: [0, 20, 0] }}
-            className="absolute bottom-0 w-full h-40 bg-blue-400 opacity-20 blur-3xl"
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0"
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 6, repeat: Infinity }}
+          >
+            <div className="absolute w-72 h-72 bg-blue-300/10 blur-[90px] rounded-full top-10 left-10" />
+            <div className="absolute w-64 h-64 bg-cyan-300/10 blur-[80px] rounded-full bottom-10 right-10" />
+          </motion.div>
+
+          {/* Soft moving water wave base */}
+          <motion.div
+            animate={{ y: [0, 30, 0], opacity: [0.25, 0.35, 0.25] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-0 w-full h-48 bg-blue-400/20 blur-3xl"
           />
 
-          <div className="relative z-10 text-white max-w-2xl px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
-              Protect Your Aquaculture Investment
+          {/* Main content */}
+          <div className="relative z-10 text-white max-w-3xl px-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 drop-shadow-xl leading-tight">
+              Aquaculture Insurance for a
+              <span className="text-red-400"> Safer Future</span>
             </h1>
-            <p className="text-gray-200 mb-6 leading-relaxed">
-              Secure guaranteed returns, safeguard your fish stock, and protect
-              your infrastructure with{" "}
-              <span className="font-semibold text-white">
-                AQUABIMA Insurance
-              </span>
-              .
+
+            <p className="text-gray-200 text-lg md:text-xl mb-8 leading-relaxed drop-shadow-md">
+              Protect your ponds, fish stock, feeds, tanks, and infrastructure with
+              <span className="font-semibold text-white"> AQUABIMA Insurance</span>.
+              Designed for fish farmers who demand stability, safety, and guaranteed returns.
             </p>
-            <Button
-              className="rounded-full px-8 py-3 font-semibold shadow-lg bg-gradient-to-r from-blue-700 to-blue-500"
-              color="primary"
-              size="lg"
-              onClick={() => setOpenModal(true)}
-            >
-              Submit Insurance Request
-            </Button>
           </div>
         </div>
       </motion.div>
@@ -346,6 +354,7 @@ export default function AquacultureInsurance() {
           <ModalFooter className="flex justify-between">
             <Button
               color="secondary"
+              className="bg-red-600 text-white hover:bg-red-500 font-semibold"
               onClick={() =>
                 setForm({ name: "", email: "", phone: "", request: "" })
               }
@@ -355,6 +364,7 @@ export default function AquacultureInsurance() {
             <Button
               color={success ? "success" : "primary"}
               disabled={loading || success}
+              className="bg-blue-600 text-white hover:bg-blue-500 font-semibold"
               onClick={handleSubmit}
             >
               {loading ? "Submitting..." : success ? "Submitted!" : "Submit"}

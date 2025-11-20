@@ -105,11 +105,11 @@ export default function Page() {
         ]}
         cta={{
           label: "Request Emergency Assistance",
-          href: "/Contact/emergency",
+          href: "/contact-us",
         }}
         ctaSecondary={{
           label: "Get a Quote",
-          href: "/Products/evacuation-repatriation/quote",
+          href: "https://quote.birdviewinsurance.com/?ProductID=1",
         }}
         eligibility={{
           heading: "Eligible members",

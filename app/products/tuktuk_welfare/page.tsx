@@ -370,7 +370,7 @@ const TuktukWelfareContent: React.FC = () => {
                 size="lg"
                 onClick={() =>
                 (window.location.href =
-                  "https://quote.birdviewinsurance.com/?ProductID=4")
+                  "https://partners.birdviewinsurance.com/auth/login")
                 }
               >
                 Get Your TukTuk Cover
@@ -381,7 +381,7 @@ const TuktukWelfareContent: React.FC = () => {
                 size="lg"
                 variant="bordered"
                 onClick={() =>
-                  window.open("https://birdviewmicroinsurance.com/partners")
+                  window.open("https://partners.birdviewinsurance.com/auth/login")
                 }
               >
                 Partner With Us

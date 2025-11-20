@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function RepatriationPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/evacuation_and_repatriation"
       ctaText="Arrange Repatriation"
       description="We ensure safe and dignified repatriation of loved ones to their home country, handling all logistics and documentation with care and professionalism."
       features={[
@@ -15,7 +15,7 @@ export default function RepatriationPage() {
         "Swift, respectful transport of remains",
         "Customizable corporate and personal plans",
       ]}
-      imageSrc="/images/evacuation-repatriation.jpg"
+      imageSrc="/images/product-photos/evacuation-repatriation.jpg"
       subtitle="Dignified & Respectful Services"
       title="Repatriation of Remains"
     />

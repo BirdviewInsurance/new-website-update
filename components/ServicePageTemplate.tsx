@@ -70,7 +70,8 @@ export const ServicePageTemplate: React.FC<ServicePageTemplateProps> = ({
             width={500}
           />
           <Button
-            className="border-white text-white hover:bg-white/10 font-medium px-8 py-3 rounded-xl"
+            as="a"
+            className="border-white text-white hover:bg-red-500 font-medium px-8 py-3 rounded-xl"
             color="primary"
             href={ctaHref}
             size="lg"
@@ -104,7 +105,8 @@ export const ServicePageTemplate: React.FC<ServicePageTemplateProps> = ({
             Get in touch with our team today and customize your insurance plan.
           </p>
           <Button
-            className="border-white text-white hover:bg-white/10 font-medium px-8 py-3 rounded-xl"
+            as="a"
+            className="border-white text-white hover:bg-red-500 font-medium px-8 py-3 rounded-xl"
             color="primary"
             href={ctaHref}
             size="lg"

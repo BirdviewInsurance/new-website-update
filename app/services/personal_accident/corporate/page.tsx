@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function CorporateAccidentPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/personal_accident"
       ctaText="Enroll Your Employees"
       description="Provide your workforce with comprehensive accident protection. Our Corporate Accident Cover safeguards employees and enhances corporate responsibility and morale."
       features={[
@@ -15,7 +15,7 @@ export default function CorporateAccidentPage() {
         "Customizable corporate packages",
         "Dedicated account and claims management",
       ]}
-      imageSrc="/images/accident-corporate.jpg"
+      imageSrc="/images/product-photos/accident-corporate.jpg"
       subtitle="Employee Safety and Welfare"
       title="Corporate Accident Cover"
     />

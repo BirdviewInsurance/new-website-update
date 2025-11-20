@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function CorporateMedicalPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/medical"
       ctaText="Enroll Your Employees"
       description="Provide your employees with comprehensive health benefits through our Corporate & SME Medical Plans, designed to boost productivity and safeguard workforce wellness."
       features={[
@@ -15,7 +15,7 @@ export default function CorporateMedicalPage() {
         "Simplified claims management for HR teams",
         "24/7 dedicated corporate support",
       ]}
-      imageSrc="/images/medical-corporate.jpg"
+      imageSrc="/Events/SLVA8028.jpg"
       subtitle="Health Insurance for Businesses and Employees"
       title="Corporate & SME Plans"
     />

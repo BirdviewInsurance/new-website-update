@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function EmergencyEvacuationPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/evacuation_and_repatriation"
       ctaText="Request Emergency Evacuation"
       description="Our Emergency Medical Evacuation service ensures critical medical emergencies are handled swiftly, transporting you or your loved ones to the nearest medical facility with utmost care."
       features={[
@@ -15,7 +15,7 @@ export default function EmergencyEvacuationPage() {
         "Expert medical personnel onboard",
         "Customizable evacuation plans for individuals & corporate clients",
       ]}
-      imageSrc="/images/evacuation-emergency.jpg"
+      imageSrc="/images/product-photos/evacuation-emergency.jpg"
       subtitle="Rapid Response, Global Coverage"
       title="Emergency Medical Evacuation"
     />

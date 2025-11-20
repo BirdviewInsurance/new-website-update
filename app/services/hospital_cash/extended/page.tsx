@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function ExtendedStayPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/hospital_cash"
       ctaText="Get Extended Coverage"
       description="Our Extended Stay Benefit covers prolonged hospitalizations, ensuring that you or your loved ones have financial support for extended treatment periods."
       features={[

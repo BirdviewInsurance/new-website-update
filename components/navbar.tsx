@@ -350,10 +350,6 @@ export const Navbar = () => {
             label: "Accident & Injury Cover",
             href: "/services/bodaboda_welfare/accident",
           },
-          {
-            label: "Funeral & Repatriation",
-            href: "/services/bodaboda_welfare/funeral",
-          },
         ],
       },
       {
@@ -367,10 +363,6 @@ export const Navbar = () => {
             label: "Accident & Property Damage",
             href: "/services/tuktuk_welfare/accident",
           },
-          {
-            label: "Medical & Last Expense",
-            href: "/services/tuktuk_welfare/medical",
-          },
         ],
       },
       {
@@ -378,15 +370,15 @@ export const Navbar = () => {
         links: [
           {
             label: "Job Risk Protection",
-            href: "/services/probation/job-protection",
+            href: "/services/probation_guard/job-protection",
           },
           {
             label: "Medical & Injury Cover",
-            href: "/services/probation/medical",
+            href: "/services/probation_guard/medical",
           },
           {
             label: "Life & Accident Benefits",
-            href: "/services/probation/life-benefits",
+            href: "/services/probation_guard/life-benefits",
           },
         ],
       },
@@ -395,12 +387,12 @@ export const Navbar = () => {
         links: [
           {
             label: "Fishermen Welfare Cover",
-            href: "/services/aquabima/fishermen",
+            href: "/services/aquaculture/fishermen",
           },
-          { label: "Marine Accident Cover", href: "/services/aquabima/marine" },
+          { label: "Marine Accident Cover", href: "/services/aquaculture/marine" },
           {
             label: "Fishing Equipment Protection",
-            href: "/services/aquabima/equipment",
+            href: "/services/aquaculture/equipment",
           },
         ],
       },

@@ -15,7 +15,7 @@ export default function MarineAccidentPage() {
         "Financial assistance for families",
         "Flexible individual and group plans",
       ]}
-      imageSrc="/images/aquabima-marine.jpg"
+      imageSrc="/images/praquabima-marine.jpg"
       subtitle="Safety on Water for Fishermen & Crews"
       title="Marine Accident Cover"
     />

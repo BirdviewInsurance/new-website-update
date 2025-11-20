@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function DailyHospitalPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/hospital_cash"
       ctaText="Apply for Daily Benefit"
       description="Receive daily cash payouts to help cover hospital expenses, transportation, and daily needs during hospitalization. Our plan ensures financial relief when you need it most."
       features={[

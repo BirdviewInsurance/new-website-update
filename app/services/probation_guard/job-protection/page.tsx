@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function JobRiskProtectionPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/probation_guard"
       ctaText="Get Job Risk Protection"
       description="Our Job Risk Protection plan ensures financial security for individuals on probation or new employment, protecting against unforeseen employment-related risks."
       features={[
@@ -15,7 +15,7 @@ export default function JobRiskProtectionPage() {
         "Quick claims and assistance",
         "Flexible individual and corporate plans",
       ]}
-      imageSrc="/images/probation-job.jpg"
+      imageSrc="/images/product-photos/probation-job.jpg"
       subtitle="Safeguarding Your Career & Income"
       title="Job Risk Protection"
     />

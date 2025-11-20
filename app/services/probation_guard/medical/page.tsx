@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function ProbationMedicalPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/probation_guard"
       ctaText="Enroll in Medical & Injury Cover"
       description="Our Probation Medical & Injury Cover provides comprehensive healthcare and injury protection for individuals during probation or new employment periods."
       features={[
@@ -15,7 +15,7 @@ export default function ProbationMedicalPage() {
         "Fast claims and support",
         "Customizable coverage for individuals and corporate teams",
       ]}
-      imageSrc="/images/probation-medical.jpg"
+      imageSrc="/images/product-photos/probation-medical.jpg"
       subtitle="Protecting Health During Employment"
       title="Medical & Injury Cover"
     />

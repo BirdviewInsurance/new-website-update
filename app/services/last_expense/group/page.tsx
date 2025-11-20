@@ -6,7 +6,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function CorporateGroupPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/last_expense"
       ctaText="Enroll Your Company"
       description="Provide employees with peace of mind through corporate group last expense plans, covering funeral and emergency support for your workforce."
       features={[
@@ -16,7 +16,7 @@ export default function CorporateGroupPage() {
         "Fast claims and reporting",
         "Dedicated account management",
       ]}
-      imageSrc="/images/last-expense-group.jpg"
+      imageSrc="/images/product-photos/last-expense-group.jpg"
       subtitle="Comprehensive Group Coverage for Companies"
       title="Corporate Group Last Expense"
     />
