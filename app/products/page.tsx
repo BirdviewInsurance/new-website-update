@@ -377,7 +377,7 @@ export default function ProductsPage() {
                         </p>
                         <Link
                             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-primary font-semibold hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl"
-                            href="/Contact"
+                            href="/contact-us"
                         >
                             <span>Contact Us</span>
                             <ArrowRight className="w-5 h-5" />
