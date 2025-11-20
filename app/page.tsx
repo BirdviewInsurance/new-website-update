@@ -416,7 +416,7 @@ export default function Home() {
             {/* Get Covered Today button */}
             <Link
               className="relative px-6 py-3 rounded-full text-white font-semibold bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-500 shadow-lg"
-              href={(siteConfig.links as any)?.getQuote || "#"}
+              href={(siteConfig.links as any)?.getQuote || "https://quote.birdviewinsurance.com/"}
             >
               Get Covered Today
             </Link>
@@ -426,7 +426,7 @@ export default function Home() {
               {/* Explore Plans button */}
               <Link
                 className="relative px-6 py-3 rounded-full text-white font-semibold bg-red-600 hover:bg-red-700 hover:scale-105 transition-all duration-500 shadow-lg"
-                href={(siteConfig.links as any)?.services || "#"}
+                href="/products"
               >
                 Explore Plans
               </Link>
@@ -618,9 +618,8 @@ export default function Home() {
           >
             {showAllProducts ? "Show Less" : "Show More"}
             <svg
-              className={`w-5 h-5 transform transition-transform duration-300 ${
-                showAllProducts ? "rotate-180" : ""
-              }`}
+              className={`w-5 h-5 transform transition-transform duration-300 ${showAllProducts ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
