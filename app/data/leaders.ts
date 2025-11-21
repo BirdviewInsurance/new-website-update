@@ -112,6 +112,20 @@ export const allLeaders = [
     },
   },
   {
+    name: "Eve Wanjira",
+    slug: "eve-wanjira",
+    role: "Head of Strategic Partnerships & Growth",
+    category: "Executive Leadership",
+    bio: "Eve Wanjira is the Head of Strategic Partnerships & Growth at Birdview, where she leads the company’s strategic partnerships and growth initiatives. She holds a Bachelor of Science in Business Administration from the University of Nairobi and a Master of Business Administration from the University of Nairobi. Eve has over 10 years of experience in the insurance sector, including her role as the Head of Strategic Partnerships & Growth at Birdview.",
+    image: "/assets/managementPhotos/Eve-Wanjira.png",
+    cta: {
+      title: "Building Strategic Partnerships",
+      text: "Eve’s strategic partnerships and growth initiatives drive Birdview’s mission forward with purpose.", 
+      button: "Go Back To Leadership",
+      link: "/our-leadership/eve-wanjira",
+    },
+  },
+  {
     name: "Esdor Yahuma",
     slug: "esdor-yahuma",
     role: "Assistant Business Development Manager",

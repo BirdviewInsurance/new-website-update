@@ -250,7 +250,7 @@ export default function Home() {
     {
       title: "Trusted Partner",
       icon: "/icons/trusted.svg",
-      desc: "Over 20 years of experience and reliability.",
+      desc: "Committed to delivering exceptional service and solutions that empower your success at every step.",
     },
     {
       title: "24/7 Support",
