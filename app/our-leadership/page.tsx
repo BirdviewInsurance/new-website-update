@@ -85,7 +85,7 @@ export default function OurLeadership() {
   const [isDarkImage, setIsDarkImage] = useState(false);
 
   // hero image path (replace if needed)
-  const heroImage = "/assets/backgroundPhotes/bg-hero1.jpg";
+  const heroImage = "/assets/backgroundPhotes/bg-hero.png";
   const ctaImage = "/assets/backgroundPhotes/cta-banner.jpg";
 
   // ---------- Auto-contrast (compute average brightness) ----------
@@ -409,17 +409,32 @@ export default function OurLeadership() {
 
       {/* 🌍 Values Section */}
       <motion.div
-        className="text-center space-y-6 mt-32 max-w-3xl mx-auto"
+        className="relative max-w-3xl mx-auto mt-32 p-10 bg-white/90 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl text-center overflow-hidden"
         id="values"
         initial={{ opacity: 0, y: 60 }}
-        transition={{ duration: 0.9 }}
+        transition={{ duration: 1, ease: "easeOut" }}
         viewport={{ once: true }}
         whileInView={{ opacity: 1, y: 0 }}
       >
-        <Globe2 className="w-10 h-10 mx-auto text-blue-600 dark:text-blue-400" />
-        <h2 className="text-3xl font-semibold text-gray-800 dark:text-white">Our Values</h2>
-        <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
-          At the core of our business lies a commitment to integrity, inclusivity, and innovation. We foster a culture where every decision is guided by transparency and accountability, ensuring that our clients and partners feel valued and supported at every step. By embracing diverse perspectives and pioneering solutions, we create meaningful experiences that uplift communities, drive sustainable growth, and strengthen the shared future of everyone we serve.
+        {/* Decorative quotation marks */}
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-blue-600 dark:text-blue-400 text-[6rem] font-serif opacity-10 select-none">
+          &ldquo;
+        </div>
+        <div className="absolute -bottom-10 right-10 text-red-600 dark:text-red-400 text-[5rem] font-serif opacity-10 select-none">
+          &rdquo;
+        </div>
+
+        {/* Icon */}
+        <Globe2 className="w-12 h-12 mx-auto text-blue-600 dark:text-blue-400 mb-4 drop-shadow-md" />
+
+        {/* Heading */}
+        <h2 className="text-3xl sm:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
+          Our Values
+        </h2>
+
+        {/* Quote-style message */}
+        <p className="relative text-lg sm:text-xl leading-relaxed text-gray-700 dark:text-gray-300 italic before:content-['“'] before:text-blue-600 before:text-4xl before:align-top before:mr-2 after:content-['”'] after:text-red-600 after:text-4xl after:align-bottom after:ml-2">
+          At the heart of our company lies unwavering integrity, visionary innovation, and genuine inclusivity. Every choice we make is rooted in transparency and accountability, ensuring our clients and partners always feel empowered and supported. By embracing diverse perspectives and pioneering smarter solutions, we create meaningful experiences that uplift communities, drive sustainable growth, and strengthen the shared future of everyone we serve.
         </p>
       </motion.div>
 
