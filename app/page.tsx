@@ -190,13 +190,13 @@ export default function Home() {
       title: "Motorbike/Bodaboda Insurance Welfare Cover",
       slug: "bodaboda_welfare",
       img: "/assets/productsPhotos/motorbike.jpg",
-      desc: "Covers your motorbike against damage, theft, or loss, including third-party liability.",
+      desc: "Health Insurace cover for BodaBoda riders.",
     },
     {
       title: "TukTuk Insurance Welfare Cover",
       slug: "tuktuk_welfare",
       img: "/assets/productsPhotos/tuktuk.png",
-      desc: "This insurance offers both Third Party and Comprehensive cover—protecting against damage or loss, third party liability.",
+      desc: "Health Insurance cover for TukTuk drivers.",
     },
     {
       title: "Probation Guard",
