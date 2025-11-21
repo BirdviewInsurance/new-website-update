@@ -634,7 +634,7 @@ export const Navbar = () => {
         title: "Our Team",
         links: [
           { label: "Board of Directors", href: "/our-leadership#board" },
-          { label: "Executive Team", href: "/our-leadership#executive" },
+          { label: "Executive Team", href: "/our-leadership#executives" },
           { label: "Advisors", href: "/our-leadership#advisors" },
         ],
       },

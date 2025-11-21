@@ -251,6 +251,39 @@ export default function OurLeadership() {
     };
   }, []);
 
+  // ---------- Hash navigation handler ----------
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = window.location.hash.slice(1); // Remove the #
+      if (hash) {
+        // Wait for the page to render
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            const navbarHeight = 100; // Approximate navbar height
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - navbarHeight;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth",
+            });
+          }
+        }, 100);
+      }
+    };
+
+    // Handle hash on mount
+    handleHashNavigation();
+
+    // Handle hash changes (e.g., when clicking links)
+    window.addEventListener("hashchange", handleHashNavigation);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashNavigation);
+    };
+  }, []);
+
   // ---------- Utility: responsive clamp values via inline style (tailwind can't clamp dynamic strings easily) ----------
   const heroTitleStyle: React.CSSProperties = {
     // example: clamp(2.25rem, 5vw + 1rem, 3.75rem)
@@ -334,7 +367,7 @@ export default function OurLeadership() {
           data: board,
         },
         {
-          id: "executive",
+          id: "executives",
           title: "Executive Team",
           icon: <Users2 className="text-red-600 w-8 h-8" />,
           data: executives,
