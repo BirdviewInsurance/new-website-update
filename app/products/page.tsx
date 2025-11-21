@@ -73,7 +73,7 @@ const allProducts: Product[] = [
         slug: "bodaboda_welfare",
         route: "/products/bodaboda_welfare",
         img: "/assets/productsPhotos/motorbike.jpg",
-        desc: "Covers your motorbike against damage, theft, or loss, including third-party liability.",
+        desc: "Health Insurance cover for Bodaboda riders",
         category: "Vehicle/Motor",
     },
     {
@@ -81,7 +81,7 @@ const allProducts: Product[] = [
         slug: "tuktuk_welfare",
         route: "/products/tuktuk_welfare",
         img: "/assets/productsPhotos/tuktuk.png",
-        desc: "This insurance offers both Third Party and Comprehensive cover—protecting against damage or loss, third party liability.",
+        desc: "Health Insurance cover for Tuktuk drivers",
         category: "Vehicle/Motor",
     },
     {
