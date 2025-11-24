@@ -5,7 +5,7 @@ import { ServicePageTemplate } from "@/components/ServicePageTemplate";
 export default function MarineAccidentPage() {
   return (
     <ServicePageTemplate
-      ctaHref="/contact"
+      ctaHref="/products/aquaculture"
       ctaText="Get Marine Accident Cover"
       description="Our Marine Accident Cover protects fishermen and marine workers against accidents on the water, including injuries, hospitalization, and emergency evacuation."
       features={[
@@ -15,7 +15,7 @@ export default function MarineAccidentPage() {
         "Financial assistance for families",
         "Flexible individual and group plans",
       ]}
-      imageSrc="/images/praquabima-marine.jpg"
+      imageSrc="/images/product-photos/aquabima-marine.jpg"
       subtitle="Safety on Water for Fishermen & Crews"
       title="Marine Accident Cover"
     />
