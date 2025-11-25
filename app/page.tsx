@@ -826,29 +826,47 @@ export default function Home() {
       </Card>
 
       {/* Quick Quote CTA */}
-      <div className="w-full bg-gradient-to-r from-primary to-violet to-danger py-24 text-center text-white relative z-20">
-        <h2 className="text-3xl md:text-5xl font-bold mb-6">
-          Ready to Protect What Matters Most?
-        </h2>
-        <p className="text-lg md:text-xl mb-8">
-          Get your personalized insurance quote in minutes.
-        </p>
-        <div className="flex justify-center gap-6 flex-wrap">
-          <Link
-            className="px-8 py-4 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition"
-            href={
-              (siteConfig.links as any)?.getQuote ||
-              "https://quote.birdviewinsurance.com/"
-            }
-          >
-            Get a Quote
-          </Link>
-          <Link
-            className="px-8 py-4 rounded-full bg-danger text-white font-semibold shadow-lg hover:bg-danger/90 transition"
-            href={(siteConfig.links as any)?.contact || "#"}
-          >
-            Contact Us
-          </Link>
+      {/* <div className="w-full bg-gradient-to-r from-primary to-violet to-danger py-24 text-center text-white relative z-20"> <h2 className="text-3xl md:text-5xl font-bold mb-6"> Ready to Protect What Matters Most? </h2> <p className="text-lg md:text-xl mb-8"> Get your personalized insurance quote in minutes. </p> <div className="flex justify-center gap-6 flex-wrap"> <Link className="px-8 py-4 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition" href={(siteConfig.links as any)?.getQuote || "https://quote.birdviewinsurance.com/"} > Get a Quote </Link> <Link className="px-8 py-4 rounded-full bg-danger text-white font-semibold shadow-lg hover:bg-danger/90 transition" href={(siteConfig.links as any)?.contact || "#"} > Contact Us </Link> </div> </div> */}
+      <div className="relative w-full h-[500px] md:h-[650px] overflow-hidden">
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover brightness-[0.45]"
+        >
+          <source src="/videos/insurance-hero.mp4" type="video/mp4" />
+          {/* Add fallback text */}
+        </video>
+
+        {/* Overlay Content */}
+        <div className="relative z-20 flex flex-col items-center justify-center text-center text-white h-full px-4">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            Ready to Protect What Matters Most?
+          </h2>
+          <p className="text-lg md:text-xl mb-8">
+            Get your personalized insurance quote in minutes.
+          </p>
+
+          <div className="flex justify-center gap-6 flex-wrap">
+            <Link
+              className="px-8 py-4 rounded-full bg-primary text-white font-semibold shadow-lg hover:bg-primary/90 transition"
+              href={
+                (siteConfig.links as any)?.getQuote ||
+                "https://quote.birdviewinsurance.com/"
+              }
+            >
+              Get a Quote
+            </Link>
+
+            <Link
+              className="px-8 py-4 rounded-full bg-danger text-white font-semibold shadow-lg hover:bg-danger/90 transition"
+              href={(siteConfig.links as any)?.contact || "contact-us"}
+            >
+              Contact Us
+            </Link>
+          </div>
         </div>
       </div>
 
